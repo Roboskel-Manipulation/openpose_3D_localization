@@ -19,9 +19,9 @@
 #include <chrono> // `std::chrono::` functions and classes, e.g. std::chrono::milliseconds
 #include <thread> // std::this_thread
 
-#include <openpose.h>
-#include <openpose_ros_io.h>
-#include <gflags_options.h>
+#include <openpose.hpp>
+#include <openpose_ros_io.hpp>
+#include <gflags_options.hpp>
 
 int openPoseROS()
 {

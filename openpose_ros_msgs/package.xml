@@ -4,11 +4,14 @@
   <version>1.2.1</version>
   <description>The openpose_ros_msgs package</description>
 
-  <maintainer email="kevinleezhang@gmail.com">Kevin Zhang</maintainer>
+  <maintainer email="yorgosk@email.com">yorgosk</maintainer>
 
   <license>MIT</license>
 
-  <url type="website">https://github.com/firephinx/openpose_ros</url>
+  <url type="website">https://github.com/yorgosk/openpose_ros</url>
+
+  <author email="kevinleezhang@gmail.com">Kevin Zhang</author>
+  <author email="yorgosk@email.com">yorgosk</author>
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>roscpp</build_depend>

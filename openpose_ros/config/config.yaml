@@ -1,0 +1,5 @@
+image_topic: "/camera/image_raw"
+output_topic: "/openpose_ros/human_list"
+display_output: true
+print_keypoints: false
+video_fps: 10

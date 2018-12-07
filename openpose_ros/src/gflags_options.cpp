@@ -1,4 +1,4 @@
-#include <gflags_options.h>
+#include <gflags_options.hpp>
 
 // See all the available parameter options withe the `--help` flag. E.g. `build/examples/openpose/openpose.bin --help`
 // Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose

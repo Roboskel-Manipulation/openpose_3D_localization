@@ -1,7 +1,7 @@
 #ifndef _OPENPOSE
 #define _OPENPOSE
 
-#include <gflags_options.h>
+#include <gflags_options.hpp>
 
 // OpenPose dependencies
 #include <openpose/headers.hpp>
@@ -23,15 +23,21 @@ namespace openpose_ros {
             const bool multipleView;
             const bool enableGoogleLogging;
 
-            op::Wrapper<std::vector<op::Datum>> opWrapper;
+            op::Wrapper/*<std::vector<op::Datum>>*/ opWrapper;
 
             const op::WrapperStructPose wrapperStructPose;
             const op::WrapperStructFace wrapperStructFace;
             const op::WrapperStructHand wrapperStructHand;
 
             const op::DisplayMode displayMode;
-            const bool guiVerbose;
-            const bool fullScreen;
+            const bool cliVerbose;
+            const std::string writeCocoFootJson;
+            const int writeCocoJsonVariant;
+            const double writeVideoFps;
+            const std::string writeVideoAdam;
+            const std::string writeBvh;
+            const std::string udpHost;
+            const std::string udpPort;
 
             const op::WrapperStructOutput wrapperStructOutput;
 

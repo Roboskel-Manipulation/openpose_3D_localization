@@ -20,7 +20,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 find_package(OpenCV REQUIRED)
 find_package(GFlags)
 find_package(Glog)
-find_package(OpenPose REQUIRED)
+find_package(/usr/local/lib/OpenPose/OpenPose REQUIRED)
 
 catkin_package(
    INCLUDE_DIRS include
