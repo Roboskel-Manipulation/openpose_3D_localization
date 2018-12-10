@@ -6,8 +6,8 @@
 // OpenPose dependencies
 #include <openpose/headers.hpp>
 
-namespace openpose_ros {
-
+namespace openpose_ros
+{
     class OpenPose
     {
         private:
