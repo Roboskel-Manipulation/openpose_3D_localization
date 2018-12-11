@@ -21,6 +21,8 @@
 // OpenPose dependencies
 #include <openpose/headers.hpp>
 
+#include <cstdlib>
+
 namespace openpose_ros {
 
     class OpenPoseROSIO
@@ -32,6 +34,9 @@ namespace openpose_ros {
             image_transport::Subscriber image_sub_;
             cv_bridge::CvImagePtr cv_img_ptr_;
             std_msgs::Header image_header_;
+            ros::Subscriber depth_sub_;
+            float* depths_ptr_;
+            int img_width_;
 
             OpenPose* openpose_;
 
@@ -56,6 +61,8 @@ namespace openpose_ros {
             ~OpenPoseROSIO(){}
 
             void processImage(const sensor_msgs::ImageConstPtr& msg);
+
+            void storeDepth(const sensor_msgs::Image::ConstPtr& msg);
 
             void convertImage(const sensor_msgs::ImageConstPtr& msg);
 

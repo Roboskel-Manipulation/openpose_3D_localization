@@ -70,7 +70,7 @@ DEFINE_bool(part_candidates,            false,          "Also enable `write_json
                                                         " slightly decrease. Not required for OpenPose, enable it only if you intend to explicitly"
                                                         " use this information.");
 // OpenPose Face
-DEFINE_bool(face,                       false,          "Enables face keypoint detection. It will share some parameters from the body pose, e.g."
+DEFINE_bool(face,                       true,          "Enables face keypoint detection. It will share some parameters from the body pose, e.g."
                                                         " `model_folder`. Note that this will considerable slow down the performance and increse"
                                                         " the required GPU memory. In addition, the greater number of people on the image, the"
                                                         " slower OpenPose will be.");
@@ -78,7 +78,7 @@ DEFINE_string(face_net_resolution,      "368x368",      "Multiples of 16 and squ
                                                         " detector. 320x320 usually works fine while giving a substantial speed up when multiple"
                                                         " faces on the image.");
 // OpenPose Hand
-DEFINE_bool(hand,                       false,          "Enables hand keypoint detection. It will share some parameters from the body pose, e.g."
+DEFINE_bool(hand,                       true,          "Enables hand keypoint detection. It will share some parameters from the body pose, e.g."
                                                         " `model_folder`. Analogously to `--face`, it will also slow down the performance, increase"
                                                         " the required GPU memory and its speed depends on the number of people.");
 DEFINE_string(hand_net_resolution,      "368x368",      "Multiples of 16 and squared. Analogous to `net_resolution` but applied to the hand keypoint"
@@ -93,7 +93,7 @@ DEFINE_bool(hand_tracking,              false,          "Adding hand tracking mi
                                                         " simply looks for hands in positions at which hands were located in previous frames, but"
                                                         " it does not guarantee the same person ID among frames.");
 // OpenPose 3-D Reconstruction
-DEFINE_bool(3d,                         false,          "Running OpenPose 3-D reconstruction demo: 1) Reading from a stereo camera system."
+DEFINE_bool(3d,                         true,          "Running OpenPose 3-D reconstruction demo: 1) Reading from a stereo camera system."
                                                         " 2) Performing 3-D reconstruction from the multiple views. 3) Displaying 3-D reconstruction"
                                                         " results. Note that it will only display 1 person. If multiple people is present, it will"
                                                         " fail.");

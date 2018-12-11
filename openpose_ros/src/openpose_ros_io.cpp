@@ -7,9 +7,11 @@ OpenPoseROSIO::OpenPoseROSIO(OpenPose &openPose): nh_("/openpose_ros_node"), it_
     // Subscribe to input video feed and publish human lists as output
     std::string image_topic;
     std::string output_topic;
+    std::string depth_topic;
 
     nh_.param("image_topic", image_topic, std::string("/usb_cam/image_raw"));
     nh_.param("output_topic", output_topic, std::string("/openpose_ros/human_list"));
+    nh_.param("depth_topic", depth_topic, std::string("/zed/depth/depth_registered"));
     nh_.param("display_output", display_output_flag_, true);
     nh_.param("print_keypoints", print_keypoints_flag_, false);
     nh_.param("save_original_video", save_original_video_flag_, false);
@@ -18,9 +20,12 @@ OpenPoseROSIO::OpenPoseROSIO(OpenPose &openPose): nh_("/openpose_ros_node"), it_
     nh_.param("openpose_video_file_name", openpose_video_file_name_, std::string(""));
     nh_.param("video_fps", video_fps_, 10);
 
+    depth_sub_ = nh_.subscribe("/zed/depth/depth_registered", 10, &OpenPoseROSIO::storeDepth, this);
     image_sub_ = it_.subscribe(image_topic, 1, &OpenPoseROSIO::processImage, this);
     openpose_human_list_pub_ = nh_.advertise<openpose_ros_msgs::OpenPoseHumanList>(output_topic, 10);
     cv_img_ptr_ = nullptr;
+    depths_ptr_ = nullptr;
+    img_width_ = 0;
     openpose_ = &openPose;
 
     if(save_original_video_flag_)
@@ -49,8 +54,38 @@ OpenPoseROSIO::OpenPoseROSIO(OpenPose &openPose): nh_("/openpose_ros_node"), it_
     }
 }
 
+void OpenPoseROSIO::storeDepth(const sensor_msgs::Image::ConstPtr& msg)
+{
+    free(depths_ptr_);
+    depths_ptr_ = nullptr;
+    // Get a pointer to the depth values casting the data
+    // pointer to floating point
+    size_t size = msg->width * msg->height;
+    depths_ptr_ = (float*) malloc(size * sizeof(float));
+    // memcpy(depths_ptr_, (float*) &msg->data[0], size);
+    for (size_t i = 0; i < size; i++)
+        depths_ptr_[i] = (float)(msg->data[i]);
+
+    img_width_ = msg->width;
+
+    // Image coordinates of the center pixel
+    int u = img_width_ / 2;
+    int v = msg->height / 2;
+
+    // Linear index of the center pixel
+    int centerIdx = u + img_width_ * v;
+
+    // Output the measure
+    ROS_INFO("Center distance : %g m", depths_ptr_[centerIdx]);
+    ROS_INFO("Center image coordinates : (%d, %d) m", u, v);
+    ROS_INFO("width: %d px, height: %d px", img_width_, msg->height);
+}
+
 void OpenPoseROSIO::processImage(const sensor_msgs::ImageConstPtr& msg)
 {
+    if (!depths_ptr_)
+        return;
+
     convertImage(msg);
     std::shared_ptr<std::vector<op::Datum>> datumToProcess = createDatum();
 
@@ -238,6 +273,9 @@ void OpenPoseROSIO::printKeypoints(const std::shared_ptr<std::vector<op::Datum>>
 
 void OpenPoseROSIO::publish(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr)
 {
+    if (!depths_ptr_)
+        return;
+
     if (datumsPtr != nullptr && !datumsPtr->empty() && !FLAGS_body_disable)
     {
         const auto& poseKeypoints = datumsPtr->at(0).poseKeypoints;
@@ -256,6 +294,7 @@ void OpenPoseROSIO::publish(const std::shared_ptr<std::vector<op::Datum>>& datum
         for (auto person = 0 ; person < poseKeypoints.getSize(0) ; person++)
         {
             openpose_ros_msgs::OpenPoseHuman human;
+            int keypointIdx = 0;
 
             int num_body_key_points_with_non_zero_prob = 0;
             for (auto bodyPart = 0 ; bodyPart < poseKeypoints.getSize(1) ; bodyPart++)
@@ -267,6 +306,11 @@ void OpenPoseROSIO::publish(const std::shared_ptr<std::vector<op::Datum>>& datum
                 if(body_point_with_prob.prob > 0)
                 {
                     num_body_key_points_with_non_zero_prob++;
+
+                    /* Calculate linear index of the keypoint's pixel */
+                    keypointIdx = (int) body_point_with_prob.x + img_width_ * ((int) body_point_with_prob.y);
+
+                    ROS_INFO("Person %d body keypoint no.%d: (x = %f, y= %f, c = %f), depth = %g", person, bodyPart, body_point_with_prob.x, body_point_with_prob.y, body_point_with_prob.prob, depths_ptr_[keypointIdx]);
                 }
                 human.body_key_points_with_prob.at(bodyPart) = body_point_with_prob;
             }
@@ -285,6 +329,11 @@ void OpenPoseROSIO::publish(const std::shared_ptr<std::vector<op::Datum>>& datum
                     if(face_point_with_prob.prob > 0)
                     {
                         num_face_key_points_with_non_zero_prob++;
+
+                        /* Calculate linear index of the keypoint's pixel */
+                        keypointIdx = (int) face_point_with_prob.x + img_width_ * ((int) face_point_with_prob.y);
+
+                        ROS_INFO("Person %d face keypoint no.%d: (x = %f, y= %f, c = %f), depth = %g", person, facePart, face_point_with_prob.x, face_point_with_prob.y, face_point_with_prob.prob, depths_ptr_[keypointIdx]);
                     }
                     human.face_key_points_with_prob.at(facePart) = face_point_with_prob;
                 }  
@@ -314,6 +363,11 @@ void OpenPoseROSIO::publish(const std::shared_ptr<std::vector<op::Datum>>& datum
                     if(right_hand_point_with_prob.prob > 0)
                     {
                         num_right_hand_key_points_with_non_zero_prob++;
+                        
+                        /* Calculate linear index of the keypoint's pixel */
+                        keypointIdx = (int) right_hand_point_with_prob.x + img_width_ * ((int) right_hand_point_with_prob.y);
+
+                        ROS_INFO("Person %d hand keypoint no.%d (right hand): (x = %f, y= %f, c = %f), depth = %g", person, handPart, right_hand_point_with_prob.x, right_hand_point_with_prob.y, right_hand_point_with_prob.prob, depths_ptr_[keypointIdx]);
                     }
                     left_hand_point_with_prob.x = leftHandKeypoints[{person, handPart, 0}];
                     left_hand_point_with_prob.y = leftHandKeypoints[{person, handPart, 1}];
@@ -321,6 +375,11 @@ void OpenPoseROSIO::publish(const std::shared_ptr<std::vector<op::Datum>>& datum
                     if(left_hand_point_with_prob.prob > 0)
                     {
                         num_left_hand_key_points_with_non_zero_prob++;
+                        
+                        /* Calculate linear index of the keypoint's pixel */
+                        keypointIdx = (int) left_hand_point_with_prob.x + img_width_ * ((int) left_hand_point_with_prob.y);
+
+                        ROS_INFO("Person %d hand keypoint no.%d (left hand): (x = %f, y= %f, c = %f), depth = %g", person, handPart, left_hand_point_with_prob.x, left_hand_point_with_prob.y, left_hand_point_with_prob.prob, depths_ptr_[keypointIdx]);
                     }
                     human.right_hand_key_points_with_prob.at(handPart) = right_hand_point_with_prob;
                     human.left_hand_key_points_with_prob.at(handPart) = left_hand_point_with_prob;
