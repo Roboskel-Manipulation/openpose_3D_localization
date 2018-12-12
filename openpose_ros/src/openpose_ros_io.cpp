@@ -56,26 +56,24 @@ OpenPoseROSIO::OpenPoseROSIO(OpenPose &openPose): nh_("/openpose_ros_node"), it_
 
 void OpenPoseROSIO::storeDepth(const sensor_msgs::Image::ConstPtr& msg)
 {
-    free(depths_ptr_);
-    depths_ptr_ = nullptr;
-    // Get a pointer to the depth values casting the data
-    // pointer to floating point
+    // Use a pointer to the depth values, also cast the data pointer to floating point
     size_t size = msg->width * msg->height;
-    depths_ptr_ = (float*) malloc(size * sizeof(float));
-    // memcpy(depths_ptr_, (float*) &msg->data[0], size);
+    if (!depths_ptr_)
+        depths_ptr_ = (float*) malloc(size * sizeof(float));
+    
     for (size_t i = 0; i < size; i++)
         depths_ptr_[i] = *((float*)(&msg->data[0])+i);
 
     img_width_ = msg->width;
 
     // Image coordinates of the center pixel
-    int u = img_width_ / 2;
-    int v = msg->height / 2;
+    // int u = img_width_ / 2;
+    // int v = msg->height / 2;
 
     // Linear index of the center pixel
-    int centerIdx = u + img_width_ * v;
+    // int centerIdx = u + img_width_ * v;
 
-    // // Output the measure
+    // Output the measure
     // ROS_INFO("Center distance : %g m", depths_ptr_[centerIdx]);
     // ROS_INFO("Center image coordinates : (%d, %d) m", u, v);
     // ROS_INFO("width: %d px, height: %d px", img_width_, msg->height);
@@ -83,9 +81,6 @@ void OpenPoseROSIO::storeDepth(const sensor_msgs::Image::ConstPtr& msg)
 
 void OpenPoseROSIO::processImage(const sensor_msgs::ImageConstPtr& msg)
 {
-    if (!depths_ptr_)
-        return;
-
     convertImage(msg);
     std::shared_ptr<std::vector<op::Datum>> datumToProcess = createDatum();
 
@@ -273,8 +268,8 @@ void OpenPoseROSIO::printKeypoints(const std::shared_ptr<std::vector<op::Datum>>
 
 void OpenPoseROSIO::publish(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr)
 {
-    if (!depths_ptr_)
-        return;
+    while (!depths_ptr_)
+        ros::spinOnce();
 
     if (datumsPtr != nullptr && !datumsPtr->empty() && !FLAGS_body_disable)
     {
@@ -312,7 +307,7 @@ void OpenPoseROSIO::publish(const std::shared_ptr<std::vector<op::Datum>>& datum
 
                     body_point_with_prob.z = depths_ptr_[keypointIdx];
 
-                    ROS_INFO("Person %d body keypoint no.%d: (x = %f, y= %f, c = %f), depth = %g", person, bodyPart, body_point_with_prob.x, body_point_with_prob.y, body_point_with_prob.prob, depths_ptr_[keypointIdx]);
+                    // ROS_INFO("Person %d body keypoint no.%d: (x = %f, y= %f, c = %f), depth = %g", person, bodyPart, body_point_with_prob.x, body_point_with_prob.y, body_point_with_prob.prob, depths_ptr_[keypointIdx]);
                 }
                 human.body_key_points_with_prob.at(bodyPart) = body_point_with_prob;
             }
