@@ -64,7 +64,7 @@ void OpenPoseROSIO::storeDepth(const sensor_msgs::Image::ConstPtr& msg)
     depths_ptr_ = (float*) malloc(size * sizeof(float));
     // memcpy(depths_ptr_, (float*) &msg->data[0], size);
     for (size_t i = 0; i < size; i++)
-        depths_ptr_[i] = (float)(msg->data[i]);
+        depths_ptr_[i] = *((float*)(&msg->data[0])+i);
 
     img_width_ = msg->width;
 
@@ -75,10 +75,10 @@ void OpenPoseROSIO::storeDepth(const sensor_msgs::Image::ConstPtr& msg)
     // Linear index of the center pixel
     int centerIdx = u + img_width_ * v;
 
-    // Output the measure
-    ROS_INFO("Center distance : %g m", depths_ptr_[centerIdx]);
-    ROS_INFO("Center image coordinates : (%d, %d) m", u, v);
-    ROS_INFO("width: %d px, height: %d px", img_width_, msg->height);
+    // // Output the measure
+    // ROS_INFO("Center distance : %g m", depths_ptr_[centerIdx]);
+    // ROS_INFO("Center image coordinates : (%d, %d) m", u, v);
+    // ROS_INFO("width: %d px, height: %d px", img_width_, msg->height);
 }
 
 void OpenPoseROSIO::processImage(const sensor_msgs::ImageConstPtr& msg)
@@ -333,7 +333,7 @@ void OpenPoseROSIO::publish(const std::shared_ptr<std::vector<op::Datum>>& datum
                         /* Calculate linear index of the keypoint's pixel */
                         keypointIdx = (int) face_point_with_prob.x + img_width_ * ((int) face_point_with_prob.y);
 
-                        ROS_INFO("Person %d face keypoint no.%d: (x = %f, y= %f, c = %f), depth = %g", person, facePart, face_point_with_prob.x, face_point_with_prob.y, face_point_with_prob.prob, depths_ptr_[keypointIdx]);
+                        // ROS_INFO("Person %d face keypoint no.%d: (x = %f, y= %f, c = %f), depth = %g", person, facePart, face_point_with_prob.x, face_point_with_prob.y, face_point_with_prob.prob, depths_ptr_[keypointIdx]);
                     }
                     human.face_key_points_with_prob.at(facePart) = face_point_with_prob;
                 }  
@@ -367,7 +367,7 @@ void OpenPoseROSIO::publish(const std::shared_ptr<std::vector<op::Datum>>& datum
                         /* Calculate linear index of the keypoint's pixel */
                         keypointIdx = (int) right_hand_point_with_prob.x + img_width_ * ((int) right_hand_point_with_prob.y);
 
-                        ROS_INFO("Person %d hand keypoint no.%d (right hand): (x = %f, y= %f, c = %f), depth = %g", person, handPart, right_hand_point_with_prob.x, right_hand_point_with_prob.y, right_hand_point_with_prob.prob, depths_ptr_[keypointIdx]);
+                        // ROS_INFO("Person %d hand keypoint no.%d (right hand): (x = %f, y= %f, c = %f), depth = %g", person, handPart, right_hand_point_with_prob.x, right_hand_point_with_prob.y, right_hand_point_with_prob.prob, depths_ptr_[keypointIdx]);
                     }
                     left_hand_point_with_prob.x = leftHandKeypoints[{person, handPart, 0}];
                     left_hand_point_with_prob.y = leftHandKeypoints[{person, handPart, 1}];
@@ -379,7 +379,7 @@ void OpenPoseROSIO::publish(const std::shared_ptr<std::vector<op::Datum>>& datum
                         /* Calculate linear index of the keypoint's pixel */
                         keypointIdx = (int) left_hand_point_with_prob.x + img_width_ * ((int) left_hand_point_with_prob.y);
 
-                        ROS_INFO("Person %d hand keypoint no.%d (left hand): (x = %f, y= %f, c = %f), depth = %g", person, handPart, left_hand_point_with_prob.x, left_hand_point_with_prob.y, left_hand_point_with_prob.prob, depths_ptr_[keypointIdx]);
+                        // ROS_INFO("Person %d hand keypoint no.%d (left hand): (x = %f, y= %f, c = %f), depth = %g", person, handPart, left_hand_point_with_prob.x, left_hand_point_with_prob.y, left_hand_point_with_prob.prob, depths_ptr_[keypointIdx]);
                     }
                     human.right_hand_key_points_with_prob.at(handPart) = right_hand_point_with_prob;
                     human.left_hand_key_points_with_prob.at(handPart) = left_hand_point_with_prob;
@@ -402,6 +402,9 @@ void OpenPoseROSIO::publish(const std::shared_ptr<std::vector<op::Datum>>& datum
 
 void OpenPoseROSIO::stop()
 {
+    free(depths_ptr_);
+    depths_ptr_ = nullptr;
+
     if(save_original_video_flag_)
     {
         original_video_writer_.release();
