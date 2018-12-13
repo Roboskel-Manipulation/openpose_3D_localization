@@ -307,7 +307,7 @@ void OpenPoseROSIO::publish(const std::shared_ptr<std::vector<op::Datum>>& datum
 
                     body_point_with_prob.z = depths_ptr_[keypointIdx];
 
-                    // ROS_INFO("Person %d body keypoint no.%d: (x = %f, y= %f, c = %f), depth = %g", person, bodyPart, body_point_with_prob.x, body_point_with_prob.y, body_point_with_prob.prob, depths_ptr_[keypointIdx]);
+                    ROS_INFO("Person %d body keypoint no.%d: (x = %f, y= %f, c = %f), depth = %g", person, bodyPart, body_point_with_prob.x, body_point_with_prob.y, body_point_with_prob.prob, depths_ptr_[keypointIdx]);
                 }
                 human.body_key_points_with_prob.at(bodyPart) = body_point_with_prob;
             }

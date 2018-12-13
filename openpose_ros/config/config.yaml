@@ -1,4 +1,4 @@
-image_topic: "/zed/left/image_raw_color" # "/zed/right/image_raw_color" # "/zed/rgb/image_raw_color" # "/usb_cam/image_raw"
+image_topic: "/zed/left/image_raw_color" # "/zed/left/image_raw_color" # "/zed/right/image_raw_color" # "/zed/rgb/image_raw_color" # "/usb_cam/image_raw"
 output_topic: "/openpose_ros/human_list"
 depth_topic: "/zed/depth/depth_registered"
 display_output: true

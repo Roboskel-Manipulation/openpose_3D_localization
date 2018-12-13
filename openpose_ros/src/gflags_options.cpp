@@ -43,10 +43,8 @@ DEFINE_bool(frame_keep_distortion,      false,          "If false (default), it 
                                                         " `camera_parameter_folder` camera parameters; if true, it will not undistortionate, i.e.,"
                                                         " it will leave it as it is.");
 // OpenPose
-DEFINE_double(camera_fps,               30.0,           "Frame rate for the webcam (also used when saving video). Set this value to the minimum"
-                                                        " value between the OpenPose displayed speed and the webcam real frame rate.");
 DEFINE_string(model_folder,             "/home/gkamaras/openpose/models/",      "Folder path (absolute or relative) where the models (pose, face, ...) are located.");
-DEFINE_string(output_resolution,        "-1x-1",        "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
+DEFINE_string(output_resolution,        "1024x512",        "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
                                                         " input image resolution.");
 DEFINE_int32(num_gpu,                   -1,             "The number of GPU devices to use. If negative, it will use all the available GPUs in your"
                                                         " machine.");
@@ -117,7 +115,7 @@ DEFINE_string(face_net_resolution,      "368x368",      "Multiples of 16 and squ
 DEFINE_bool(hand,                       true,          "Enables hand keypoint detection. It will share some parameters from the body pose, e.g."
                                                         " `model_folder`. Analogously to `--face`, it will also slow down the performance, increase"
                                                         " the required GPU memory and its speed depends on the number of people.");
-DEFINE_string(hand_net_resolution,      "368x368",      "Multiples of 16 and squared. Analogous to `net_resolution` but applied to the hand keypoint"
+DEFINE_string(hand_net_resolution,      "320x320",      "Multiples of 16 and squared. Analogous to `net_resolution` but applied to the hand keypoint"
                                                         " detector.");
 DEFINE_int32(hand_scale_number,         1,              "Analogous to `scale_number` but applied to the hand keypoint detector. Our best results"
                                                         " were found with `hand_scale_number` = 6 and `hand_scale_range` = 0.4.");
@@ -160,7 +158,7 @@ DEFINE_double(render_threshold,         0.05,           "Only estimated keypoint
                                                         " rendered. Generally, a high threshold (> 0.5) will only render very clear body parts;"
                                                         " while small thresholds (~0.1) will also output guessed and occluded keypoints, but also"
                                                         " more false positives (i.e., wrong detections).");
-DEFINE_int32(render_pose,               -1,             "Set to 0 for no rendering, 1 for CPU rendering (slightly faster), and 2 for GPU rendering"
+DEFINE_int32(render_pose,               1,             "Set to 0 for no rendering, 1 for CPU rendering (slightly faster), and 2 for GPU rendering"
                                                         " (slower but greater functionality, e.g., `alpha_X` flags). If -1, it will pick CPU if"
                                                         " CPU_ONLY is enabled, or GPU if CUDA is enabled. If rendering is enabled, it will render"
                                                         " both `outputData` and `cvOutputData` with the original image and desired body part to be"
