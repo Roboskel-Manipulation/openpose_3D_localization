@@ -66,14 +66,14 @@ void OpenPoseROSIO::storeDepth(const sensor_msgs::Image::ConstPtr& msg)
 
     img_width_ = msg->width;
 
-    // Image coordinates of the center pixel
+    // // Image coordinates of the center pixel
     // int u = img_width_ / 2;
     // int v = msg->height / 2;
 
-    // Linear index of the center pixel
+    // // Linear index of the center pixel
     // int centerIdx = u + img_width_ * v;
 
-    // Output the measure
+    // // Output the measure
     // ROS_INFO("Center distance : %g m", depths_ptr_[centerIdx]);
     // ROS_INFO("Center image coordinates : (%d, %d) m", u, v);
     // ROS_INFO("width: %d px, height: %d px", img_width_, msg->height);
