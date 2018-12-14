@@ -19,10 +19,12 @@ OpenPoseROSIO::OpenPoseROSIO(OpenPose &openPose): nh_("/openpose_ros_node"), it_
     nh_.param("original_video_file_name", original_video_file_name_, std::string(""));
     nh_.param("openpose_video_file_name", openpose_video_file_name_, std::string(""));
     nh_.param("video_fps", video_fps_, 10);
+    nh_.param("depth_queue_size", depth_queue_size_, 10);
+    nh_.param("human_list_queue_size", human_list_queue_size_, 10);
 
-    depth_sub_ = nh_.subscribe("/zed/depth/depth_registered", 10, &OpenPoseROSIO::storeDepth, this);
+    depth_sub_ = nh_.subscribe("/zed/depth/depth_registered", depth_queue_size_, &OpenPoseROSIO::storeDepth, this);
     image_sub_ = it_.subscribe(image_topic, 1, &OpenPoseROSIO::processImage, this);
-    openpose_human_list_pub_ = nh_.advertise<openpose_ros_msgs::OpenPoseHumanList>(output_topic, 10);
+    openpose_human_list_pub_ = nh_.advertise<openpose_ros_msgs::OpenPoseHumanList>(output_topic, human_list_queue_size_);
     cv_img_ptr_ = nullptr;
     depths_ptr_ = nullptr;
     img_width_ = 0;

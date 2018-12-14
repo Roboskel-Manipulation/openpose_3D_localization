@@ -1,0 +1,2 @@
+human_list_topic: "/openpose_ros/human_list"
+human_list_queue_size: 10

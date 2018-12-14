@@ -1,0 +1,8 @@
+<launch>
+
+  <!-- Start openpose_ros_receiver -->
+  <node pkg="openpose_ros_receiver" type="openpose_ros_receiver_node" name="openpose_ros_receiver_node" output="screen">
+    <rosparam command="load" file="$(find openpose_ros_receiver)/config/config.yaml"/>
+  </node>
+
+</launch>

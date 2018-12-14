@@ -54,6 +54,8 @@ namespace openpose_ros {
             cv::VideoWriter openpose_video_writer_;
 
             int video_fps_;
+            int depth_queue_size_;
+            int human_list_queue_size_;
 
         public:
             OpenPoseROSIO(OpenPose &openPose);
