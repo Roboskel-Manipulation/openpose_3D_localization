@@ -2,6 +2,15 @@
 
 Example ROS catkin package that utilizes the OpenPose library from https://github.com/CMU-Perceptual-Computing-Lab/openpose.
 
+## Important note
+The original package has been upgraded in order to support OpenPose 1.5.0 and has been modified to take input with depth information from a ZED stereo camera.
+
+## Contends
+
+* **openpose_ros**: The core functionality of the OpenPose ROS wrapper
+* **openpose_ros_msgs**: The messages used to publish the OpenPose output to a ROS system
+* **openpose_ros_receiver**: Receive and utilize the OpenPose output
+
 ## System
 Tested on:
 * Ubuntu 14.04 / Ubuntu 16.04
@@ -9,6 +18,7 @@ Tested on:
 * CUDA 8.0
 * cuDNN 5.1 / cuDNN 6.0
 * OpenCV 3.3 / OpenCV 3.4
+* ZED SDK 2.7.1 (should do fine with any version ≥ 2.3)
 
 ## Installation Steps
 

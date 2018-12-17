@@ -7,7 +7,7 @@
 DEFINE_int32(logging_level,             3,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while"
                                                         " 255 will not output any. Current OpenPose library messages are in the range 0-4: 1 for"
                                                         " low priority messages and 4 for important ones.");
-DEFINE_bool(disable_multi_thread,       false,          "It would slightly reduce the frame rate in order to highly reduce the lag. Mainly useful"
+DEFINE_bool(disable_multi_thread,       true,          "It would slightly reduce the frame rate in order to highly reduce the lag. Mainly useful"
                                                         " for 1) Cases where it is needed a low latency (e.g., webcam in real-time scenarios with"
                                                         " low-range GPU devices); and 2) Debugging OpenPose when it is crashing to locate the"
                                                         " error.");
@@ -36,7 +36,7 @@ DEFINE_uint64(frame_last,               -1,             "Finish on desired frame
 DEFINE_bool(frame_flip,                 false,          "Flip/mirror each frame (e.g., for real time webcam demonstrations).");
 DEFINE_int32(frame_rotate,              0,              "Rotate each frame, 4 possible values: 0, 90, 180, 270.");
 DEFINE_bool(frames_repeat,              false,          "Repeat frames when finished.");
-DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g., for video). If the processing time is"
+DEFINE_bool(process_real_time,          true,          "Enable to keep the original source frame rate (e.g., for video). If the processing time is"
                                                         " too long, it will skip frames. If it is too fast, it will slow it down.");
 DEFINE_string(camera_parameter_folder,  "models/cameraParameters/flir/", "String with the folder where the camera parameters are located.");
 DEFINE_bool(frame_keep_distortion,      false,          "If false (default), it will undistortionate the image based on the"
@@ -57,7 +57,7 @@ DEFINE_int32(keypoint_scale,            0,              "Scaling of the (x,y) co
                                                         " corner of the image, and (1,1) the bottom-right one; and 4 for range [-1,1], where"
                                                         " (-1,-1) would be the top-left corner of the image, and (1,1) the bottom-right one. Non"
                                                         " related with `scale_number` and `scale_gap`.");
-DEFINE_int32(number_people_max,         1,             "This parameter will limit the maximum number of people detected, by keeping the people with"
+DEFINE_int32(number_people_max,         -1,             "This parameter will limit the maximum number of people detected, by keeping the people with"
                                                         " top scores. The score is based in person area over the image, body part score, as well as"
                                                         " joint score (between each pair of connected body parts). Useful if you know the exact"
                                                         " number of people in the scene, so it can remove false positives (if all the people have"
@@ -112,7 +112,7 @@ DEFINE_string(face_net_resolution,      "368x368",      "Multiples of 16 and squ
                                                         " detector. 320x320 usually works fine while giving a substantial speed up when multiple"
                                                         " faces on the image.");
 // OpenPose Hand
-DEFINE_bool(hand,                       true,          "Enables hand keypoint detection. It will share some parameters from the body pose, e.g."
+DEFINE_bool(hand,                       false,          "Enables hand keypoint detection. It will share some parameters from the body pose, e.g."
                                                         " `model_folder`. Analogously to `--face`, it will also slow down the performance, increase"
                                                         " the required GPU memory and its speed depends on the number of people.");
 DEFINE_string(hand_net_resolution,      "320x320",      "Multiples of 16 and squared. Analogous to `net_resolution` but applied to the hand keypoint"
@@ -183,7 +183,7 @@ DEFINE_double(hand_alpha_heatmap,       0.7,            "Analogous to `alpha_hea
 DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode (press f during runtime to toggle).");
 DEFINE_bool(no_gui_verbose,             false,          "Do not write text on output images on GUI (e.g., number of current frame and people). It"
                                                         " does not affect the pose rendering.");
-DEFINE_int32(display,                   -1,             "Display mode: -1 for automatic selection; 0 for no display (useful if there is no X server"
+DEFINE_int32(display,                   0,             "Display mode: -1 for automatic selection; 0 for no display (useful if there is no X server"
                                                         " and/or to slightly speed up the processing if visual output is not required); 2 for 2-D"
                                                         " display; 3 for 3-D display (if `--3d` enabled); and 1 for both 2-D and 3-D display.");
 // Command Line Interface Verbose
