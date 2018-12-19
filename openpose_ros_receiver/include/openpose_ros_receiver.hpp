@@ -9,7 +9,10 @@
 
 /* ROS headers */
 #include <ros/ros.h>
+
+/* TF headers */
 #include <tf/transform_broadcaster.h>
+#include <tf/transform_listener.h>
 
 /* C++ headers */
 #include <fstream>
@@ -18,7 +21,8 @@
 #include <openpose/pose/poseParameters.hpp>
 
 /* OpenPose BODY_25 Body Parts Mapping */
-const std::map<unsigned int, std::string> POSE_BODY_25_BODY_PARTS {
+const std::map<unsigned int, std::string> POSE_BODY_25_BODY_PARTS
+{
     {0,  "Nose"},
     {1,  "Neck"},
     {2,  "RShoulder"},
