@@ -7,7 +7,9 @@ add_compile_options(-std=c++11)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   openpose_ros_msgs
+  tf
 )
+find_package(/usr/local/lib/OpenPose/OpenPose REQUIRED)
 
 catkin_package(
    INCLUDE_DIRS include
@@ -17,12 +19,14 @@ catkin_package(
 include_directories( 
   include
   ${catkin_INCLUDE_DIRS}
+  ${OpenPose_INCLUDE_DIRS} 
 )
 
-add_executable(${PROJECT_NAME}_node src/openpose_ros_receiver_node.cpp)
+add_executable(${PROJECT_NAME}_node src/openpose_ros_receiver_node.cpp src/functions.cpp)
 
 add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
+  ${OpenPose_LIBS} 
 )
