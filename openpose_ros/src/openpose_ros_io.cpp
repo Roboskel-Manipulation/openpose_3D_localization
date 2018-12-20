@@ -305,7 +305,7 @@ void OpenPoseROSIO::publish(const std::shared_ptr<std::vector<op::Datum>>& datum
                     num_body_key_points_with_non_zero_prob++;
 
                     /* Calculate linear index of the keypoint's pixel */
-                    keypointIdx = (int) body_point_with_prob.x + img_width_ * ((int) body_point_with_prob.y);
+                    keypointIdx = (int) body_point_with_prob.x + img_width_ * ((int) body_point_with_prob.y - 1);
 
                     body_point_with_prob.z = depths_ptr_[keypointIdx];
 
@@ -330,7 +330,7 @@ void OpenPoseROSIO::publish(const std::shared_ptr<std::vector<op::Datum>>& datum
                         num_face_key_points_with_non_zero_prob++;
 
                         /* Calculate linear index of the keypoint's pixel */
-                        keypointIdx = (int) face_point_with_prob.x + img_width_ * ((int) face_point_with_prob.y);
+                        keypointIdx = (int) face_point_with_prob.x + img_width_ * ((int) face_point_with_prob.y - 1);
 
                         face_point_with_prob.z = depths_ptr_[keypointIdx];
 
@@ -366,7 +366,7 @@ void OpenPoseROSIO::publish(const std::shared_ptr<std::vector<op::Datum>>& datum
                         num_right_hand_key_points_with_non_zero_prob++;
                         
                         /* Calculate linear index of the keypoint's pixel */
-                        keypointIdx = (int) right_hand_point_with_prob.x + img_width_ * ((int) right_hand_point_with_prob.y);
+                        keypointIdx = (int) right_hand_point_with_prob.x + img_width_ * ((int) right_hand_point_with_prob.y - 1);
 
                         right_hand_point_with_prob.z = depths_ptr_[keypointIdx];
 
@@ -380,7 +380,7 @@ void OpenPoseROSIO::publish(const std::shared_ptr<std::vector<op::Datum>>& datum
                         num_left_hand_key_points_with_non_zero_prob++;
                         
                         /* Calculate linear index of the keypoint's pixel */
-                        keypointIdx = (int) left_hand_point_with_prob.x + img_width_ * ((int) left_hand_point_with_prob.y);
+                        keypointIdx = (int) left_hand_point_with_prob.x + img_width_ * ((int) left_hand_point_with_prob.y - 1);
 
                         left_hand_point_with_prob.z = depths_ptr_[keypointIdx];
 

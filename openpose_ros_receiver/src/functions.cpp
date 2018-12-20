@@ -1,25 +1,145 @@
 #include "openpose_ros_receiver.hpp"
 
-void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg)
+/* Global variables */
+bool new_data_flag;
+std::vector<double> xVec, yVec, zVec;
+uint32_t ind;
+
+void initGlobalVars()
 {
-    static tf::TransformBroadcaster br;
-    tf::Transform transform;
+    new_data_flag = false;
+    xVec = std::vector<double>(0);
+    yVec = std::vector<double>(0);
+    zVec = std::vector<double>(0);
+    ind = 0;
+}
+
+void reInitGlobalVars()
+{
+    xVec = std::vector<double>(0);
+    yVec = std::vector<double>(0);
+    zVec = std::vector<double>(0);
+}
+
+void humanListBroadcastCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg)
+{
+    // static tf::TransformBroadcaster br;
+    // tf::Transform transform;
+    // ros::Rate rate(5.0);
 
     for (uint32_t i = 0; i < msg->num_humans; i++)
     {
-        for (uint32_t j = 0; j < msg->human_list[i].num_body_key_points_with_non_zero_prob; j++)
+        if (msg->human_list[i].num_body_key_points_with_non_zero_prob)
         {
-            if (!std::isnan(msg->human_list[i].body_key_points_with_prob[j].x) && !std::isnan(msg->human_list[i].body_key_points_with_prob[j].y) && !std::isnan(msg->human_list[i].body_key_points_with_prob[j].z))
+            /* Probabilities check, do not log invalid "ghost" skeletons */
+            double avg_prob, total_prob = 0.0;
+
+            for (uint32_t j = 0; j < msg->human_list[i].num_body_key_points_with_non_zero_prob; j++)
+                total_prob += msg->human_list[i].body_key_points_with_prob[j].prob;
+
+            avg_prob = total_prob / msg->human_list[i].num_body_key_points_with_non_zero_prob;
+
+            if (avg_prob > 0.0 /*MIN_PROB_THRESHOLD*/)
             {
-                transform.setOrigin( tf::Vector3(msg->human_list[i].body_key_points_with_prob[j].x, msg->human_list[i].body_key_points_with_prob[j].y, msg->human_list[i].body_key_points_with_prob[j].z) );
-                tf::Quaternion q(0, 0, 0, 1);
-                transform.setRotation(q);
-                br.sendTransform( tf::StampedTransform(transform, ros::Time::now(), "zed_left_camera_frame", getPoseBodyPartMappingBody25(j)/*+"_"+std::to_string(i)*/) );
+                for (uint32_t j = 0; j < msg->human_list[i].num_body_key_points_with_non_zero_prob; j++)
+                {
+                    // rate.sleep();
+                    if (!std::isnan(msg->human_list[i].body_key_points_with_prob[j].x) && !std::isnan(msg->human_list[i].body_key_points_with_prob[j].y) && !std::isnan(msg->human_list[i].body_key_points_with_prob[j].z))
+                    {
+                        ROS_WARN("Filling");
+                        // /* BROADCAST TRANSFORMATIONS */
+                        // transform.setOrigin( tf::Vector3(msg->human_list[i].body_key_points_with_prob[j].x, msg->human_list[i].body_key_points_with_prob[j].y, msg->human_list[i].body_key_points_with_prob[j].z) );
+                        // tf::Quaternion q(0, 0, 0, 1);
+                        // transform.setRotation(q);
+                        // br.sendTransform( tf::StampedTransform(transform, ros::Time::now(), "zed_left_camera_frame", getPoseBodyPartMappingBody25(j)/*+"_"+std::to_string(i)*/) );
+                        xVec.push_back(msg->human_list[i].body_key_points_with_prob[j].x);
+                        yVec.push_back(msg->human_list[i].body_key_points_with_prob[j].y);
+                        zVec.push_back(msg->human_list[i].body_key_points_with_prob[j].z);
+                    }
+                }
             }
+
+            new_data_flag = true;
+            while (new_data_flag) {;}
+
+            /* Re-Initialize Global variables */
+            reInitGlobalVars();
         }
     }
 
-    writeSkeletonToFile(msg);
+    // writeSkeletonToFile(msg);
+}
+
+void pointcloudCallback(const sensor_msgs::PointCloud2::ConstPtr& pPCL2)
+{
+    ROS_WARN("HIIIIIIIIIIIIIIIIIIIIIIIIIIII");
+    while (!new_data_flag) {;}
+    if (new_data_flag)
+    {
+        static tf::TransformBroadcaster br;
+        tf::Transform transform;
+        int j;
+
+        for (uint32_t i = 0; i < xVec.size(); i++)
+        {
+            j = xVec.at(i) + (yVec.at(i) - 1) * pPCL2->width;
+
+            double x = pPCL2->data[j * pPCL2->point_step + pPCL2->fields[0].offset];
+            double y = pPCL2->data[j * pPCL2->point_step + pPCL2->fields[1].offset];
+            double z = pPCL2->data[j * pPCL2->point_step + pPCL2->fields[2].offset];
+
+            /* BROADCAST TRANSFORMATIONS */
+            transform.setOrigin( tf::Vector3(x, y, z) );
+            tf::Quaternion q(0, 0, 0, 1);
+            transform.setRotation(q);
+            br.sendTransform( tf::StampedTransform(transform, ros::Time::now(), "zed_left_camera_frame", getPoseBodyPartMappingBody25(j)) );
+        }
+        
+        new_data_flag = false;
+    }
+}
+
+void listenForSkeleton(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg)
+{
+    /* log skeletons to file */
+    std::ofstream outfile;
+    outfile.open("/home/gkamaras/openpose_ros_receiver.txt", std::ofstream::trunc);
+
+    tf::TransformListener listener;
+    tf::StampedTransform transform;
+    ros::Rate rate(1000.0);
+
+
+    int retry = 0;
+    outfile << "Body keypoints:" << std::endl;
+    for (uint32_t j = 0; j < 25; j++)
+    {
+        rate.sleep();
+        try
+        {
+            /* LISTEN FOR TRANSFORMATIONS */
+            listener.waitForTransform("base_link", getPoseBodyPartMappingBody25(j), ros::Time(0), ros::Duration(0.1));
+            listener.lookupTransform("base_link", getPoseBodyPartMappingBody25(j), ros::Time(0), transform);
+        }
+        catch (tf::TransformException &ex)
+        {
+            ROS_ERROR("%s",ex.what());
+            // /* if listening for transformation fails do not instantly give up on it, give it some more attempts */
+            // if (retry < MAX_RETRY)
+            // {
+            //     j--;
+            //     retry++;
+            // }
+            // else
+            //     retry = 0;
+            ros::Duration(0.1).sleep();
+            continue;
+        }
+
+        outfile << "kp " << getPoseBodyPartMappingBody25(j) << ": x=" << transform.getOrigin().x() << " y=" <<  transform.getOrigin().y() << " z=" <<  transform.getOrigin().z() << std::endl;
+    }
+
+    outfile.close();
 }
 
 void writeSkeletonToFile(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg)
@@ -36,28 +156,54 @@ void writeSkeletonToFile(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& m
             tf::StampedTransform transform;
             ros::Rate rate(5.0);
 
-            outfile << "Body keypoints:" << std::endl;
-            for (uint32_t j = 0; j < msg->human_list[i].num_body_key_points_with_non_zero_prob; j++)
-            {
-                if (!std::isnan(msg->human_list[i].body_key_points_with_prob[j].x) && !std::isnan(msg->human_list[i].body_key_points_with_prob[j].y) && !std::isnan(msg->human_list[i].body_key_points_with_prob[j].z))
-                {
-                    rate.sleep();
-                    try
-                    {
-                        listener.waitForTransform("gripper_link", "zed_left_camera_frame", ros::Time(0), ros::Duration(3.0));
-                        listener.lookupTransform("gripper_link", "zed_left_camera_frame", ros::Time(0), transform);
-                    }
-                    catch (tf::TransformException &ex)
-                    {
-                        ROS_ERROR("%s",ex.what());
-                        ros::Duration(1.0).sleep();
-                        continue;
-                    }
+            /* Probabilities check, do not log invalid "ghost" skeletons */
+            double avg_prob, total_prob = 0.0;
+            int i = 0;  // for development
 
-                    outfile << "kp " << getPoseBodyPartMappingBody25(j) << ": x=" << transform.getOrigin().x() << " y=" <<  transform.getOrigin().y()
-                            << " z=" <<  transform.getOrigin().y() << " prob=" <<  msg->human_list[i].body_key_points_with_prob[j].prob << std::endl;
+            for (uint32_t j = 0; j < msg->human_list[i].num_body_key_points_with_non_zero_prob; j++)
+                total_prob += msg->human_list[i].body_key_points_with_prob[j].prob;
+
+            avg_prob = total_prob / msg->human_list[i].num_body_key_points_with_non_zero_prob;
+
+            if (avg_prob > 0.0 /*MIN_PROB_THRESHOLD*/)
+            {
+                i++;    // for development phase
+
+                int retry = 0;
+                outfile << "Body " << i << " keypoints:" << std::endl;
+                for (uint32_t j = 0; j < msg->human_list[i].num_body_key_points_with_non_zero_prob; j++)
+                {
+                    if (!std::isnan(msg->human_list[i].body_key_points_with_prob[j].x) && !std::isnan(msg->human_list[i].body_key_points_with_prob[j].y) && !std::isnan(msg->human_list[i].body_key_points_with_prob[j].z))
+                    {
+                        rate.sleep();
+                        try
+                        {
+                            /* LISTEN FOR TRANSFORMATIONS */
+                            listener.waitForTransform("base_link", getPoseBodyPartMappingBody25(j)/*+"_"+std::to_string(i)*/, ros::Time(0), ros::Duration(1.0));
+                            listener.lookupTransform("base_link", getPoseBodyPartMappingBody25(j)/*+"_"+std::to_string(i)*/, ros::Time(0), transform);
+                        }
+                        catch (tf::TransformException &ex)
+                        {
+                            ROS_ERROR("%s",ex.what());
+                            // /* if listening for transformation fails do not instantly give up on it, give it some more attempts */
+                            // if (retry < MAX_RETRY)
+                            // {
+                            //     j--;
+                            //     retry++;
+                            // }
+                            // else
+                            //     retry = 0;
+                            ros::Duration(1.0).sleep();
+                            continue;
+                        }
+
+                        outfile << "kp " << getPoseBodyPartMappingBody25(j) << ": x=" << transform.getOrigin().x() << " y=" <<  transform.getOrigin().y()
+                                << " z=" <<  transform.getOrigin().y() << " prob=" <<  msg->human_list[i].body_key_points_with_prob[j].prob << std::endl;
+                    }
                 }
             }
+
+            assert(i < 5);  // for development phase
         }
 
         if (msg->human_list[i].num_face_key_points_with_non_zero_prob)
