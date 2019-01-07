@@ -9,6 +9,9 @@
 
 /* ROS headers */
 #include <ros/ros.h>
+#include <message_filters/subscriber.h>
+#include <message_filters/synchronizer.h>
+#include <message_filters/sync_policies/approximate_time.h>
 
 /* TF headers */
 #include <tf/transform_broadcaster.h>
@@ -32,8 +35,9 @@
 #define MAX_RETRY 5
 
 /* Global variables */
-extern bool new_data_flag;
+extern bool /*new_data_flag,*/ broadcast_flag, pointcloud_flag;
 extern std::vector<double> xVec, yVec, zVec;
+extern sensor_msgs::PointCloud2 pcl;
 extern uint32_t ind;
 /* OpenPose BODY_25 Body Parts Mapping */
 const std::map<unsigned int, std::string> POSE_BODY_25_BODY_PARTS
@@ -69,8 +73,9 @@ const std::map<unsigned int, std::string> POSE_BODY_25_BODY_PARTS
 /* Wrappers functions */
 void initGlobalVars();
 void reInitGlobalVars();
-void humanListBroadcastCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg);
-void pointcloudCallback(const sensor_msgs::PointCloud2::ConstPtr& pPCL2);
+void humanListPointcloudSkeletonCallback(const sensor_msgs::PointCloud2::ConstPtr& pPCL2, const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& list_msg, const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg);
+// void humanListBroadcastCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg);
+// void pointcloudCallback(const sensor_msgs::PointCloud2::ConstPtr& pPCL2);
 void listenForSkeleton(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg);
 void writeSkeletonToFile(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg);
 std::string getPoseBodyPartMappingBody25(unsigned int idx);

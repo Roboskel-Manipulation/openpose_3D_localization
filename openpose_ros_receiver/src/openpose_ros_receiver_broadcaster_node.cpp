@@ -17,8 +17,16 @@ int main (int argc, char** argv)
     initGlobalVars();
 
     /* Read human list topic, process it and broadcast its keypoints to tf */
-    ros::Subscriber subHumanList = nh.subscribe(human_list_topic, queue_size, humanListBroadcastCallback);
-    ros::Subscriber subPointcloud = nh.subscribe(pointcloud_topic, queue_size, pointcloudCallback);
+    // ros::Subscriber subHumanList = nh.subscribe(human_list_topic, queue_size, humanListBroadcastCallback);
+    // ros::Subscriber subPointcloud = nh.subscribe(pointcloud_topic, queue_size, pointcloudCallback);
+    message_filters::Subscriber<sensor_msgs::PointCloud2> subPointcloud(nh, pointcloud_topic, queue_size);
+    message_filters::Subscriber<openpose_ros_msgs::OpenPoseHumanList> subHumanList(nh, human_list_topic, queue_size);
+    // ros::Subscriber subHumanList = nh.subscribe(human_list_topic, queue_size, listenForSkeleton);
+    message_filters::Subscriber<openpose_ros_msgs::OpenPoseHumanList> subSkeletonFromHumanList(nh, human_list_topic, queue_size);
+    typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::PointCloud2, openpose_ros_msgs::OpenPoseHumanList, openpose_ros_msgs::OpenPoseHumanList> MySyncPolicy;
+
+    message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(10), subPointcloud, subHumanList, subSkeletonFromHumanList);
+    sync.registerCallback(boost::bind(&humanListPointcloudSkeletonCallback, _1, _2, _3));
 
     ros::spin();
 
