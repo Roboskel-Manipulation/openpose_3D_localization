@@ -8,10 +8,11 @@ int main (int argc, char** argv)
     /* Initialize node variables */
     ros::NodeHandle nh;
     std::string human_list_topic, pointcloud_topic;
-    int queue_size;
+    int queue_size, buffer_size;
     nh.param("human_list_topic", human_list_topic, std::string("/openpose_ros/human_list"));
     nh.param("pointcloud_topic", pointcloud_topic, std::string("/zed/point_cloud/cloud_registered"));
-    nh.param("queue_size", queue_size, 10);
+    nh.param("queue_size", queue_size, 10000);
+    nh.param("buffer_size", buffer_size, 10000);
 
     /* Initialize Global variables */
     initGlobalVars();
@@ -25,7 +26,7 @@ int main (int argc, char** argv)
     message_filters::Subscriber<openpose_ros_msgs::OpenPoseHumanList> subSkeletonFromHumanList(nh, human_list_topic, queue_size);
     typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::PointCloud2, openpose_ros_msgs::OpenPoseHumanList, openpose_ros_msgs::OpenPoseHumanList> MySyncPolicy;
 
-    message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(10), subPointcloud, subHumanList, subSkeletonFromHumanList);
+    message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(buffer_size), subPointcloud, subHumanList, subSkeletonFromHumanList);
     sync.registerCallback(boost::bind(&humanListPointcloudSkeletonCallback, _1, _2, _3));
 
     ros::spin();

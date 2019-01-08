@@ -10,7 +10,7 @@ int main (int argc, char** argv)
     std::string human_list_topic;
     int queue_size;
     nh.param("human_list_topic", human_list_topic, std::string("/openpose_ros/human_list"));
-    nh.param("queue_size", queue_size, 10);
+    nh.param("queue_size", queue_size, 10000);
 
     /* Subscribe to human list topic, listen for keypoints to tf transformations */
     ros::Subscriber subHumanList = nh.subscribe(human_list_topic, queue_size, listenForSkeleton);

@@ -32,7 +32,7 @@
 /* Important definitions */
 /* TODO: Make them configurations read from config */
 #define MIN_PROB_THRESHOLD 0.04
-#define MAX_RETRY 5
+#define MAX_RETRY 100
 
 /* Global variables */
 extern bool /*new_data_flag,*/ broadcast_flag, pointcloud_flag;
@@ -77,7 +77,7 @@ void humanListPointcloudSkeletonCallback(const sensor_msgs::PointCloud2::ConstPt
 // void humanListBroadcastCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg);
 // void pointcloudCallback(const sensor_msgs::PointCloud2::ConstPtr& pPCL2);
 void listenForSkeleton(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg);
-void writeSkeletonToFile(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg);
+void writeSkeletonToFile(const openpose_ros_msgs::OpenPoseHumanList& msg);
 std::string getPoseBodyPartMappingBody25(unsigned int idx);
 
 #endif

@@ -1,3 +1,4 @@
 human_list_topic: "/openpose_ros/human_list"
 pointcloud_topic: "/zed/point_cloud/cloud_registered"
-queue_size: 10
+queue_size: 10000
+buffer_size: 10000
