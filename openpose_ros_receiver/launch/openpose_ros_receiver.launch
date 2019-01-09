@@ -1,5 +1,8 @@
 <launch>
 
+  <!-- Use simulated time while in development phase -->
+  <param name="/use_sim_time " value="true"/>
+
   <!-- Start openpose_ros_receiver_broadcaster_node -->
   <node pkg="openpose_ros_receiver" type="openpose_ros_receiver_broadcaster_node" name="openpose_ros_receiver_broadcaster_node" output="screen">
     <rosparam command="load" file="$(find openpose_ros_receiver)/config/config.yaml"/>
