@@ -32,15 +32,13 @@
 #include <openpose/pose/poseParameters.hpp>
 
 /* Important definitions */
-/* TODO: Make them configurations read from config */
 #define MIN_PROB_THRESHOLD 0.04
 #define MAX_RETRY 100
 
 /* Global variables */
-extern bool /*new_data_flag,*/ broadcast_flag, pointcloud_flag;
+extern bool broadcast_flag, pointcloud_flag;
 extern std::vector<double> xVec, yVec, zVec;
 extern pcl::PointCloud<pcl::PointXYZ> pclCp;
-extern uint32_t ind;
 /* OpenPose BODY_25 Body Parts Mapping */
 const std::map<unsigned int, std::string> POSE_BODY_25_BODY_PARTS
 {
@@ -72,12 +70,10 @@ const std::map<unsigned int, std::string> POSE_BODY_25_BODY_PARTS
     {25, "Background"}
 };
 
-/* Wrappers functions */
+/* Broadcaster's and Receiver's functions */
 void initGlobalVars();
 void reInitGlobalVars();
-void humanListPointcloudSkeletonCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& pPCL2, const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& list_msg, const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg);
-// void humanListBroadcastCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg);
-// void pointcloudCallback(const sensor_msgs::PointCloud2::ConstPtr& pPCL2);
+void humanListPointcloudSkeletonCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& pPCL2, const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& list_msg);
 void listenForSkeleton(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg);
 void writeSkeletonToFile(const openpose_ros_msgs::OpenPoseHumanList& msg);
 std::string getPoseBodyPartMappingBody25(unsigned int idx);

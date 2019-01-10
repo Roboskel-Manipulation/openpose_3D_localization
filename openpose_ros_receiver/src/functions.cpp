@@ -1,20 +1,17 @@
 #include "openpose_ros_receiver.hpp"
 
 /* Global variables */
-bool /*new_data_flag,*/ broadcast_flag, pointcloud_flag;
+bool broadcast_flag, pointcloud_flag;
 std::vector<double> xVec, yVec, zVec;
 pcl::PointCloud<pcl::PointXYZ> pclCp;
-uint32_t ind;
 
 void initGlobalVars()
 {
-    // new_data_flag = false;
     broadcast_flag = false;
     pointcloud_flag = false;
     xVec = std::vector<double>(0);
     yVec = std::vector<double>(0);
     zVec = std::vector<double>(0);
-    ind = 0;
 }
 
 void reInitGlobalVars()
@@ -24,7 +21,7 @@ void reInitGlobalVars()
     zVec = std::vector<double>(0);
 }
 
-void humanListPointcloudSkeletonCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& pPCL, const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& list_msg, const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg)
+void humanListPointcloudSkeletonCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& pPCL, const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& list_msg)
 {
     if (pPCL)
     {
@@ -125,7 +122,6 @@ void listenForSkeleton(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg
     // ROS_WARN("listenForSkeleton IN");
     /* log skeletons to file */
     std::ofstream outfile;
-    outfile.open("/home/gkamaras/openpose_ros_receiver_tfed.txt", std::ofstream::out);
 
     tf::TransformListener listener;
     tf::StampedTransform transform;
@@ -157,7 +153,10 @@ void listenForSkeleton(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg
         }
 
         if (writen == 0)
+        {
+            outfile.open("/home/gkamaras/openpose_ros_receiver_tfed.txt", std::ofstream::out);
             outfile << "Body keypoints:" << std::endl;
+        }
 
         if (!std::isnan(transform.getOrigin().x()) && !std::isnan(transform.getOrigin().y()) && !std::isnan(transform.getOrigin().z()))
             outfile << "kp " << getPoseBodyPartMappingBody25(j) << ": x=" << transform.getOrigin().x() << " y=" <<  transform.getOrigin().y()
@@ -175,12 +174,17 @@ void writeSkeletonToFile(const openpose_ros_msgs::OpenPoseHumanList& msg)
 {
     /* log skeletons to file */
     std::ofstream outfile;
-    outfile.open("/home/gkamaras/openpose_ros_receiver_raw.txt", std::ofstream::out);
 
+    int writen = 0;
     for (uint32_t i = 0; i < msg.num_humans; i++)
     {
         if (msg.human_list[i].num_body_key_points_with_non_zero_prob)
         {
+            if (writen == 0)
+                outfile.open("/home/gkamaras/openpose_ros_receiver_raw.txt", std::ofstream::out);
+
+            outfile << "Body " << i << " keypoints:" << std::endl;
+
             /* Probabilities check, do not log invalid "ghost" skeletons */
             double avg_prob, total_prob = 0.0;
             int i = 0;  // for development
@@ -194,8 +198,6 @@ void writeSkeletonToFile(const openpose_ros_msgs::OpenPoseHumanList& msg)
             {
                 i++;    // for development phase
 
-                int retry = 0;
-                outfile << "Body " << i << " keypoints:" << std::endl;
                 for (uint32_t j = 0; j < 25; j++)
                 {
                     if (!std::isnan(msg.human_list[i].body_key_points_with_prob[j].x) && !std::isnan(msg.human_list[i].body_key_points_with_prob[j].y) && !std::isnan(msg.human_list[i].body_key_points_with_prob[j].z))
@@ -207,9 +209,11 @@ void writeSkeletonToFile(const openpose_ros_msgs::OpenPoseHumanList& msg)
             }
 
             assert(i < 5);  // for development phase
-        }
 
-        outfile << std::endl << std::endl;
+            outfile << std::endl << std::endl;
+
+            writen++;
+        }
     }
 
     outfile.close();
