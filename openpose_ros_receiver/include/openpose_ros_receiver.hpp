@@ -24,6 +24,8 @@
 
 /* C++ headers */
 #include <fstream>
+#include <ctime>
+#include <sstream>
 
 /* C headers */
 #include <assert.h>   // for development phase
@@ -32,11 +34,12 @@
 #include <openpose/pose/poseParameters.hpp>
 
 /* Important definitions */
-#define MIN_PROB_THRESHOLD 0.04
-#define MAX_RETRY 100
+#define MIN_PROB_THRESHOLD 0.00     // probability -> float in [0..1]
+#define RELIABILITY_THRESHOLD 3.0   // seconds -> float
+#define MAX_RETRY 1                 // number of repetitions -> int
 
 /* Global variables */
-extern bool broadcast_flag, pointcloud_flag;
+extern bool pointcloud_flag;
 extern std::vector<double> xVec, yVec, zVec;
 extern pcl::PointCloud<pcl::PointXYZ> pclCp;
 /* OpenPose BODY_25 Body Parts Mapping */

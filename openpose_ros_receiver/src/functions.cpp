@@ -1,13 +1,12 @@
 #include "openpose_ros_receiver.hpp"
 
 /* Global variables */
-bool broadcast_flag, pointcloud_flag;
+bool pointcloud_flag;
 std::vector<double> xVec, yVec, zVec;
 pcl::PointCloud<pcl::PointXYZ> pclCp;
 
 void initGlobalVars()
 {
-    broadcast_flag = false;
     pointcloud_flag = false;
     xVec = std::vector<double>(0);
     yVec = std::vector<double>(0);
@@ -34,7 +33,6 @@ void humanListPointcloudSkeletonCallback(const pcl::PointCloud<pcl::PointXYZ>::C
     if (list_msg && pointcloud_flag)
     {
         // ROS_WARN("humanListBroadcastCallback IN");
-
         openpose_ros_msgs::OpenPoseHumanList temp_list_msg = *list_msg;
 
         for (uint32_t i = 0; i < list_msg->num_humans; i++)
@@ -42,14 +40,14 @@ void humanListPointcloudSkeletonCallback(const pcl::PointCloud<pcl::PointXYZ>::C
             if (list_msg->human_list[i].num_body_key_points_with_non_zero_prob)
             {
                 /* Probabilities check, do not log invalid "ghost" skeletons */
-                double avg_prob, total_prob = 0.0;
+                double bodyAvgProb, bodyTotalProb = 0.0;
 
                 for (uint32_t j = 0; j < 25; j++)
-                    total_prob += list_msg->human_list[i].body_key_points_with_prob[j].prob;
+                    bodyTotalProb += list_msg->human_list[i].body_key_points_with_prob[j].prob;
 
-                avg_prob = total_prob / list_msg->human_list[i].num_body_key_points_with_non_zero_prob;
+                bodyAvgProb = bodyTotalProb / ((float) list_msg->human_list[i].num_body_key_points_with_non_zero_prob);
 
-                if (avg_prob > 0.0 /*MIN_PROB_THRESHOLD*/)
+                if (bodyAvgProb > MIN_PROB_THRESHOLD)
                 {
                     for (uint32_t j = 0; j < 25; j++)
                     {
@@ -88,6 +86,7 @@ void humanListPointcloudSkeletonCallback(const pcl::PointCloud<pcl::PointXYZ>::C
                             x = p1.x; y = p1.y; z = p1.z;
 
                             if (std::isnan(x) || std::isnan(y) || std::isnan(z))
+                                // x = 0.0; y = 0.0; z = 0.0;
                                 continue;
 
                             /* BROADCAST TRANSFORMATIONS */
@@ -102,9 +101,6 @@ void humanListPointcloudSkeletonCallback(const pcl::PointCloud<pcl::PointXYZ>::C
                             temp_list_msg.human_list[ext_i].body_key_points_with_prob[i].z = z;
                         }
                     }
-
-                    if (xVec.size())
-                        broadcast_flag = true;
 
                     /* Re-Initialize Global variables */
                     reInitGlobalVars();
@@ -121,7 +117,7 @@ void listenForSkeleton(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg
 {
     // ROS_WARN("listenForSkeleton IN");
     /* log skeletons to file */
-    std::ofstream outfile;
+    std::ofstream outfile, logfile;
 
     tf::TransformListener listener;
     tf::StampedTransform transform;
@@ -134,6 +130,20 @@ void listenForSkeleton(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg
             /* LISTEN FOR TRANSFORMATIONS */
             listener.waitForTransform("base_link", getPoseBodyPartMappingBody25(j), ros::Time(0), ros::Duration(0.1));
             listener.lookupTransform("base_link", getPoseBodyPartMappingBody25(j), ros::Time(0), transform);
+
+            /* process transform's timestamp */
+            if (!std::isnan(transform.getOrigin().x()) && !std::isnan(transform.getOrigin().y()) && !std::isnan(transform.getOrigin().z()))
+            {
+
+                ros::Time now = ros::Time::now(), transformStamp = transform.stamp_;
+                ros::Duration timeDiff = now - transformStamp;
+                /* check if we are dealing with a frame old enough (e.g. > 2 sec) to be considered unreliable */
+                if (timeDiff > ros::Duration(RELIABILITY_THRESHOLD))
+                {
+                    ROS_WARN("Transform older than %f seconds detected", RELIABILITY_THRESHOLD);
+                    continue;
+                }
+            }
         }
         catch (tf::TransformException &ex)
         {
@@ -147,7 +157,7 @@ void listenForSkeleton(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg
             {
                 retry = 0;
                 ROS_ERROR("%s",ex.what());
-                ros::Duration(0.1).sleep();
+                // ros::Duration(0.1).sleep();
             }
             continue;
         }
@@ -156,24 +166,36 @@ void listenForSkeleton(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg
         {
             outfile.open("/home/gkamaras/openpose_ros_receiver_tfed.txt", std::ofstream::out);
             outfile << "Body keypoints:" << std::endl;
+            /* current date/time based on current system */
+            time_t now = time(0);
+            /* convert now to string form */
+            char* dt = ctime(&now);
+            std::stringstream strstream;
+            strstream << "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/tfed " << dt << ".txt";
+            logfile.open(strstream.str(), std::ofstream::out);
+            logfile << "Body keypoints:" << std::endl;
         }
 
         if (!std::isnan(transform.getOrigin().x()) && !std::isnan(transform.getOrigin().y()) && !std::isnan(transform.getOrigin().z()))
+        {
             outfile << "kp " << getPoseBodyPartMappingBody25(j) << ": x=" << transform.getOrigin().x() << " y=" <<  transform.getOrigin().y()
                     << " z=" <<  transform.getOrigin().z() << std::endl;
-    
+            logfile << "kp " << getPoseBodyPartMappingBody25(j) << ": x=" << transform.getOrigin().x() << " y=" <<  transform.getOrigin().y()
+                    << " z=" <<  transform.getOrigin().z() << std::endl;
+        }
+
         writen++;
     }
 
     outfile.close();
-
+    logfile.close();
     // ROS_WARN("listenForSkeleton OUT");
 }
 
 void writeSkeletonToFile(const openpose_ros_msgs::OpenPoseHumanList& msg)
 {
     /* log skeletons to file */
-    std::ofstream outfile;
+    std::ofstream outfile, logfile;
 
     int writen = 0;
     for (uint32_t i = 0; i < msg.num_humans; i++)
@@ -181,20 +203,30 @@ void writeSkeletonToFile(const openpose_ros_msgs::OpenPoseHumanList& msg)
         if (msg.human_list[i].num_body_key_points_with_non_zero_prob)
         {
             if (writen == 0)
+            {
                 outfile.open("/home/gkamaras/openpose_ros_receiver_raw.txt", std::ofstream::out);
+                /* current date/time based on current system */
+                time_t now = time(0);
+                /* convert now to string form */
+                char* dt = ctime(&now);
+                std::stringstream strstream;
+                strstream << "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/raw " << dt << ".txt";
+                logfile.open(strstream.str(), std::ofstream::out);
+            }
 
             outfile << "Body " << i << " keypoints:" << std::endl;
+            logfile << "Body " << i << " keypoints:" << std::endl;
 
             /* Probabilities check, do not log invalid "ghost" skeletons */
-            double avg_prob, total_prob = 0.0;
+            double bodyAvgProb, bodyTotalProb = 0.0;
             int i = 0;  // for development
 
             for (uint32_t j = 0; j < msg.human_list[i].num_body_key_points_with_non_zero_prob; j++)
-                total_prob += msg.human_list[i].body_key_points_with_prob[j].prob;
+                bodyTotalProb += msg.human_list[i].body_key_points_with_prob[j].prob;
 
-            avg_prob = total_prob / msg.human_list[i].num_body_key_points_with_non_zero_prob;
+            bodyAvgProb = bodyTotalProb / ((float) msg.human_list[i].num_body_key_points_with_non_zero_prob);
 
-            if (avg_prob > 0.0 /*MIN_PROB_THRESHOLD*/)
+            if (bodyAvgProb > MIN_PROB_THRESHOLD)
             {
                 i++;    // for development phase
 
@@ -204,6 +236,8 @@ void writeSkeletonToFile(const openpose_ros_msgs::OpenPoseHumanList& msg)
                     {
                         outfile << "raw kp " << getPoseBodyPartMappingBody25(j) << ": x=" << msg.human_list[i].body_key_points_with_prob[j].x << " y=" <<  msg.human_list[i].body_key_points_with_prob[j].y
                                 << " z=" <<  msg.human_list[i].body_key_points_with_prob[j].z << " prob=" <<  msg.human_list[i].body_key_points_with_prob[j].prob << std::endl;
+                        logfile << "raw kp " << getPoseBodyPartMappingBody25(j) << ": x=" << msg.human_list[i].body_key_points_with_prob[j].x << " y=" <<  msg.human_list[i].body_key_points_with_prob[j].y
+                                << " z=" <<  msg.human_list[i].body_key_points_with_prob[j].z << " prob=" <<  msg.human_list[i].body_key_points_with_prob[j].prob << std::endl;
                     }
                 } 
             }
@@ -211,12 +245,14 @@ void writeSkeletonToFile(const openpose_ros_msgs::OpenPoseHumanList& msg)
             assert(i < 5);  // for development phase
 
             outfile << std::endl << std::endl;
+            logfile << std::endl << std::endl;
 
             writen++;
         }
     }
 
     outfile.close();
+    logfile.close();
 }
 
 std::string getPoseBodyPartMappingBody25(unsigned int idx)
