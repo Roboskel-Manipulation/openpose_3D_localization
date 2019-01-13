@@ -73,20 +73,10 @@ void humanListPointcloudSkeletonCallback(const pcl::PointCloud<pcl::PointXYZ>::C
                         }
                         else
                         {
-                            // j = xVec.at(i) * pPCL->point_step + yVec.at(i) * pPCL->row_step;
-                            // // ROS_INFO("i = %d, j = %d", i, j);
-                            // x = pPCL->data[j + pPCL->fields[0].offset];
-                            // y = pPCL->data[j + pPCL->fields[1].offset];
-                            // z = pPCL->data[j + pPCL->fields[2].offset];
-                            // // ROS_INFO("x = %f, y = %f, z = %f", x, y, z);
-
-                            // pcl::PointCloud<pcl::PointXYZ> pCloud;
-                            // pcl::fromROSMsg(*pPCL, pCloud);
                             pcl::PointXYZ p1 = pPCL->at(xVec.at(i), yVec.at(i));
                             x = p1.x; y = p1.y; z = p1.z;
 
                             if (std::isnan(x) || std::isnan(y) || std::isnan(z))
-                                // x = 0.0; y = 0.0; z = 0.0;
                                 continue;
 
                             /* BROADCAST TRANSFORMATIONS */
@@ -94,8 +84,12 @@ void humanListPointcloudSkeletonCallback(const pcl::PointCloud<pcl::PointXYZ>::C
                             tf::Quaternion q(0, 0, 0, 1);
                             transform.setRotation(q);
                             br.sendTransform( tf::StampedTransform(transform, ros::Time::now(), "zed_left_camera_frame", getPoseBodyPartMappingBody25(i)) );
-                            // ROS_INFO("Just send transform for %s frame", getPoseBodyPartMappingBody25(i).c_str());
 
+                            /* report */
+                            ROS_INFO("SEND time=%d, from=%s, to=%s, x=%f, y=%f, z=%f",
+                                    ros::Time::now().toSec(), "zed_left_camera_frame", getPoseBodyPartMappingBody25(i), transform.getOrigin().x(), transform.getOrigin().y(), transform.getOrigin().z());
+
+                            /* log */
                             temp_list_msg.human_list[ext_i].body_key_points_with_prob[i].x = x;
                             temp_list_msg.human_list[ext_i].body_key_points_with_prob[i].y = y;
                             temp_list_msg.human_list[ext_i].body_key_points_with_prob[i].z = z;
@@ -142,6 +136,13 @@ void listenForSkeleton(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg
                 {
                     ROS_WARN("Transform older than %f seconds detected", RELIABILITY_THRESHOLD);
                     continue;
+                }
+                else
+                {
+                    /* report */
+                    if (!std::isnan(transform.getOrigin().x()) && !std::isnan(transform.getOrigin().y()) && !std::isnan(transform.getOrigin().z()))
+                        ROS_INFO("RCV: stamp=%d, from=%s, to=%s, x=%f, y=%f, z=%f",
+                               transform.stamp_.toSec(), transform.frame_id_, transform.child_frame_id_, transform.getOrigin().x(), transform.getOrigin().y(), transform.getOrigin().z());
                 }
             }
         }
