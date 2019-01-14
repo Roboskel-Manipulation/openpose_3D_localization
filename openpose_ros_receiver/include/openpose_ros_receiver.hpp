@@ -78,7 +78,6 @@ void initGlobalVars();
 void reInitGlobalVars();
 void humanListPointcloudSkeletonCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& pPCL2, const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& list_msg);
 void listenForSkeleton(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg);
-void writeSkeletonToFile(const openpose_ros_msgs::OpenPoseHumanList& msg);
 std::string getPoseBodyPartMappingBody25(unsigned int idx);
 
 #endif

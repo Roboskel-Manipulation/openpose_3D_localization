@@ -57,7 +57,7 @@ DEFINE_int32(keypoint_scale,            0,              "Scaling of the (x,y) co
                                                         " corner of the image, and (1,1) the bottom-right one; and 4 for range [-1,1], where"
                                                         " (-1,-1) would be the top-left corner of the image, and (1,1) the bottom-right one. Non"
                                                         " related with `scale_number` and `scale_gap`.");
-DEFINE_int32(number_people_max,         1,             "This parameter will limit the maximum number of people detected, by keeping the people with"
+DEFINE_int32(number_people_max,         -1,             "This parameter will limit the maximum number of people detected, by keeping the people with"
                                                         " top scores. The score is based in person area over the image, body part score, as well as"
                                                         " joint score (between each pair of connected body parts). Useful if you know the exact"
                                                         " number of people in the scene, so it can remove false positives (if all the people have"
