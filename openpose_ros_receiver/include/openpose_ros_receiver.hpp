@@ -36,7 +36,7 @@
 /* Important definitions */
 #define MIN_PROB_THRESHOLD 0.00     // probability -> float in [0..1]
 #define RELIABILITY_THRESHOLD 3.0   // seconds -> float
-#define MAX_RETRY 1                 // number of repetitions -> int
+#define MAX_RETRY 2                 // number of repetitions -> int
 
 /* Global variables */
 extern bool pointcloud_flag;

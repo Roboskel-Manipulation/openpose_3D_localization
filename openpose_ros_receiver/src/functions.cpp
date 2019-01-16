@@ -129,8 +129,8 @@ void humanListPointcloudSkeletonCallback(const pcl::PointCloud<pcl::PointXYZ>::C
 
                 writen++;
             }
-            // writeSkeletonToFile(temp_list_msg);
         }
+        
         outfile.close();
         logfile.close();
         // ROS_WARN("humanListBroadcastCallback OUT");
