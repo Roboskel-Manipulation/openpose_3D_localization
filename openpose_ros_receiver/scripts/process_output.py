@@ -26,6 +26,7 @@ if __name__ == "__main__":
                                      (20, "LSmallToe"), (21, "LHeel"), (22, "RBigToe"), (23, "RSmallToe"), (24, "RHeel"),
                                      (25, "Background")
                                 ])
+    element_dict = dict([ (0, "x"), (1, "y"), (2, "z"), (3, "c") ])
 
     output_path = "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/"
     output_subfolder = "take1/"
@@ -40,12 +41,15 @@ if __name__ == "__main__":
 
     # create CSVs
     for key, value in body_25_body_parts_dict.items():
+        fp = open(csv_folder_path + value + "CoordsAndProb" + ".csv", 'w')
+        fp.close()
+    for key, value in body_25_body_parts_dict.items():
         fp = open(csv_folder_path + value + ".csv", 'w')
         fp.close()
     
     # create our 3d report matrix: [BodyPart][x/y/z/prob][t1,...,t10,mean,variance] --> 25 * 4 * 12
-    x, y, z = 25, 4, 12
-    report_matrix = [ [ [ float('nan') for k in range(z) ] for j in range(y) ] for i in range(x) ]
+    part, elem, val = 25, 4, 12
+    report_matrix = [ [ [ float('nan') for k in range(val) ] for j in range(elem) ] for i in range(part) ]
 
     # access the files of the output directory
     file_counter = 0
@@ -53,14 +57,14 @@ if __name__ == "__main__":
         try:
             if os.path.isfile(os.path.join(output_folder_path, file)) and raw_output_file_prefix in file:
                 # read from file
-                with open(os.path.join(output_folder_path, file), 'r') as fp:
+                with open( os.path.join(output_folder_path, file), 'r' ) as fp:
                     for cnt, line in enumerate(fp):
                         if "Body" not in line and line.strip():     # ignore header lines and empty lines
                             body_part = re.search('kp (.*):', line).group(1)
                             coords_and_prob = re.findall(r'\d+\.\d+', line)
 
                             # write in the appropriate CSV
-                            with open(csv_folder_path + body_part + ".csv", 'a') as fp:
+                            with open(csv_folder_path + body_part + "CoordsAndProb" + ".csv", 'a') as fp:
                                 string = ""
                                 coord_or_prob_idx = 0
                                 for i in coords_and_prob:
@@ -68,26 +72,33 @@ if __name__ == "__main__":
                                         string = string + ","
                                     string = string + str(i)
 
-                                    # print "m[{}][{}][{}] {}".format(getKeysByValue(body_25_body_parts_dict, body_part)[0], coord_or_prob_idx, file_counter, report_matrix[getKeysByValue(body_25_body_parts_dict, body_part)[0]][coord_or_prob_idx][file_counter])
                                     # fill report matrix
-                                    # report_matrix[getKeysByValue(body_25_body_parts_dict, body_part)[0]][coord_or_prob_idx][file_counter] = float(i)
+                                    report_matrix[ getKeysByValue(body_25_body_parts_dict, body_part)[0] ][coord_or_prob_idx][file_counter] = float(i)
 
                                     coord_or_prob_idx = coord_or_prob_idx + 1
-
-                                # report_matrix[getKeysByValue(body_25_body_parts_dict, body_part)[0]][coord_or_prob_idx+1][file_counter] = 0.0
-                                # report_matrix[getKeysByValue(body_25_body_parts_dict, body_part)[0]][coord_or_prob_idx+2][file_counter] = 0.0
 
                                 string = string + "\n"
                                 fp.write(string)
             
-            file_counter = file_counter + 1
+                file_counter = file_counter + 1
         except Exception as e:
             raise e
 
+    for i in range(part):
+       # write in the appropriate CSV
+        with open(csv_folder_path + body_25_body_parts_dict.get(i) + ".csv", 'a') as fp:
+            for j in range(elem):
+                print >> fp , element_dict.get(j) + "," + (",".join( str(e) for e in report_matrix[i][j] ))
+
     # # debugging
-    # for i in range(x):
-    #     for j in range(y):
-    #         for k in range(z):
-    #             print "m[{}][{}][{}] {}".format(i, j, k, report_matrix[i][j][k])
-    #             if math.isnan(float(report_matrix[i][j][k])):
-    #                 time.sleep(1)
+    # print report_matrix
+    # # for i in range(part):
+    # #     for j in range(elem):
+    # #         for k in range(val):
+    # #             print "m[{}][{}][{}] {}".format(i, j, k, report_matrix[i][j][k])
+    # #             # if math.isnan(float(report_matrix[i][j][k])):
+    # #             #     time.sleep(1)
+    # for i in range(part):
+    #     print "\n----------------------------------------\n" + body_25_body_parts_dict.get(i) + "\n"
+    #     for j in range(elem):
+    #         print report_matrix[i][j]
