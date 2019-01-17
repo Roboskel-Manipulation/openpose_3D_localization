@@ -6,10 +6,10 @@ import math
 import time
 import numpy as np
 from scipy import stats
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
-'''
-Get a list of keys from dictionary which has the given value
-'''
+# Get a list of keys from dictionary which has the given value
 def getKeysByValue(dictOfElements, valueToFind):
     listOfKeys = list()
     listOfItems = dictOfElements.items()
@@ -17,6 +17,40 @@ def getKeysByValue(dictOfElements, valueToFind):
         if item[1] == valueToFind:
             listOfKeys.append(item[0])
     return  listOfKeys
+
+# Define a function for a histogram
+def histogram(data, x_label, y_label, title, directory):
+    fig, ax = plt.subplots()
+    ax.hist(np.array(data)[~np.isnan(np.array(data))], color = '#539caf')
+    ax.set_xlabel(x_label)
+    ax.set_ylabel(y_label)
+    ax.set_title(title)
+    plt.savefig(directory+title+".png")
+    plt.close(fig)
+
+# Define a function for a 3D scatterplot
+def scatterplot(x, y, z, x_label, y_label, z_label, title, directory):
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(x, y, z, c='r', marker='o')
+    ax.set_xlabel(x_label)
+    ax.set_ylabel(y_label)
+    ax.set_zlabel(z_label)
+    ax.set_title(title)
+    plt.savefig(directory+title+".png")
+    plt.close(fig)
+
+# Define a function for plotting error
+def errorbar(x, y, x_label, y_label, title, directory, x_lim_min=0, x_lim_max=1):
+    dy = (x_lim_min + x_lim_max) / 2
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    plt.errorbar(x, y, yerr=dy, fmt='.k')
+    ax.set_xlabel(x_label)
+    ax.set_ylabel(y_label)
+    ax.set_title(title)
+    plt.savefig(directory+title+".png")
+    plt.close()
 
 if __name__ == "__main__":
 
@@ -35,10 +69,15 @@ if __name__ == "__main__":
     raw_output_file_prefix = "raw Tue Jan 15 14:21:2"   # to go from 14:21:20 to 14:21:29 (10 files)
     tfed_output_file_prefix = "tfed Tue Jan 15 14:21:"
     csv_folder_path = output_folder_path + "csv/"
+    plots_folder_path = output_folder_path + "plots/"
 
     # create CSVs directory
     if not os.path.exists(csv_folder_path):
         os.makedirs(csv_folder_path)
+
+    # create plots directory
+    if not os.path.exists(plots_folder_path):
+        os.makedirs(plots_folder_path)
 
     # create CSVs
     for key, value in body_25_body_parts_dict.items():
@@ -103,6 +142,82 @@ if __name__ == "__main__":
             report_matrix[i][j][variance_idx] = description.variance
             report_matrix[i][j][skewness_idx] = description.skewness
             report_matrix[i][j][kurtosis_idx] = description.kurtosis
+        
+            histogram(  data=report_matrix[i][j][0:stat_analysis_idx],
+                        x_label=element_dict.get(j), y_label="Frequency",
+                        title="Distribution of "+element_dict.get(j)+" at "+body_25_body_parts_dict.get(i),
+                        directory=plots_folder_path
+                    )
+        
+        scatterplot(    x=report_matrix[i][0][0:stat_analysis_idx], y=report_matrix[i][1][0:stat_analysis_idx], z=report_matrix[i][2][0:stat_analysis_idx],
+                        x_label='X', y_label='Y', z_label='Z',
+                        title="Scatterplot of X, Y, Z at "+body_25_body_parts_dict.get(i),
+                        directory=plots_folder_path
+                    )
+
+    for i in range(part):
+        if i < part-1:
+            errorbar(  x=np.sort(np.nan_to_num(report_matrix[i][3][0:stat_analysis_idx])), y=np.sort(np.nan_to_num(report_matrix[i+1][3][0:stat_analysis_idx])),
+                        x_label="Certainties", y_label="Error",
+                        title="Errorplot of "+body_25_body_parts_dict.get(i)+" certainty compared to "+body_25_body_parts_dict.get(i+1)+" certainty",
+                        directory=plots_folder_path,
+                        x_lim_min=(report_matrix[i][3][min_idx] if report_matrix[i][3][min_idx] < report_matrix[i+1][3][min_idx] else report_matrix[i+1][3][min_idx]), x_lim_max=((report_matrix[i][3][max_idx] if report_matrix[i][3][max_idx] > report_matrix[i+1][3][max_idx] else report_matrix[i+1][3][max_idx]))
+                    )
+
+    variances, means, skewnesses, kurtoses = [], [], [], []
+    for i in range(part):
+        local_variances, local_means, local_skewnesses, local_kurtoses = [], [], [], []
+        for j in range(elem):
+            variances.append(report_matrix[i][j][variance_idx])
+            means.append(report_matrix[i][j][mean_idx])
+            skewnesses.append(report_matrix[i][j][skewness_idx])
+            kurtoses.append(report_matrix[i][j][kurtosis_idx])
+            local_variances.append(report_matrix[i][j][variance_idx])
+            local_means.append(report_matrix[i][j][mean_idx])
+            local_skewnesses.append(report_matrix[i][j][skewness_idx])
+            local_kurtoses.append(report_matrix[i][j][kurtosis_idx])
+
+        histogram(  data=local_variances,
+                    x_label="All " + body_25_body_parts_dict.get(i) + " variances", y_label="Frequency",
+                    title="Distribution of all " + body_25_body_parts_dict.get(i) + " variances",
+                    directory=plots_folder_path
+                )
+        histogram(  data=local_means,
+                    x_label="All " + body_25_body_parts_dict.get(i) + " means", y_label="Frequency",
+                    title="Distribution of all " + body_25_body_parts_dict.get(i) + " means",
+                    directory=plots_folder_path
+                )
+        histogram(  data=local_skewnesses,
+                    x_label="All " + body_25_body_parts_dict.get(i) + " skewnesses", y_label="Frequency",
+                    title="Distribution of all " + body_25_body_parts_dict.get(i) + " skewnesses",
+                    directory=plots_folder_path
+                )
+        histogram(  data=local_kurtoses,
+                    x_label="All " + body_25_body_parts_dict.get(i) + " kurtoses", y_label="Frequency",
+                    title="Distribution of all " + body_25_body_parts_dict.get(i) + " kurtoses",
+                    directory=plots_folder_path
+                )
+
+    histogram(  data=variances,
+                x_label="All variances", y_label="Frequency",
+                title="Distribution of all variances",
+                directory=plots_folder_path
+            )
+    histogram(  data=means,
+                x_label="All means", y_label="Frequency",
+                title="Distribution of all means",
+                directory=plots_folder_path
+            )
+    histogram(  data=skewnesses,
+                x_label="All skewnesses", y_label="Frequency",
+                title="Distribution of all skewnesses",
+                directory=plots_folder_path
+            )
+    histogram(  data=kurtoses,
+                x_label="All kurtoses", y_label="Frequency",
+                title="Distribution of all kurtoses",
+                directory=plots_folder_path
+            )
 
     # write statistical analysis report
     for i in range(part):
@@ -111,16 +226,3 @@ if __name__ == "__main__":
             print >> fp , "elem,t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,nobs,min,max,mean,variance,skewness,kurtosis"
             for j in range(elem):
                 print >> fp , element_dict.get(j) + "," + (",".join( str(e) for e in report_matrix[i][j] ))
-
-    # # debugging
-    # print report_matrix
-    # # for i in range(part):
-    # #     for j in range(elem):
-    # #         for k in range(val):
-    # #             print "m[{}][{}][{}] {}".format(i, j, k, report_matrix[i][j][k])
-    # #             # if math.isnan(float(report_matrix[i][j][k])):
-    # #             #     time.sleep(1)
-    # for i in range(part):
-    #     print "\n----------------------------------------\n" + body_25_body_parts_dict.get(i) + "\n"
-    #     for j in range(elem):
-    #         print report_matrix[i][j]
