@@ -9,6 +9,7 @@ from scipy import stats
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
+
 # Get a list of keys from dictionary which has the given value
 def getKeysByValue(dictOfElements, valueToFind):
     listOfKeys = list()
@@ -17,6 +18,7 @@ def getKeysByValue(dictOfElements, valueToFind):
         if item[1] == valueToFind:
             listOfKeys.append(item[0])
     return  listOfKeys
+
 
 # Define a function for a histogram
 def histogram(data, x_label, y_label, title, directory):
@@ -27,6 +29,7 @@ def histogram(data, x_label, y_label, title, directory):
     ax.set_title(title)
     plt.savefig(directory+title+".png")
     plt.close(fig)
+
 
 # Define a function for a 3D scatterplot
 def scatterplot(x, y, z, x_label, y_label, z_label, title, directory):
@@ -40,6 +43,7 @@ def scatterplot(x, y, z, x_label, y_label, z_label, title, directory):
     plt.savefig(directory+title+".png")
     plt.close(fig)
 
+
 # Define a function for plotting error
 def errorbar(x, y, x_label, y_label, title, directory, x_lim_min=0, x_lim_max=1):
     dy = (x_lim_min + x_lim_max) / 2
@@ -51,6 +55,7 @@ def errorbar(x, y, x_label, y_label, title, directory, x_lim_min=0, x_lim_max=1)
     ax.set_title(title)
     plt.savefig(directory+title+".png")
     plt.close()
+
 
 if __name__ == "__main__":
 
@@ -95,6 +100,7 @@ if __name__ == "__main__":
     # access the files of the output directory
     file_counter = 0
     for file in os.listdir(output_folder_path):
+
         try:
             if os.path.isfile(os.path.join(output_folder_path, file)) and raw_output_file_prefix in file:
                 # read from file
@@ -122,11 +128,14 @@ if __name__ == "__main__":
                                 fp.write(string)
             
                 file_counter = file_counter + 1
+
         except Exception as e:
             raise e
 
+
     # do statistical analysis
     for i in range(part):
+
         for j in range(elem):
             # count the non-nan values
             non_nans = (~np.isnan(report_matrix[i][j][0:stat_analysis_idx])).sum(0)
@@ -143,17 +152,21 @@ if __name__ == "__main__":
             report_matrix[i][j][skewness_idx] = description.skewness
             report_matrix[i][j][kurtosis_idx] = description.kurtosis
         
+            # Plot a histogram of the values of a certain element (x,y,z,c) of a certain body part's keypoints
             histogram(  data=report_matrix[i][j][0:stat_analysis_idx],
                         x_label=element_dict.get(j), y_label="Frequency",
                         title="Distribution of "+element_dict.get(j)+" at "+body_25_body_parts_dict.get(i),
                         directory=plots_folder_path
                     )
         
+
+        # Do a scatterplot of a certain body part's keypoints detected in space
         scatterplot(    x=report_matrix[i][0][0:stat_analysis_idx], y=report_matrix[i][1][0:stat_analysis_idx], z=report_matrix[i][2][0:stat_analysis_idx],
                         x_label='X', y_label='Y', z_label='Z',
                         title="Scatterplot of X, Y, Z at "+body_25_body_parts_dict.get(i),
                         directory=plots_folder_path
                     )
+
 
     for i in range(part):
         if i < part-1:
@@ -165,7 +178,12 @@ if __name__ == "__main__":
                     )
 
     variances, means, skewnesses, kurtoses = [], [], [], []
+    x_variances, y_variances, z_variances, c_variances = [], [], [], []
+    x_means, y_means, z_means, c_means = [], [], [], []
+    x_skewnesses, y_skewnesses, z_skewnesses, c_skewnesses = [], [], [], []
+    x_kurtoses, y_kurtoses, z_kurtoses, c_kurtoses = [], [], [], []
     for i in range(part):
+
         local_variances, local_means, local_skewnesses, local_kurtoses = [], [], [], []
         for j in range(elem):
             variances.append(report_matrix[i][j][variance_idx])
@@ -177,6 +195,8 @@ if __name__ == "__main__":
             local_skewnesses.append(report_matrix[i][j][skewness_idx])
             local_kurtoses.append(report_matrix[i][j][kurtosis_idx])
 
+
+        # Plot histograms of the values of all variances, means, skewnesses and kurtoses of a certain body part
         histogram(  data=local_variances,
                     x_label="All " + body_25_body_parts_dict.get(i) + " variances", y_label="Frequency",
                     title="Distribution of all " + body_25_body_parts_dict.get(i) + " variances",
@@ -198,6 +218,25 @@ if __name__ == "__main__":
                     directory=plots_folder_path
                 )
 
+
+        x_variances.append(report_matrix[i][getKeysByValue(element_dict, "x")[0]][variance_idx])
+        y_variances.append(report_matrix[i][getKeysByValue(element_dict, "y")[0]][variance_idx])
+        z_variances.append(report_matrix[i][getKeysByValue(element_dict, "z")[0]][variance_idx])
+        c_variances.append(report_matrix[i][getKeysByValue(element_dict, "c")[0]][variance_idx])
+        x_means.append(report_matrix[i][getKeysByValue(element_dict, "x")[0]][mean_idx])
+        y_means.append(report_matrix[i][getKeysByValue(element_dict, "y")[0]][mean_idx])
+        z_means.append(report_matrix[i][getKeysByValue(element_dict, "z")[0]][mean_idx])
+        c_means.append(report_matrix[i][getKeysByValue(element_dict, "c")[0]][mean_idx])
+        x_skewnesses.append(report_matrix[i][getKeysByValue(element_dict, "x")[0]][skewness_idx])
+        y_skewnesses.append(report_matrix[i][getKeysByValue(element_dict, "y")[0]][skewness_idx])
+        z_skewnesses.append(report_matrix[i][getKeysByValue(element_dict, "z")[0]][skewness_idx])
+        c_skewnesses.append(report_matrix[i][getKeysByValue(element_dict, "c")[0]][skewness_idx])
+        x_kurtoses.append(report_matrix[i][getKeysByValue(element_dict, "x")[0]][kurtosis_idx])
+        y_kurtoses.append(report_matrix[i][getKeysByValue(element_dict, "y")[0]][kurtosis_idx])
+        z_kurtoses.append(report_matrix[i][getKeysByValue(element_dict, "z")[0]][kurtosis_idx])
+        c_kurtoses.append(report_matrix[i][getKeysByValue(element_dict, "c")[0]][kurtosis_idx])
+
+    # Plot histograms of the values of all variances, means, skewnesses and kurtoses
     histogram(  data=variances,
                 x_label="All variances", y_label="Frequency",
                 title="Distribution of all variances",
@@ -218,6 +257,89 @@ if __name__ == "__main__":
                 title="Distribution of all kurtoses",
                 directory=plots_folder_path
             )
+
+    # Plot histograms of the values of the variances, means, skewnesses and kurtoses of each keypoint elements
+    histogram(  data=x_variances,
+                x_label="All x variances", y_label="Frequency",
+                title="Distribution of all x variances",
+                directory=plots_folder_path
+            )
+    histogram(  data=x_means,
+                x_label="All x means", y_label="Frequency",
+                title="Distribution of all x means",
+                directory=plots_folder_path
+            )
+    histogram(  data=x_skewnesses,
+                x_label="All x skewnesses", y_label="Frequency",
+                title="Distribution of all x skewnesses",
+                directory=plots_folder_path
+            )
+    histogram(  data=x_kurtoses,
+                x_label="All x kurtoses", y_label="Frequency",
+                title="Distribution of all x kurtoses",
+                directory=plots_folder_path
+            )
+    histogram(  data=y_variances,
+                x_label="All y variances", y_label="Frequency",
+                title="Distribution of all y variances",
+                directory=plots_folder_path
+            )
+    histogram(  data=y_means,
+                x_label="All y means", y_label="Frequency",
+                title="Distribution of all y means",
+                directory=plots_folder_path
+            )
+    histogram(  data=y_skewnesses,
+                x_label="All y skewnesses", y_label="Frequency",
+                title="Distribution of all y skewnesses",
+                directory=plots_folder_path
+            )
+    histogram(  data=y_kurtoses,
+                x_label="All y kurtoses", y_label="Frequency",
+                title="Distribution of all y kurtoses",
+                directory=plots_folder_path
+            )
+    histogram(  data=z_variances,
+                x_label="All z variances", y_label="Frequency",
+                title="Distribution of all z variances",
+                directory=plots_folder_path
+            )
+    histogram(  data=z_means,
+                x_label="All z means", y_label="Frequency",
+                title="Distribution of all z means",
+                directory=plots_folder_path
+            )
+    histogram(  data=z_skewnesses,
+                x_label="All z skewnesses", y_label="Frequency",
+                title="Distribution of all z skewnesses",
+                directory=plots_folder_path
+            )
+    histogram(  data=z_kurtoses,
+                x_label="All z kurtoses", y_label="Frequency",
+                title="Distribution of all z kurtoses",
+                directory=plots_folder_path
+            )
+    histogram(  data=c_variances,
+                x_label="All c variances", y_label="Frequency",
+                title="Distribution of all c variances",
+                directory=plots_folder_path
+            )
+    histogram(  data=c_means,
+                x_label="All c means", y_label="Frequency",
+                title="Distribution of all c means",
+                directory=plots_folder_path
+            )
+    histogram(  data=c_skewnesses,
+                x_label="All c skewnesses", y_label="Frequency",
+                title="Distribution of all c skewnesses",
+                directory=plots_folder_path
+            )
+    histogram(  data=c_kurtoses,
+                x_label="All c kurtoses", y_label="Frequency",
+                title="Distribution of all c kurtoses",
+                directory=plots_folder_path
+            )
+
 
     # write statistical analysis report
     for i in range(part):
