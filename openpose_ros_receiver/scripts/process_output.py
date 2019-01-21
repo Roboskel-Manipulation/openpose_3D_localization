@@ -22,13 +22,20 @@ def getKeysByValue(dictOfElements, valueToFind):
 
 
 # Define a function for a plot
-def plot(x, y, directory, x_label=None, y_label=None, title=None, y_lim_min=None, y_lim_max=None):
+def plot(x, y, directory, x_label=None, y_label=None, title=None, y_lim_min=None, y_lim_max=None, x_tick_labels=None):
     fig, ax = plt.subplots()
-    ax.plot(x, y)
+    ax.plot(x, y, linestyle='--', marker='o')
+    # number of index to markers
+    i = 0
+    for x_i, y_i in zip(x, y):
+        ax.text(x_i, y_i, str(i), fontsize=10)
+        i = i+1
     if x_label:
         ax.set_xlabel(x_label)
     if y_label:
         ax.set_ylabel(y_label)
+    if x_tick_labels:
+        ax.set_xticklabels(x_tick_labels)
     if title:
         ax.set_title(title)
     if y_lim_min and y_lim_max:
@@ -38,15 +45,26 @@ def plot(x, y, directory, x_label=None, y_label=None, title=None, y_lim_min=None
 
 
 # Define a function for multiple plots
-def multiplot(x, y_data, directory, y_names=None, x_label=None, y_label=None, title=None, y_lim_min=None, y_lim_max=None):
+def multiplot(x, y_data, directory, y_names=None, x_label=None, y_label=None, title=None, y_lim_min=None, y_lim_max=None, x_tick_labels=None):
     if y_names:
         fig, (ax, lax) = plt.subplots(ncols=2, gridspec_kw={"width_ratios":[5,1]})
         for i in range(len(y_data)):
-            ax.plot(x, y_data[i], label=y_names[i])
+            ax.plot(x, y_data[i], label=y_names[i], linestyle='--', marker='o')
+            # number of index to markers
+            j = 0
+            for x_j, y_j in zip(x, y_data[i]):
+                ax.text(x_j, y_j, str(j), fontsize=10)
+                j = j+1
     else:
         fig, ax = plt.subplots()
         for y in y_data:
-            ax.plot(x, y)
+            ax.plot(x, y, linestyle='--', marker='o')
+            # number of index to markers
+            i = 0
+            for x_i, y_i in zip(x, y):
+                ax.text(x_i, y_i, str(i), fontsize=10)
+                i = i+1
+    # color palette for the plots
     cmap = sns.blend_palette(["firebrick", "palegreen"], len(y_data))
     sns.set_palette(cmap, n_colors=len(y_data))
     # ax.set_prop_cycle('color', colors)
@@ -54,6 +72,8 @@ def multiplot(x, y_data, directory, y_names=None, x_label=None, y_label=None, ti
         ax.set_xlabel(x_label)
     if y_label:
         ax.set_ylabel(y_label)
+    if x_tick_labels:
+        ax.set_xticklabels(x_tick_labels)
     if title:
         ax.set_title(title)
     if y_names:
@@ -115,26 +135,27 @@ def boxplot(data, directory, data_label=None, y_label=None, title=None, x_tick_l
     plt.close(fig)
 
 
-# Define a function for plotting error
-def errorbar(x, y, directory, x_label=None, y_label=None, title=None, x_lim_min=0, x_lim_max=1, x_tick_labels=None):
-    dy = (x_lim_min + x_lim_max) / 2
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    plt.errorbar(x, y, yerr=dy, fmt='.k')
-    if x_label:
-        ax.set_xlabel(x_label)
-    if y_label:
-        ax.set_ylabel(y_label)
-    if x_tick_labels:
-        ax.set_xticklabels(x_tick_labels)
-    if title:
-        ax.set_title(title)
-    plt.savefig(directory+title+".png")
-    plt.close()
+# # Define a function for plotting error
+# def errorbar(x, y, directory, x_label=None, y_label=None, title=None, x_lim_min=0, x_lim_max=1, x_tick_labels=None):
+#     dy = (x_lim_min + x_lim_max) / 2
+#     fig = plt.figure()
+#     ax = fig.add_subplot(111)
+#     plt.errorbar(x, y, yerr=dy, fmt='.k')
+#     if x_label:
+#         ax.set_xlabel(x_label)
+#     if y_label:
+#         ax.set_ylabel(y_label)
+#     if x_tick_labels:
+#         ax.set_xticklabels(x_tick_labels)
+#     if title:
+#         ax.set_title(title)
+#     plt.savefig(directory+title+".png")
+#     plt.close()
 
 
 if __name__ == "__main__":
 
+    # Body 25 human pose model specific variables
     body_25_body_parts_dict = dict([ (0,  "Nose"), (1,  "Neck"), (2,  "RShoulder"), (3,  "RElbow"), (4,  "RWrist"),
                                      (5,  "LShoulder"), (6,  "LElbow"), (7,  "LWrist"), (8,  "MidHip"), (9,  "RHip"),
                                      (10, "RKnee"), (11, "RAnkle"), (12, "LHip"), (13, "LKnee"), (14, "LAnkle"),
@@ -142,8 +163,15 @@ if __name__ == "__main__":
                                      (20, "LSmallToe"), (21, "LHeel"), (22, "RBigToe"), (23, "RSmallToe"), (24, "RHeel"),
                                      (25, "Background")
                                 ])
+    body_25_body_part_pairs = [ [1, 8], [1, 2], [1, 5], [2, 3], [3, 4], [5, 6], [6, 7],
+                                [8, 9], [9, 10], [10, 11], [8, 12], [12, 13], [13, 14], [1, 0],
+                                [0, 15], [15, 17], [0, 16], [16, 18], [2, 17], [5, 18], [14, 19],
+                                [19, 20], [14, 21], [11, 22], [22, 23], [11, 24]
+                            ]
+    # OpenPose specific variables
     element_dict = dict([ (0, "x"), (1, "y"), (2, "z"), (3, "certainty") ])
 
+    # File I/O specific variables
     output_path = "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/"
     output_subfolder = "take1/"
     # output_subfolder = "take4/"
@@ -297,15 +325,16 @@ if __name__ == "__main__":
                 certainty_accross_frames[i][k] = report_matrix[i][ getKeysByValue(element_dict, "certainty")[0] ][k]
 
 
-    for i in range(part):
-        if i < part-1:
-            errorbar(  x=np.sort(np.nan_to_num(report_matrix[i][3][0:stat_analysis_idx])), y=np.sort(np.nan_to_num(report_matrix[i+1][3][0:stat_analysis_idx])),
-                        x_label="Certainties", y_label="Error",
-                        title="Errorplot of "+body_25_body_parts_dict.get(i)+" certainty compared to "+body_25_body_parts_dict.get(i+1)+" certainty",
-                        directory=plots_folder_path,
-                        x_lim_min=(report_matrix[i][3][min_idx] if report_matrix[i][3][min_idx] < report_matrix[i+1][3][min_idx] else report_matrix[i+1][3][min_idx]), x_lim_max=((report_matrix[i][3][max_idx] if report_matrix[i][3][max_idx] > report_matrix[i+1][3][max_idx] else report_matrix[i+1][3][max_idx])),
-                        x_tick_labels=[ str(i+1) for i in range(stat_analysis_idx) ]
-                    )
+    # # Create Errorbars
+    # for i in range(part):
+    #     if i < part-1:
+    #         errorbar(  x=np.sort(np.nan_to_num(report_matrix[i][3][0:stat_analysis_idx])), y=np.sort(np.nan_to_num(report_matrix[i+1][3][0:stat_analysis_idx])),
+    #                     x_label="Certainties", y_label="Error",
+    #                     title="Errorplot of "+body_25_body_parts_dict.get(i)+" certainty compared to "+body_25_body_parts_dict.get(i+1)+" certainty",
+    #                     directory=plots_folder_path,
+    #                     x_lim_min=(report_matrix[i][3][min_idx] if report_matrix[i][3][min_idx] < report_matrix[i+1][3][min_idx] else report_matrix[i+1][3][min_idx]), x_lim_max=((report_matrix[i][3][max_idx] if report_matrix[i][3][max_idx] > report_matrix[i+1][3][max_idx] else report_matrix[i+1][3][max_idx])),
+    #                     x_tick_labels=[ str(i+1) for i in range(stat_analysis_idx) ]
+    #                 )
 
     variances, means, skewnesses, kurtoses = [], [], [], []
     x_variances, y_variances, z_variances, certainty_variances = [], [], [], []
@@ -530,9 +559,19 @@ if __name__ == "__main__":
                 x_label="Frame",
                 y_label=body_25_body_parts_dict.get(i) + " certainty",
                 title="Plot of " + body_25_body_parts_dict.get(i) + " certainty accross frames",
+                directory=plots_folder_path,
+                x_tick_labels=[str(j) for j in range(stat_analysis_idx)]
+            )
+    # second, for all body part pairs
+    for pair in body_25_body_part_pairs:
+        plot(   x=certainty_accross_frames[pair[0]],
+                y=certainty_accross_frames[pair[1]],
+                x_label=body_25_body_parts_dict.get(pair[0]) + " certainty",
+                y_label=body_25_body_parts_dict.get(pair[1]) + " certainty",
+                title="Plot of " + body_25_body_parts_dict.get(pair[0]) + " and " + body_25_body_parts_dict.get(pair[1]) + " certainty accross frames",
                 directory=plots_folder_path
             )
-    # second, for all body parts collectivelly
+    # third, for all body parts collectivelly
     multiplot(  x=[ i for i in range(stat_analysis_idx) ],
                 y_data=certainty_accross_frames,
                 y_names=[ body_25_body_parts_dict.get(i) for i in range(part) ],
@@ -541,7 +580,8 @@ if __name__ == "__main__":
                 x_label="Frame",
                 y_label="Body parts certainty",
                 title="Plot of body parts certainty accross frames",
-                directory=plots_folder_path
+                directory=plots_folder_path,
+                x_tick_labels=[str(j) for j in range(stat_analysis_idx)]
             )
 
 
