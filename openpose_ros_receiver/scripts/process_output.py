@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+# python modules
 import os
 import re
 import math
@@ -46,6 +47,8 @@ def plot(x, y, directory, x_label=None, y_label=None, title=None, y_lim_min=None
 
 # Define a function for multiple plots
 def multiplot(x, y_data, directory, y_names=None, x_label=None, y_label=None, title=None, y_lim_min=None, y_lim_max=None, x_tick_labels=None):
+    # expand the color palette for the plots
+    sns.set_palette(sns.color_palette("hls", len(y_data)))
     if y_names:
         fig, (ax, lax) = plt.subplots(ncols=2, gridspec_kw={"width_ratios":[5,1]})
         for i in range(len(y_data)):
@@ -64,10 +67,6 @@ def multiplot(x, y_data, directory, y_names=None, x_label=None, y_label=None, ti
             for x_i, y_i in zip(x, y):
                 ax.text(x_i, y_i, str(i), fontsize=10)
                 i = i+1
-    # color palette for the plots
-    cmap = sns.blend_palette(["firebrick", "palegreen"], len(y_data))
-    sns.set_palette(cmap, n_colors=len(y_data))
-    # ax.set_prop_cycle('color', colors)
     if x_label:
         ax.set_xlabel(x_label)
     if y_label:
@@ -133,24 +132,6 @@ def boxplot(data, directory, data_label=None, y_label=None, title=None, x_tick_l
         ax.set_title(title)
     plt.savefig(directory+title+".png")
     plt.close(fig)
-
-
-# # Define a function for plotting error
-# def errorbar(x, y, directory, x_label=None, y_label=None, title=None, x_lim_min=0, x_lim_max=1, x_tick_labels=None):
-#     dy = (x_lim_min + x_lim_max) / 2
-#     fig = plt.figure()
-#     ax = fig.add_subplot(111)
-#     plt.errorbar(x, y, yerr=dy, fmt='.k')
-#     if x_label:
-#         ax.set_xlabel(x_label)
-#     if y_label:
-#         ax.set_ylabel(y_label)
-#     if x_tick_labels:
-#         ax.set_xticklabels(x_tick_labels)
-#     if title:
-#         ax.set_title(title)
-#     plt.savefig(directory+title+".png")
-#     plt.close()
 
 
 if __name__ == "__main__":
@@ -324,17 +305,6 @@ if __name__ == "__main__":
             if ~np.isnan(report_matrix[i][ getKeysByValue(element_dict, "certainty")[0] ][k]):
                 certainty_accross_frames[i][k] = report_matrix[i][ getKeysByValue(element_dict, "certainty")[0] ][k]
 
-
-    # # Create Errorbars
-    # for i in range(part):
-    #     if i < part-1:
-    #         errorbar(  x=np.sort(np.nan_to_num(report_matrix[i][3][0:stat_analysis_idx])), y=np.sort(np.nan_to_num(report_matrix[i+1][3][0:stat_analysis_idx])),
-    #                     x_label="Certainties", y_label="Error",
-    #                     title="Errorplot of "+body_25_body_parts_dict.get(i)+" certainty compared to "+body_25_body_parts_dict.get(i+1)+" certainty",
-    #                     directory=plots_folder_path,
-    #                     x_lim_min=(report_matrix[i][3][min_idx] if report_matrix[i][3][min_idx] < report_matrix[i+1][3][min_idx] else report_matrix[i+1][3][min_idx]), x_lim_max=((report_matrix[i][3][max_idx] if report_matrix[i][3][max_idx] > report_matrix[i+1][3][max_idx] else report_matrix[i+1][3][max_idx])),
-    #                     x_tick_labels=[ str(i+1) for i in range(stat_analysis_idx) ]
-    #                 )
 
     variances, means, skewnesses, kurtoses = [], [], [], []
     x_variances, y_variances, z_variances, certainty_variances = [], [], [], []
