@@ -8,6 +8,7 @@ import numpy as np
 from scipy import stats
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import seaborn as sns
 
 
 # Get a list of keys from dictionary which has the given value
@@ -20,13 +21,62 @@ def getKeysByValue(dictOfElements, valueToFind):
     return  listOfKeys
 
 
+# Define a function for a plot
+def plot(x, y, directory, x_label=None, y_label=None, title=None, y_lim_min=None, y_lim_max=None):
+    fig, ax = plt.subplots()
+    ax.plot(x, y)
+    if x_label:
+        ax.set_xlabel(x_label)
+    if y_label:
+        ax.set_ylabel(y_label)
+    if title:
+        ax.set_title(title)
+    if y_lim_min and y_lim_max:
+        plt.ylim(y_lim_min, y_lim_max)
+    plt.savefig(directory+title+".png")
+    plt.close(fig)
+
+
+# Define a function for multiple plots
+def multiplot(x, y_data, directory, y_names=None, x_label=None, y_label=None, title=None, y_lim_min=None, y_lim_max=None):
+    if y_names:
+        fig, (ax, lax) = plt.subplots(ncols=2, gridspec_kw={"width_ratios":[5,1]})
+        for i in range(len(y_data)):
+            ax.plot(x, y_data[i], label=y_names[i])
+    else:
+        fig, ax = plt.subplots()
+        for y in y_data:
+            ax.plot(x, y)
+    cmap = sns.blend_palette(["firebrick", "palegreen"], len(y_data))
+    sns.set_palette(cmap, n_colors=len(y_data))
+    # ax.set_prop_cycle('color', colors)
+    if x_label:
+        ax.set_xlabel(x_label)
+    if y_label:
+        ax.set_ylabel(y_label)
+    if title:
+        ax.set_title(title)
+    if y_names:
+        h,l = ax.get_legend_handles_labels()
+        lax.legend(h, l, borderaxespad=0, prop={'size': 10})
+        lax.axis("off")
+        plt.tight_layout()
+    if y_lim_min and y_lim_max:
+        plt.ylim(y_lim_min, y_lim_max)
+    plt.savefig(directory+title+".png")
+    plt.close(fig)
+
+
 # Define a function for a histogram
-def histogram(data, x_label, y_label, title, directory):
+def histogram(data, directory, x_label=None, y_label=None, title=None):
     fig, ax = plt.subplots()
     ax.hist(np.array(data)[~np.isnan(np.array(data))], color = '#539caf')
-    ax.set_xlabel(x_label)
-    ax.set_ylabel(y_label)
-    ax.set_title(title)
+    if x_label:
+        ax.set_xlabel(x_label)
+    if y_label:
+        ax.set_ylabel(y_label)
+    if title:
+        ax.set_title(title)
     plt.savefig(directory+title+".png")
     plt.close(fig)
 
@@ -96,9 +146,12 @@ if __name__ == "__main__":
 
     output_path = "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/"
     output_subfolder = "take1/"
+    # output_subfolder = "take4/"
     output_folder_path = output_path + output_subfolder
-    raw_output_file_prefix = "raw Tue Jan 15 14:21:2"   # to go from 14:21:20 to 14:21:29 (10 files)
+    raw_output_file_prefix = "raw Tue Jan 15 14:21:2"   # to go from 14:21:20 to 14:21:29 (10 files -- 10 log frames)
     tfed_output_file_prefix = "tfed Tue Jan 15 14:21:"
+    # raw_output_file_prefix = "raw Fri Jan 15 15:18:0"   # to go from 15:18:00 to 15:18:20 (20 files -- 20 log frames)
+    # tfed_output_file_prefix = "tfed Fri Jan 15 15:18:"
     csv_folder_path = output_folder_path + "csv/"
     plots_folder_path = output_folder_path + "plots/"
     statistics_folder_path = output_folder_path + "statistics/"
@@ -127,11 +180,14 @@ if __name__ == "__main__":
     fp = open(statistics_folder_path + "Statistics.txt", 'w')
     fp.close()
     
-    # create our 3d report matrix: [BodyPart][x/y/z/prob][t0,...,t9,mean,variance,skewness,kurtosis] --> 25 * 4 * 17
+    # create our 3d report matrix for 10 log frames: [BodyPart][x/y/z/prob][t0,...,t9,mean,variance,skewness,kurtosis] --> 25 * 4 * 17
     part, elem, val = 25, 4, 17
     stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx = 10, 10, 11, 12, 13, 14, 15, 16
     report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
-
+    # # create our 3d report matrix for 20 log frames: [BodyPart][x/y/z/prob][t0,...,t19,mean,variance,skewness,kurtosis] --> 25 * 4 * 27
+    # part, elem, val = 25, 4, 27
+    # stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx = 20, 20, 21, 22, 23, 24, 25, 26
+    # report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
 
     # access the files of the output directory
     file_counter = 0
@@ -172,9 +228,10 @@ if __name__ == "__main__":
             raise e
 
 
-    occurences_accross_frames = [ 0 for i in range(part) ]
-
     # do statistical analysis
+    occurences_accross_frames = [ 0 for i in range(part) ]
+    certainty_accross_frames = [ [ 0.0 for k in range(stat_analysis_idx) ] for i in range(part) ]
+
     for i in range(part):
 
         for j in range(elem):
@@ -201,7 +258,10 @@ if __name__ == "__main__":
                     )
 
             # Plot a boxplot of the values of a certain element (x,y,z,certainty) of a certain body part's keypoints
-            boxplot(    data=report_matrix[i][j][0:stat_analysis_idx],
+            # first, sanitize data
+            data = np.array(report_matrix[i][j][0:stat_analysis_idx])[~np.isnan(np.array(report_matrix[i][j][0:stat_analysis_idx]))]
+            # second, plot them
+            boxplot(    data=data,
                         data_label=element_dict.get(j),
                         title="Boxplot of "+element_dict.get(j)+" at "+body_25_body_parts_dict.get(i),
                         directory=plots_folder_path
@@ -216,7 +276,12 @@ if __name__ == "__main__":
                     )
 
         # Do a boxplot for a certain body part's keypoints elements
-        boxplot(    data=[report_matrix[i][0][0:stat_analysis_idx], report_matrix[i][1][0:stat_analysis_idx], report_matrix[i][2][0:stat_analysis_idx]],
+        # first, sanitize data
+        x = np.array(report_matrix[i][0][0:stat_analysis_idx])[~np.isnan(np.array(report_matrix[i][0][0:stat_analysis_idx]))]
+        y = np.array(report_matrix[i][1][0:stat_analysis_idx])[~np.isnan(np.array(report_matrix[i][1][0:stat_analysis_idx]))]
+        z = np.array(report_matrix[i][2][0:stat_analysis_idx])[~np.isnan(np.array(report_matrix[i][2][0:stat_analysis_idx]))]
+        # second, plot them
+        boxplot(    data=[x, y, z],
                     data_label=body_25_body_parts_dict.get(i),
                     title="Boxplot of X, Y, Z at "+body_25_body_parts_dict.get(i),
                     directory=plots_folder_path,
@@ -225,6 +290,11 @@ if __name__ == "__main__":
 
         # Count occurences accross log frames
         occurences_accross_frames[i] = (~np.isnan(report_matrix[i][ getKeysByValue(element_dict, "certainty")[0] ][0:stat_analysis_idx])).sum(0)
+
+        # Log certainty accross frames
+        for k in range(stat_analysis_idx):
+            if ~np.isnan(report_matrix[i][ getKeysByValue(element_dict, "certainty")[0] ][k]):
+                certainty_accross_frames[i][k] = report_matrix[i][ getKeysByValue(element_dict, "certainty")[0] ][k]
 
 
     for i in range(part):
@@ -449,6 +519,29 @@ if __name__ == "__main__":
                 title="Boxplot of certainty value for all BODY_25 human pose model body parts",
                 directory=plots_folder_path,
                 x_tick_labels=[str(i) for i in body_25_body_parts_dict]
+            )
+
+
+    # Plot certainty accross frames
+    # first, for each body part individually
+    for i in range(part):
+        plot(   x=[ j for j in range(stat_analysis_idx) ],
+                y=certainty_accross_frames[i],
+                x_label="Frame",
+                y_label=body_25_body_parts_dict.get(i) + " certainty",
+                title="Plot of " + body_25_body_parts_dict.get(i) + " certainty accross frames",
+                directory=plots_folder_path
+            )
+    # second, for all body parts collectivelly
+    multiplot(  x=[ i for i in range(stat_analysis_idx) ],
+                y_data=certainty_accross_frames,
+                y_names=[ body_25_body_parts_dict.get(i) for i in range(part) ],
+                y_lim_min=0.0,
+                y_lim_max=1.0,
+                x_label="Frame",
+                y_label="Body parts certainty",
+                title="Plot of body parts certainty accross frames",
+                directory=plots_folder_path
             )
 
 
