@@ -86,6 +86,81 @@ def multiplot(x, y_data, directory, y_names=None, x_label=None, y_label=None, ti
     plt.close(fig)
 
 
+# Define a function for a 3D scatterplot
+def scatterplot(x, y, z, directory, x_label=None, y_label=None, z_label=None, title=None, x_lim_min=None, x_lim_max=None, y_lim_min=None, y_lim_max=None, z_lim_min=None, z_lim_max=None):
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(x, y, z, c='r', marker='o')
+    # number of index to markers
+    i = 0
+    for x_i, y_i, z_i in zip(np.array(x)[~np.isnan(np.array(x))], np.array(y)[~np.isnan(np.array(y))], np.array(z)[~np.isnan(np.array(z))]):
+        ax.text(x_i, y_i, z_i, str(i), fontsize=10)
+        i = i+1
+    if x_label:
+        ax.set_xlabel(x_label)
+    if y_label:
+        ax.set_ylabel(y_label)
+    if z_label:
+        ax.set_zlabel(z_label)
+    if title:
+        ax.set_title(title)
+    if x_lim_min and x_lim_max and y_lim_min and y_lim_max and z_lim_min and z_lim_max:
+        if x_lim_min != x_lim_max:
+            ax.set_xlim3d(x_lim_min, x_lim_max)
+        if y_lim_min != y_lim_max:
+            ax.set_ylim3d(y_lim_min, y_lim_max)
+        if z_lim_min != z_lim_max:
+            ax.set_zlim3d(z_lim_min, z_lim_max)
+    plt.savefig(directory+title+".png")
+    plt.close(fig)
+
+
+# Define a function for a 3D multi-scatterplot
+def multiscatterplot(data, directory, names=None, x_label=None, y_label=None, z_label=None, title=None, x_lim_min=None, x_lim_max=None, y_lim_min=None, y_lim_max=None, z_lim_min=None, z_lim_max=None):
+    # expand the color palette for the plots
+    sns.set_palette(sns.color_palette("hls", len(data)))
+    if names:
+        fig, (ax, lax) = plt.subplots(ncols=2, gridspec_kw={"width_ratios":[5,1]}, projection='3d')
+        for i in range(len(data)):
+            ax.scatter(data[i][0], data[i][1], data[i][2], label=names[i], marker='o')
+            # number of index to markers
+            i = 0
+            for x_i, y_i, z_i in zip(np.array(data[i][0])[~np.isnan(np.array(data[i][0]))], np.array(data[i][1])[~np.isnan(np.array(data[i][1]))], np.array(data[i][2])[~np.isnan(np.array(data[i][2]))]):
+                ax.text(x_i, y_i, z_i, str(i), fontsize=10)
+                i = i+1
+    else:
+        fig, ax = plt.subplots(projection='3d')
+        for i in range(len(data)):
+            ax.scatter(data[i][0], data[i][1], data[i][2], marker='o')
+            # number of index to markers
+            i = 0
+            for x_i, y_i, z_i in zip(np.array(data[i][0])[~np.isnan(np.array(data[i][0]))], np.array(data[i][1])[~np.isnan(np.array(data[i][1]))], np.array(data[i][2])[~np.isnan(np.array(data[i][2]))]):
+                ax.text(x_i, y_i, z_i, str(i), fontsize=10)
+                i = i+1
+    if x_label:
+        ax.set_xlabel(x_label)
+    if y_label:
+        ax.set_ylabel(y_label)
+    if z_label:
+        ax.set_zlabel(z_label)
+    if title:
+        ax.set_title(title)
+    if names:
+        h,l = ax.get_legend_handles_labels()
+        lax.legend(h, l, borderaxespad=0, prop={'size': 10})
+        lax.axis("off")
+        plt.tight_layout()
+    if x_lim_min and x_lim_max and y_lim_min and y_lim_max and z_lim_min and z_lim_max:
+        if x_lim_min != x_lim_max:
+            ax.set_xlim3d(x_lim_min, x_lim_max)
+        if y_lim_min != y_lim_max:
+            ax.set_ylim3d(y_lim_min, y_lim_max)
+        if z_lim_min != z_lim_max:
+            ax.set_zlim3d(z_lim_min, z_lim_max)
+    plt.savefig(directory+title+".png")
+    plt.close(fig)
+
+
 # Define a function for a histogram
 def histogram(data, directory, x_label=None, y_label=None, title=None):
     fig, ax = plt.subplots()
@@ -94,23 +169,6 @@ def histogram(data, directory, x_label=None, y_label=None, title=None):
         ax.set_xlabel(x_label)
     if y_label:
         ax.set_ylabel(y_label)
-    if title:
-        ax.set_title(title)
-    plt.savefig(directory+title+".png")
-    plt.close(fig)
-
-
-# Define a function for a 3D scatterplot
-def scatterplot(x, y, z, directory, x_label=None, y_label=None, z_label=None, title=None):
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(x, y, z, c='r', marker='o')
-    if x_label:
-        ax.set_xlabel(x_label)
-    if y_label:
-        ax.set_ylabel(y_label)
-    if z_label:
-        ax.set_zlabel(z_label)
     if title:
         ax.set_title(title)
     plt.savefig(directory+title+".png")
@@ -278,11 +336,15 @@ if __name__ == "__main__":
         
 
         # Do a scatterplot of a certain body part's keypoints detected in space
-        scatterplot(    x=report_matrix[i][0][0:stat_analysis_idx], y=report_matrix[i][1][0:stat_analysis_idx], z=report_matrix[i][2][0:stat_analysis_idx],
-                        x_label='X', y_label='Y', z_label='Z',
-                        title="Scatterplot of X, Y, Z at "+body_25_body_parts_dict.get(i),
-                        directory=plots_folder_path
-                    )
+        if (~np.isnan(report_matrix[i][0][0:stat_analysis_idx])).sum(0) and (~np.isnan(report_matrix[i][1][0:stat_analysis_idx])).sum(0) and (~np.isnan(report_matrix[i][2][0:stat_analysis_idx])).sum(0):
+            scatterplot(    x=report_matrix[i][0][0:stat_analysis_idx], y=report_matrix[i][1][0:stat_analysis_idx], z=report_matrix[i][2][0:stat_analysis_idx],
+                            x_label='X', y_label='Y', z_label='Z',
+                            title="Scatterplot of X, Y, Z at "+body_25_body_parts_dict.get(i),
+                            directory=plots_folder_path,
+                            x_lim_min=np.nanmin(report_matrix[i][0][0:stat_analysis_idx]), x_lim_max=np.nanmax(report_matrix[i][0][0:stat_analysis_idx]),
+                            y_lim_min=np.nanmin(report_matrix[i][1][0:stat_analysis_idx]), y_lim_max=np.nanmax(report_matrix[i][1][0:stat_analysis_idx]),
+                            z_lim_min=np.nanmin(report_matrix[i][2][0:stat_analysis_idx]), z_lim_max=np.nanmax(report_matrix[i][2][0:stat_analysis_idx])
+                        )
 
         # Do a boxplot for a certain body part's keypoints elements
         # first, sanitize data
@@ -553,6 +615,20 @@ if __name__ == "__main__":
                 directory=plots_folder_path,
                 x_tick_labels=[str(j) for j in range(stat_analysis_idx)]
             )
+
+
+    # # Do a scatterplot for all body part pairs detected in space
+    # for pair in body_25_body_part_pairs:
+    #     if (~np.isnan(report_matrix[ pair[0] ][0][0:stat_analysis_idx])).sum(0) and (~np.isnan(report_matrix[ pair[0] ][1][0:stat_analysis_idx])).sum(0) and (~np.isnan(report_matrix[ pair[0] ][2][0:stat_analysis_idx])).sum(0) and (~np.isnan(report_matrix[ pair[1] ][0][0:stat_analysis_idx])).sum(0) and (~np.isnan(report_matrix[ pair[1] ][1][0:stat_analysis_idx])).sum(0) and (~np.isnan(report_matrix[ pair[1] ][2][0:stat_analysis_idx])).sum(0):
+    #         multiscatterplot(   data=[report_matrix[ pair[0] ][0][0:stat_analysis_idx], report_matrix[ pair[1] ][0][0:stat_analysis_idx]],
+    #                             x_label='X', y_label='Y', z_label='Z',
+    #                             title="Scatterplot of X, Y, Z at "+body_25_body_parts_dict.get(pair[0])+" and "+body_25_body_parts_dict.get(pair[1])+" pair",
+    #                             directory=plots_folder_path,
+    #                             x_lim_min=np.nanmin([report_matrix[pair[0]][0][0:stat_analysis_idx], report_matrix[pair[1]][0][0:stat_analysis_idx]]), x_lim_max=np.nanmax([report_matrix[pair[0]][0][0:stat_analysis_idx], report_matrix[pair[1]][0][0:stat_analysis_idx]]),
+    #                             y_lim_min=np.nanmin([report_matrix[pair[0]][0][0:stat_analysis_idx], report_matrix[pair[1]][0][0:stat_analysis_idx]]), y_lim_max=np.nanmax([report_matrix[pair[0]][0][0:stat_analysis_idx], report_matrix[pair[1]][0][0:stat_analysis_idx]]),
+    #                             z_lim_min=np.nanmin([report_matrix[pair[0]][0][0:stat_analysis_idx], report_matrix[pair[1]][0][0:stat_analysis_idx]]), z_lim_max=np.nanmax([report_matrix[pair[0]][0][0:stat_analysis_idx], report_matrix[pair[1]][0][0:stat_analysis_idx]]),
+    #                             names=[body_25_body_parts_dict.get(pair[0]), body_25_body_parts_dict.get(pair[1])]
+    #                         )
 
 
     # write statistical analysis report
