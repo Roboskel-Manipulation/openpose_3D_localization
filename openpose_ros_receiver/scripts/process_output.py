@@ -6,7 +6,7 @@ import re
 import math
 import time
 import numpy as np
-from scipy import stats
+from scipy import stats as stats
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import seaborn as sns
@@ -19,7 +19,18 @@ def getKeysByValue(dictOfElements, valueToFind):
     for item  in listOfItems:
         if item[1] == valueToFind:
             listOfKeys.append(item[0])
-    return  listOfKeys
+    return listOfKeys
+
+
+# Re-order a list's element under a specific rule
+def reorderList(lst, rule, values=None):
+    new_list, new_values = [], []
+    for r in rule:
+        if r in lst:
+            idx = lst.index(r)
+            new_list.append(lst[idx])
+            new_values.append(values[idx])
+    return new_list, new_values
 
 
 # Define a function for a plot
@@ -47,8 +58,6 @@ def plot(x, y, directory, x_label=None, y_label=None, title=None, y_lim_min=None
 
 # Define a function for multiple plots
 def multiplot(x, y_data, directory, y_names=None, x_label=None, y_label=None, title=None, y_lim_min=None, y_lim_max=None, x_tick_labels=None):
-    # expand the color palette for the plots
-    sns.set_palette(sns.color_palette("hls", len(y_data)))
     if y_names:
         fig, (ax, lax) = plt.subplots(ncols=2, gridspec_kw={"width_ratios":[5,1]})
         for i in range(len(y_data)):
@@ -116,7 +125,7 @@ def scatterplot(x, y, z, directory, x_label=None, y_label=None, z_label=None, ti
 
 
 # Define a function for a 3D multi-scatterplot
-def multiscatterplot(data, directory, names=None, x_label=None, y_label=None, z_label=None, title=None, x_lim_min=None, x_lim_max=None, y_lim_min=None, y_lim_max=None, z_lim_min=None, z_lim_max=None):
+def multiscatterplot(data, directory, names=None, x_label=None, y_label=None, z_label=None, title=None, x_lim_min=None, x_lim_max=None, y_lim_min=None, y_lim_max=None, z_lim_min=None, z_lim_max=None, border_idx=None):
     colors = ['red', 'green', 'silver', 'rosybrown', 'firebrick',
             'grey', 'darksalmon', 'sienna', 'sandybrown', 'darkkhaki',
             'palegreen', 'lightseagreen', 'darkcyan', 'paleturquoise', 'deepskyblue',
@@ -126,26 +135,38 @@ def multiscatterplot(data, directory, names=None, x_label=None, y_label=None, z_
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax = fig.gca(projection='3d')
-    if names:
-        j = 0
-        for d, name in zip(data, names):
-            x, y, z = d
-            ax.scatter(x, y, z, marker='o', label=name, c=colors[j])
-            j = j + 1
-            # # number of index to markers
-            # i = 0
-            # for x_i, y_i, z_i in zip(x, y, z):
-            #     ax.text(x_i, y_i, z_i, str(i), fontsize=10)
-            #     i = i+1
+    if border_idx:
+        if names:
+            b, j = 0, 0
+            for d, name in zip(data, names):
+                x, y, z = d
+                if b <= border_idx:
+                    ax.scatter(x, y, z, marker='o', label=name, c=colors[j])
+                    j = j + 1
+                else:
+                    ax.plot(x, y, z, marker='o', label=name)
+                b = b + 1
+
+        else:
+            b = 0
+            for d in data:
+                x, y, z = d
+                if b <= border_idx:
+                    ax.scatter(x, y, z, marker='o')
+                else:
+                    ax.plot(x, y, z, marker='o')
+                b = b + 1
     else:
-        for d in data:
-            x, y, z = d
-            ax.scatter(x, y, z, marker='o')
-            # # number of index to markers
-            # i = 0
-            # for x_i, y_i, z_i in zip(x, y, z):
-            #     ax.text(x_i, y_i, z_i, str(i), fontsize=10)
-            #     i = i+1
+        if names:
+            j = 0
+            for d, name in zip(data, names):
+                x, y, z = d
+                ax.scatter(x, y, z, marker='o', label=name, c=colors[j])
+                j = j + 1
+        else:
+            for d in data:
+                x, y, z = d
+                ax.scatter(x, y, z, marker='o')
     if x_label:
         ax.set_xlabel(x_label)
     if y_label:
@@ -157,8 +178,7 @@ def multiscatterplot(data, directory, names=None, x_label=None, y_label=None, z_
     if names:
         chartBox = ax.get_position()
         ax.set_position([chartBox.x0, chartBox.y0, chartBox.width*0.85, chartBox.height])
-        ax.legend(loc='center', bbox_to_anchor=(1.15, 0.5), shadow=True, ncol=1)
-        # plt.legend(loc=0)
+        ax.legend(loc='center', bbox_to_anchor=(1.15, 0.5), shadow=True, ncol=1, borderaxespad=0, prop={'size':6})
     if x_lim_min and x_lim_max and y_lim_min and y_lim_max and z_lim_min and z_lim_max:
         if x_lim_min != x_lim_max:
             ax.set_xlim3d(x_lim_min, x_lim_max)
@@ -201,7 +221,12 @@ def boxplot(data, directory, data_label=None, y_label=None, title=None, x_tick_l
     plt.close(fig)
 
 
+# MAIN FUNCTION
+
+
 if __name__ == "__main__":
+    # expand the color palette for the plots, once and for all
+    sns.set_palette(sns.color_palette("hls", 25))
 
     # Body 25 human pose model specific variables
     body_25_body_parts_dict = dict([ (0,  "Nose"), (1,  "Neck"), (2,  "RShoulder"), (3,  "RElbow"), (4,  "RWrist"),
@@ -210,12 +235,14 @@ if __name__ == "__main__":
                                      (15, "REye"), (16, "LEye"), (17, "REar"), (18, "LEar"), (19, "LBigToe"),
                                      (20, "LSmallToe"), (21, "LHeel"), (22, "RBigToe"), (23, "RSmallToe"), (24, "RHeel"),
                                      (25, "Background")
-                                ])
+                                    ])
     body_25_body_part_pairs = [ [1, 8], [1, 2], [1, 5], [2, 3], [3, 4], [5, 6], [6, 7],
                                 [8, 9], [9, 10], [10, 11], [8, 12], [12, 13], [13, 14], [1, 0],
                                 [0, 15], [15, 17], [0, 16], [16, 18], [2, 17], [5, 18], [14, 19],
                                 [19, 20], [14, 21], [11, 22], [22, 23], [11, 24]
                             ]
+    body_25_body_parts_LR_order_of_appearance = [ '4', '23', '3', '22', '11', '2', '10', '9', '24', '17', '15', '8', '1', '0', '16', '18', '21', '12', '13', '14', '19', '5', '6', '20', '7' ]
+
     # OpenPose specific variables
     element_dict = dict([ (0, "x"), (1, "y"), (2, "z"), (3, "certainty") ])
 
@@ -255,14 +282,16 @@ if __name__ == "__main__":
     # create statistics file(s)
     fp = open(statistics_folder_path + "Statistics.txt", 'w')
     fp.close()
+    fp = open(statistics_folder_path + "z_table.txt", 'w')
+    fp.close()
     
-    # create our 3d report matrix for 10 log frames: [BodyPart][x/y/z/prob][t0,...,t9,mean,variance,skewness,kurtosis] --> 25 * 4 * 17
-    part, elem, val = 25, 4, 17
-    stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx = 10, 10, 11, 12, 13, 14, 15, 16
+    # create our 3d report matrix for 10 log frames: [BodyPart][x/y/z/prob][t0,...,t9,mean,nobs,min,max,variance,skewness,kurtosis,std_dev] --> 25 * 4 * 18
+    part, elem, val = 25, 4, 18
+    stat_analysis_idx, mean_idx, nobs_idx, min_idx, max_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 10, 10, 11, 12, 13, 14, 15, 16, 17
     report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
-    # # create our 3d report matrix for 20 log frames: [BodyPart][x/y/z/prob][t0,...,t19,mean,variance,skewness,kurtosis] --> 25 * 4 * 27
-    # part, elem, val = 25, 4, 27
-    # stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx = 20, 20, 21, 22, 23, 24, 25, 26
+    # # create our 3d report matrix for 20 log frames: [BodyPart][x/y/z/prob][t0,...,t19,mean,variance,skewness,kurtosis,std_dev] --> 25 * 4 * 28
+    # part, elem, val = 25, 4, 28
+    # stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 20, 20, 21, 22, 23, 24, 25, 26, 27
     # report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
 
     # access the files of the output directory
@@ -306,7 +335,8 @@ if __name__ == "__main__":
 
     # do statistical analysis
     occurences_accross_frames = [ 0 for i in range(part) ]
-    certainty_accross_frames = [ [ 0.0 for k in range(stat_analysis_idx) ] for i in range(part) ]
+    certainty_accross_frames = [ [ 0.0 for j in range(stat_analysis_idx) ] for i in range(part) ]
+    z_table = [ [ [ np.nan for k in range(stat_analysis_idx) ] for j in range(elem) ] for i in range(part) ]
 
     for i in range(part):
 
@@ -317,7 +347,7 @@ if __name__ == "__main__":
                 continue
 
             # source: https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.describe.html
-            description = stats.describe(report_matrix[i][j][0:stat_analysis_idx])
+            description = stats.describe(np.array(report_matrix[i][j][0:stat_analysis_idx])[~np.isnan(report_matrix[i][j][0:stat_analysis_idx])])
             report_matrix[i][j][nobs_idx] = description.nobs
             report_matrix[i][j][min_idx] = np.nanmin(report_matrix[i][j][0:stat_analysis_idx], axis=0)
             report_matrix[i][j][max_idx] = np.nanmax(report_matrix[i][j][0:stat_analysis_idx], axis=0)
@@ -325,23 +355,14 @@ if __name__ == "__main__":
             report_matrix[i][j][variance_idx] = description.variance
             report_matrix[i][j][skewness_idx] = description.skewness
             report_matrix[i][j][kurtosis_idx] = description.kurtosis
-        
-            # Plot a histogram of the values of a certain element (x,y,z,certainty) of a certain body part's keypoints
-            histogram(  data=report_matrix[i][j][0:stat_analysis_idx],
-                        x_label=element_dict.get(j), y_label="Frequency",
-                        title="Distribution of "+element_dict.get(j)+" at "+body_25_body_parts_dict.get(i),
-                        directory=plots_folder_path
-                    )
+            report_matrix[i][j][std_dev_idx] = np.std(np.array(report_matrix[i][j][0:stat_analysis_idx])[~np.isnan(report_matrix[i][j][0:stat_analysis_idx])])
 
-            # Plot a boxplot of the values of a certain element (x,y,z,certainty) of a certain body part's keypoints
-            # first, sanitize data
-            data = np.array(report_matrix[i][j][0:stat_analysis_idx])[~np.isnan(np.array(report_matrix[i][j][0:stat_analysis_idx]))]
-            # second, plot them
-            boxplot(    data=data,
-                        data_label=element_dict.get(j),
-                        title="Boxplot of "+element_dict.get(j)+" at "+body_25_body_parts_dict.get(i),
-                        directory=plots_folder_path
-                    )
+            # fill z-table
+            for k in range(stat_analysis_idx):
+                if not np.isnan(report_matrix[i][j][k]) and not np.isnan(report_matrix[i][j][mean_idx]) and not np.isnan(report_matrix[i][j][std_dev_idx]) and report_matrix[i][j][std_dev_idx] != 0:
+                    z_table[i][j][k] = (report_matrix[i][j][k] - report_matrix[i][j][mean_idx]) / report_matrix[i][j][std_dev_idx]
+                else:
+                    z_table[i][j][k] = np.nan
         
 
         # Do a scatterplot of a certain body part's keypoints detected in space
@@ -377,213 +398,169 @@ if __name__ == "__main__":
                 certainty_accross_frames[i][k] = report_matrix[i][ getKeysByValue(element_dict, "certainty")[0] ][k]
 
 
-    variances, means, skewnesses, kurtoses = [], [], [], []
-    x_variances, y_variances, z_variances, certainty_variances = [], [], [], []
-    x_means, y_means, z_means, certainty_means = [], [], [], []
-    x_skewnesses, y_skewnesses, z_skewnesses, certainty_skewnesses = [], [], [], []
-    x_kurtoses, y_kurtoses, z_kurtoses, certainty_kurtoses = [], [], [], []
-    for i in range(part):
+    # variances, means, skewnesses, kurtoses = [], [], [], []
+    # x_variances, y_variances, z_variances, certainty_variances = [], [], [], []
+    # x_means, y_means, z_means, certainty_means = [], [], [], []
+    # x_skewnesses, y_skewnesses, z_skewnesses, certainty_skewnesses = [], [], [], []
+    # x_kurtoses, y_kurtoses, z_kurtoses, certainty_kurtoses = [], [], [], []
+    # for i in range(part):
 
-        local_variances, local_means, local_skewnesses, local_kurtoses = [], [], [], []
-        for j in range(elem):
-            variances.append(report_matrix[i][j][variance_idx])
-            means.append(report_matrix[i][j][mean_idx])
-            skewnesses.append(report_matrix[i][j][skewness_idx])
-            kurtoses.append(report_matrix[i][j][kurtosis_idx])
-            local_variances.append(report_matrix[i][j][variance_idx])
-            local_means.append(report_matrix[i][j][mean_idx])
-            local_skewnesses.append(report_matrix[i][j][skewness_idx])
-            local_kurtoses.append(report_matrix[i][j][kurtosis_idx])
-
-
-        # Plot histograms of the values of all variances, means, skewnesses and kurtoses of a certain body part
-        histogram(  data=local_variances,
-                    x_label="All " + body_25_body_parts_dict.get(i) + " variances", y_label="Frequency",
-                    title="Distribution of all " + body_25_body_parts_dict.get(i) + " variances",
-                    directory=plots_folder_path
-                )
-        histogram(  data=local_means,
-                    x_label="All " + body_25_body_parts_dict.get(i) + " means", y_label="Frequency",
-                    title="Distribution of all " + body_25_body_parts_dict.get(i) + " means",
-                    directory=plots_folder_path
-                )
-        histogram(  data=local_skewnesses,
-                    x_label="All " + body_25_body_parts_dict.get(i) + " skewnesses", y_label="Frequency",
-                    title="Distribution of all " + body_25_body_parts_dict.get(i) + " skewnesses",
-                    directory=plots_folder_path
-                )
-        histogram(  data=local_kurtoses,
-                    x_label="All " + body_25_body_parts_dict.get(i) + " kurtoses", y_label="Frequency",
-                    title="Distribution of all " + body_25_body_parts_dict.get(i) + " kurtoses",
-                    directory=plots_folder_path
-                )
+    #     local_variances, local_means, local_skewnesses, local_kurtoses = [], [], [], []
+    #     for j in range(elem):
+    #         variances.append(report_matrix[i][j][variance_idx])
+    #         means.append(report_matrix[i][j][mean_idx])
+    #         skewnesses.append(report_matrix[i][j][skewness_idx])
+    #         kurtoses.append(report_matrix[i][j][kurtosis_idx])
+    #         local_variances.append(report_matrix[i][j][variance_idx])
+    #         local_means.append(report_matrix[i][j][mean_idx])
+    #         local_skewnesses.append(report_matrix[i][j][skewness_idx])
+    #         local_kurtoses.append(report_matrix[i][j][kurtosis_idx])
 
 
-        # collect x,y,z,certainty means, variances, skewnesses and kurtoses
-        x_variances.append(report_matrix[i][getKeysByValue(element_dict, "x")[0]][variance_idx])
-        y_variances.append(report_matrix[i][getKeysByValue(element_dict, "y")[0]][variance_idx])
-        z_variances.append(report_matrix[i][getKeysByValue(element_dict, "z")[0]][variance_idx])
-        certainty_variances.append(report_matrix[i][getKeysByValue(element_dict, "certainty")[0]][variance_idx])
-        x_means.append(report_matrix[i][getKeysByValue(element_dict, "x")[0]][mean_idx])
-        y_means.append(report_matrix[i][getKeysByValue(element_dict, "y")[0]][mean_idx])
-        z_means.append(report_matrix[i][getKeysByValue(element_dict, "z")[0]][mean_idx])
-        certainty_means.append(report_matrix[i][getKeysByValue(element_dict, "certainty")[0]][mean_idx])
-        x_skewnesses.append(report_matrix[i][getKeysByValue(element_dict, "x")[0]][skewness_idx])
-        y_skewnesses.append(report_matrix[i][getKeysByValue(element_dict, "y")[0]][skewness_idx])
-        z_skewnesses.append(report_matrix[i][getKeysByValue(element_dict, "z")[0]][skewness_idx])
-        certainty_skewnesses.append(report_matrix[i][getKeysByValue(element_dict, "certainty")[0]][skewness_idx])
-        x_kurtoses.append(report_matrix[i][getKeysByValue(element_dict, "x")[0]][kurtosis_idx])
-        y_kurtoses.append(report_matrix[i][getKeysByValue(element_dict, "y")[0]][kurtosis_idx])
-        z_kurtoses.append(report_matrix[i][getKeysByValue(element_dict, "z")[0]][kurtosis_idx])
-        certainty_kurtoses.append(report_matrix[i][getKeysByValue(element_dict, "certainty")[0]][kurtosis_idx])
-
-
-    # Plot histograms of the values of all variances, means, skewnesses and kurtoses
-    histogram(  data=variances,
-                x_label="All variances", y_label="Frequency",
-                title="Distribution of all variances",
-                directory=plots_folder_path
-            )
-    histogram(  data=means,
-                x_label="All means", y_label="Frequency",
-                title="Distribution of all means",
-                directory=plots_folder_path
-            )
-    histogram(  data=skewnesses,
-                x_label="All skewnesses", y_label="Frequency",
-                title="Distribution of all skewnesses",
-                directory=plots_folder_path
-            )
-    histogram(  data=kurtoses,
-                x_label="All kurtoses", y_label="Frequency",
-                title="Distribution of all kurtoses",
-                directory=plots_folder_path
-            )
-
-
-    # Plot histograms of the values of the variances, means, skewnesses and kurtoses of each keypoint elements
-    histogram(  data=x_variances,
-                x_label="All x variances", y_label="Frequency",
-                title="Distribution of all x variances",
-                directory=plots_folder_path
-            )
-    histogram(  data=x_means,
-                x_label="All x means", y_label="Frequency",
-                title="Distribution of all x means",
-                directory=plots_folder_path
-            )
-    histogram(  data=x_skewnesses,
-                x_label="All x skewnesses", y_label="Frequency",
-                title="Distribution of all x skewnesses",
-                directory=plots_folder_path
-            )
-    histogram(  data=x_kurtoses,
-                x_label="All x kurtoses", y_label="Frequency",
-                title="Distribution of all x kurtoses",
-                directory=plots_folder_path
-            )
-    histogram(  data=y_variances,
-                x_label="All y variances", y_label="Frequency",
-                title="Distribution of all y variances",
-                directory=plots_folder_path
-            )
-    histogram(  data=y_means,
-                x_label="All y means", y_label="Frequency",
-                title="Distribution of all y means",
-                directory=plots_folder_path
-            )
-    histogram(  data=y_skewnesses,
-                x_label="All y skewnesses", y_label="Frequency",
-                title="Distribution of all y skewnesses",
-                directory=plots_folder_path
-            )
-    histogram(  data=y_kurtoses,
-                x_label="All y kurtoses", y_label="Frequency",
-                title="Distribution of all y kurtoses",
-                directory=plots_folder_path
-            )
-    histogram(  data=z_variances,
-                x_label="All z variances", y_label="Frequency",
-                title="Distribution of all z variances",
-                directory=plots_folder_path
-            )
-    histogram(  data=z_means,
-                x_label="All z means", y_label="Frequency",
-                title="Distribution of all z means",
-                directory=plots_folder_path
-            )
-    histogram(  data=z_skewnesses,
-                x_label="All z skewnesses", y_label="Frequency",
-                title="Distribution of all z skewnesses",
-                directory=plots_folder_path
-            )
-    histogram(  data=z_kurtoses,
-                x_label="All z kurtoses", y_label="Frequency",
-                title="Distribution of all z kurtoses",
-                directory=plots_folder_path
-            )
-    histogram(  data=certainty_variances,
-                x_label="All certainty variances", y_label="Frequency",
-                title="Distribution of all certainty variances",
-                directory=plots_folder_path
-            )
-    histogram(  data=certainty_means,
-                x_label="All certainty means", y_label="Frequency",
-                title="Distribution of all certainty means",
-                directory=plots_folder_path
-            )
-    histogram(  data=certainty_skewnesses,
-                x_label="All certainty skewnesses", y_label="Frequency",
-                title="Distribution of all certainty skewnesses",
-                directory=plots_folder_path
-            )
-    histogram(  data=certainty_kurtoses,
-                x_label="All certainty kurtoses", y_label="Frequency",
-                title="Distribution of all certainty kurtoses",
-                directory=plots_folder_path
-            )
+    #     # collect x,y,z,certainty means, variances, skewnesses and kurtoses
+    #     x_variances.append(report_matrix[i][getKeysByValue(element_dict, "x")[0]][variance_idx])
+    #     y_variances.append(report_matrix[i][getKeysByValue(element_dict, "y")[0]][variance_idx])
+    #     z_variances.append(report_matrix[i][getKeysByValue(element_dict, "z")[0]][variance_idx])
+    #     certainty_variances.append(report_matrix[i][getKeysByValue(element_dict, "certainty")[0]][variance_idx])
+    #     x_means.append(report_matrix[i][getKeysByValue(element_dict, "x")[0]][mean_idx])
+    #     y_means.append(report_matrix[i][getKeysByValue(element_dict, "y")[0]][mean_idx])
+    #     z_means.append(report_matrix[i][getKeysByValue(element_dict, "z")[0]][mean_idx])
+    #     certainty_means.append(report_matrix[i][getKeysByValue(element_dict, "certainty")[0]][mean_idx])
+    #     x_skewnesses.append(report_matrix[i][getKeysByValue(element_dict, "x")[0]][skewness_idx])
+    #     y_skewnesses.append(report_matrix[i][getKeysByValue(element_dict, "y")[0]][skewness_idx])
+    #     z_skewnesses.append(report_matrix[i][getKeysByValue(element_dict, "z")[0]][skewness_idx])
+    #     certainty_skewnesses.append(report_matrix[i][getKeysByValue(element_dict, "certainty")[0]][skewness_idx])
+    #     x_kurtoses.append(report_matrix[i][getKeysByValue(element_dict, "x")[0]][kurtosis_idx])
+    #     y_kurtoses.append(report_matrix[i][getKeysByValue(element_dict, "y")[0]][kurtosis_idx])
+    #     z_kurtoses.append(report_matrix[i][getKeysByValue(element_dict, "z")[0]][kurtosis_idx])
+    #     certainty_kurtoses.append(report_matrix[i][getKeysByValue(element_dict, "certainty")[0]][kurtosis_idx])
 
 
     # Collect the elements of each body part
-    x_coll, y_coll, z_coll, certainty_coll = [], [], [], []
+    x_col, y_col, z_col, certainty_col = [], [], [], []
     for i in range(part):
-        x_coll.append(report_matrix[i][ getKeysByValue(element_dict, "x")[0] ][0:stat_analysis_idx])
-        y_coll.append(report_matrix[i][ getKeysByValue(element_dict, "y")[0] ][0:stat_analysis_idx])
-        z_coll.append(report_matrix[i][ getKeysByValue(element_dict, "z")[0] ][0:stat_analysis_idx])
-        certainty_coll.append(report_matrix[i][ getKeysByValue(element_dict, "certainty")[0] ][0:stat_analysis_idx])
-
+        x_col.append(report_matrix[i][ getKeysByValue(element_dict, "x")[0] ][0:stat_analysis_idx])
+        y_col.append(report_matrix[i][ getKeysByValue(element_dict, "y")[0] ][0:stat_analysis_idx])
+        z_col.append(report_matrix[i][ getKeysByValue(element_dict, "z")[0] ][0:stat_analysis_idx])
+        certainty_col.append(report_matrix[i][ getKeysByValue(element_dict, "certainty")[0] ][0:stat_analysis_idx])
 
     # Sanitize collected data
-    for i in range(len(x_coll)):
-        x_coll[i] = np.array(x_coll[i])[~np.isnan(x_coll[i])]
-        y_coll[i] = np.array(y_coll[i])[~np.isnan(y_coll[i])]
-        z_coll[i] = np.array(z_coll[i])[~np.isnan(z_coll[i])]
-        certainty_coll[i] = np.array(certainty_coll[i])[~np.isnan(certainty_coll[i])]
+    for i in range(len(x_col)):
+        x_col[i] = np.array(x_col[i])[~np.isnan(x_col[i])]
+        y_col[i] = np.array(y_col[i])[~np.isnan(y_col[i])]
+        z_col[i] = np.array(z_col[i])[~np.isnan(z_col[i])]
+        certainty_col[i] = np.array(certainty_col[i])[~np.isnan(certainty_col[i])]
+    
+    # Trim data to what is not empty
+    x_data = [ x_c for x_c in x_col if len(x_c) ]
+    x_x_tick_labels = [ str(i) for i in body_25_body_parts_dict if i < len(x_col) and len(x_col[i]) ]
+    y_data = [ y_c for y_c in y_col if len(y_c) ]
+    y_x_tick_labels = [ str(i) for i in body_25_body_parts_dict if i < len(y_col) and len(y_col[i]) ]
+    z_data = [ z_c for z_c in z_col if len(z_c) ]
+    z_x_tick_labels = [ str(i) for i in body_25_body_parts_dict if i < len(z_col) and len(z_col[i]) ]
+    certainty_data = [ certainty_c for certainty_c in certainty_col if len(certainty_c) ]
+    certainty_x_tick_labels = [ str(i) for i in body_25_body_parts_dict if i < len(certainty_col) and len(certainty_col[i]) ]
+
+    # Re-order data in order of appearance
+    x_x_tick_labels_LR, x_data_LR = reorderList(x_x_tick_labels, body_25_body_parts_LR_order_of_appearance, x_data)
+    y_x_tick_labels_LR, y_data_LR = reorderList(y_x_tick_labels, body_25_body_parts_LR_order_of_appearance, y_data)
+    z_x_tick_labels_LR, z_data_LR = reorderList(z_x_tick_labels, body_25_body_parts_LR_order_of_appearance, z_data)
+    certainty_x_tick_labels_LR, certainty_data_LR = reorderList(certainty_x_tick_labels, body_25_body_parts_LR_order_of_appearance, certainty_data)
 
     # Do a boxplot for each body parts' element
-    boxplot(    data=x_coll,
+    boxplot(    data=x_data_LR,
                 data_label="BODY_25 human pose model body parts",
                 title="Boxplot of x values for all BODY_25 human pose model body parts",
                 directory=plots_folder_path,
-                x_tick_labels=[str(i) for i in body_25_body_parts_dict]
+                x_tick_labels=x_x_tick_labels_LR
             )
-    boxplot(    data=y_coll,
+    boxplot(    data=y_data_LR,
                 data_label="BODY_25 human pose model body parts",
                 title="Boxplot of y value for all BODY_25 human pose model body parts",
                 directory=plots_folder_path,
-                x_tick_labels=[str(i) for i in body_25_body_parts_dict]
+                x_tick_labels=y_x_tick_labels_LR
             )
-    boxplot(    data=z_coll,
+    boxplot(    data=z_data_LR,
                 data_label="BODY_25 human pose model body parts",
                 title="Boxplot of z value for all BODY_25 human pose model body parts",
                 directory=plots_folder_path,
-                x_tick_labels=[str(i) for i in body_25_body_parts_dict]
+                x_tick_labels=z_x_tick_labels_LR
             )
-    boxplot(    data=certainty_coll,
+    boxplot(    data=certainty_data_LR,
                 data_label="BODY_25 human pose model body parts",
                 title="Boxplot of certainty value for all BODY_25 human pose model body parts",
                 directory=plots_folder_path,
-                x_tick_labels=[str(i) for i in body_25_body_parts_dict]
+                x_tick_labels=certainty_x_tick_labels_LR
+            )
+
+    # Repeat, with median normalization
+    # Collect the elements of each body part
+    x_col, y_col, z_col, certainty_col = [], [], [], []
+    for i in range(part):
+        x_col.append(report_matrix[i][ getKeysByValue(element_dict, "x")[0] ][0:stat_analysis_idx])
+        y_col.append(report_matrix[i][ getKeysByValue(element_dict, "y")[0] ][0:stat_analysis_idx])
+        z_col.append(report_matrix[i][ getKeysByValue(element_dict, "z")[0] ][0:stat_analysis_idx])
+        certainty_col.append(report_matrix[i][ getKeysByValue(element_dict, "certainty")[0] ][0:stat_analysis_idx])
+
+    # Perform median normalization to the collected data
+    for i in range(len(x_col)):
+        for j in range(len(x_col[i])):
+            if not np.isnan(x_col[i][j]):
+                x_col[i][j] = x_col[i][j] - report_matrix[i][ getKeysByValue(element_dict, "x")[0] ][mean_idx]
+            if not np.isnan(y_col[i][j]):
+                y_col[i][j] = y_col[i][j] - report_matrix[i][ getKeysByValue(element_dict, "y")[0] ][mean_idx]
+            if not np.isnan(z_col[i][j]):
+                z_col[i][j] = z_col[i][j] - report_matrix[i][ getKeysByValue(element_dict, "z")[0] ][mean_idx]
+            if not np.isnan(certainty_col[i][j]):
+                certainty_col[i][j] = certainty_col[i][j] - report_matrix[i][ getKeysByValue(element_dict, "certainty")[0] ][mean_idx]
+
+    # Sanitize collected data
+    for i in range(len(x_col)):
+        x_col[i] = np.array(x_col[i])[~np.isnan(x_col[i])]
+        y_col[i] = np.array(y_col[i])[~np.isnan(y_col[i])]
+        z_col[i] = np.array(z_col[i])[~np.isnan(z_col[i])]
+        certainty_col[i] = np.array(certainty_col[i])[~np.isnan(certainty_col[i])]
+    
+    # Trim data to what is not empty
+    x_data = [ x_c for x_c in x_col if len(x_c) ]
+    x_x_tick_labels = [ str(i) for i in body_25_body_parts_dict if i < len(x_col) and len(x_col[i]) ]
+    y_data = [ y_c for y_c in y_col if len(y_c) ]
+    y_x_tick_labels = [ str(i) for i in body_25_body_parts_dict if i < len(y_col) and len(y_col[i]) ]
+    z_data = [ z_c for z_c in z_col if len(z_c) ]
+    z_x_tick_labels = [ str(i) for i in body_25_body_parts_dict if i < len(z_col) and len(z_col[i]) ]
+    certainty_data = [ certainty_c for certainty_c in certainty_col if len(certainty_c) ]
+    certainty_x_tick_labels = [ str(i) for i in body_25_body_parts_dict if i < len(certainty_col) and len(certainty_col[i]) ]
+
+    # Re-order data in order of appearance
+    x_x_tick_labels_LR, x_data_LR = reorderList(x_x_tick_labels, body_25_body_parts_LR_order_of_appearance, x_data)
+    y_x_tick_labels_LR, y_data_LR = reorderList(y_x_tick_labels, body_25_body_parts_LR_order_of_appearance, y_data)
+    z_x_tick_labels_LR, z_data_LR = reorderList(z_x_tick_labels, body_25_body_parts_LR_order_of_appearance, z_data)
+    certainty_x_tick_labels_LR, certainty_data_LR = reorderList(certainty_x_tick_labels, body_25_body_parts_LR_order_of_appearance, certainty_data)
+
+    # Do a boxplot for each body parts' element
+    boxplot(    data=x_data_LR,
+                data_label="BODY_25 human pose model body parts",
+                title="Boxplot of x values for all BODY_25 human pose model body parts after median normalization",
+                directory=plots_folder_path,
+                x_tick_labels=x_x_tick_labels_LR
+            )
+    boxplot(    data=y_data_LR,
+                data_label="BODY_25 human pose model body parts",
+                title="Boxplot of y value for all BODY_25 human pose model body parts after median normalization",
+                directory=plots_folder_path,
+                x_tick_labels=y_x_tick_labels_LR
+            )
+    boxplot(    data=z_data_LR,
+                data_label="BODY_25 human pose model body parts",
+                title="Boxplot of z value for all BODY_25 human pose model body parts after median normalization",
+                directory=plots_folder_path,
+                x_tick_labels=z_x_tick_labels_LR
+            )
+    boxplot(    data=certainty_data_LR,
+                data_label="BODY_25 human pose model body parts",
+                title="Boxplot of certainty value for all BODY_25 human pose model body parts after median normalization",
+                directory=plots_folder_path,
+                x_tick_labels=certainty_x_tick_labels_LR
             )
 
 
@@ -642,7 +619,8 @@ if __name__ == "__main__":
 
 
     # Do a scatterplot for all body parts detected in space
-    data, names, x_mins, x_maxes, y_mins, y_maxes, z_mins, z_maxes = [], [], [], [], [], [], [], []
+    data, names, x_mins, x_maxes, y_mins, y_maxes, z_mins, z_maxes, data_means = [], [], [], [], [], [], [], [], []
+    all_data, normal_data = 0, 0
     for i in range(part):
         if (~np.isnan(report_matrix[i][0][0:stat_analysis_idx])).sum(0) and (~np.isnan(report_matrix[i][1][0:stat_analysis_idx])).sum(0) and (~np.isnan(report_matrix[i][2][0:stat_analysis_idx])).sum(0):
             x = np.array(report_matrix[i][0][0:stat_analysis_idx])[~np.isnan(report_matrix[i][0][0:stat_analysis_idx])]
@@ -656,6 +634,17 @@ if __name__ == "__main__":
             z_maxes.append(np.max(z))
             data.append([x, y, z])
             names.append(body_25_body_parts_dict.get(i))
+            all_data = all_data + 1
+            normal_data = normal_data + 1
+        
+    # Add to the scatterplot a skeleton of the means of the body part pairs detected in space
+    pair_data = 0
+    for pair in body_25_body_part_pairs:
+        if not np.isnan(report_matrix[pair[0]][0][mean_idx]) and not np.isnan(report_matrix[pair[0]][1][mean_idx]) and not np.isnan(report_matrix[pair[0]][2][mean_idx]) and not np.isnan(report_matrix[pair[1]][0][mean_idx]) and not np.isnan(report_matrix[pair[1]][1][mean_idx]) and not np.isnan(report_matrix[pair[1]][2][mean_idx]):
+            data.append([[report_matrix[pair[0]][0][mean_idx], report_matrix[pair[1]][0][mean_idx]], [report_matrix[pair[0]][1][mean_idx], report_matrix[pair[1]][1][mean_idx]], [report_matrix[pair[0]][2][mean_idx], report_matrix[pair[1]][2][mean_idx]]])
+            names.append(body_25_body_parts_dict.get(pair[0])+" and "+body_25_body_parts_dict.get(pair[1])+" pair")
+            all_data = all_data + 1
+            pair_data = pair_data + 1
 
     multiscatterplot(   data=data,
                         x_label='X', y_label='Y', z_label='Z',
@@ -664,14 +653,15 @@ if __name__ == "__main__":
                         x_lim_min=np.min(x_mins), x_lim_max=np.max(x_maxes),
                         y_lim_min=np.min(y_mins), y_lim_max=np.max(y_maxes),
                         z_lim_min=np.min(z_mins), z_lim_max=np.max(z_maxes),
-                        names=names
+                        names=names,
+                        border_idx=all_data-pair_data-1
                     )
 
     # write statistical analysis report
     for i in range(part):
        # write in the appropriate CSV
         with open(csv_folder_path + body_25_body_parts_dict.get(i) + ".csv", 'a') as fp:
-            print >> fp , "elem,t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,nobs,min,max,mean,variance,skewness,kurtosis"
+            print >> fp , "elem,t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,nobs,min,max,mean,variance,skewness,kurtosis,std_dev"
             for j in range(elem):
                 print >> fp , element_dict.get(j) + "," + (",".join( str(e) for e in report_matrix[i][j] ))
 
@@ -681,3 +671,12 @@ if __name__ == "__main__":
         print >> fp , "BODY_25 human pose model body part,Occurences accross " + str(stat_analysis_idx) + " log frames"
         for i in range(part):
             print >> fp , body_25_body_parts_dict.get(i) + "," + str(occurences_accross_frames[i])
+
+
+    # report z-table
+    with open(statistics_folder_path + "z_table.txt", 'w') as fp:
+        print >> fp , "BODY_25 human pose model body part,z-scores accross " + str(stat_analysis_idx) + " log frames" + "\n"
+        for i in range(part):
+            for j in range(elem):
+                print >> fp , body_25_body_parts_dict.get(i) + ":" + element_dict.get(j) + "," + str(z_table[i][j])
+            print >> fp , "\n"
