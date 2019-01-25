@@ -271,6 +271,8 @@ def histogram(data, directory, x_label=None, y_label=None, title=None):
 
 # Define a function for a boxplot
 def boxplot(data, directory, data_label=None, y_label=None, title=None, x_tick_labels=None):
+    if not data:
+        return
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.boxplot(data)
@@ -313,30 +315,51 @@ if __name__ == "__main__":
 
     # File I/O specific variables
     output_path = "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/"
+    ''''''
     # output_subfolder = "take1/"
     # raw_output_file_prefix = "raw Tue Jan 15 14:21:2"   # to go from 14:21:20 to 14:21:29 (10 files -- 10 log frames)
     # tfed_output_file_prefix = "tfed Tue Jan 15 14:21:"
-    # output_subfolder = "take6/"
-    # raw_output_file_prefix = "raw Thu Jan 24 12:10:"   # to go from 12:10:00 to 11:10:39 (40 files -- 40 log frames)
-    # tfed_output_file_prefix = "tfed Thu Jan 24 12:10:"
+    ''''''
+    output_subfolder = "take6/"
+    raw_output_file_prefix = "raw Thu Jan 24 12:10:"   # to go from 12:10:00 to 11:10:39 (40 files -- 40 log frames)
+    tfed_output_file_prefix = "tfed Thu Jan 24 12:10:"
+    ''''''
     # output_subfolder = "take7/"
     # raw_output_file_prefix = "raw Thu Jan 24 12:47:4"   # to go from 12:47:40 to 12:47:49 (10 files -- 10 log frames)
     # tfed_output_file_prefix = "tfed Thu Jan 24 12:47:"
+    ''''''
     # output_subfolder = "take8/"
     # raw_output_file_prefix = "raw Thu Jan 24 13:06:"   # to go from 13:06:00 to 13:06:59 (60 files -- 60 log frames)
     # tfed_output_file_prefix = "tfed Thu Jan 24 13:06:"
-    # output_folder_path = output_path + output_subfolder
-    output_subfolder = "take9/"
-    op_output_file_prefix = "OP Fri Jan 25 12:41:"
-    raw_output_file_prefix = "raw Fri Jan 25 12:41:"   # to go from 13:06:00 to 13:06:59 (60 files -- 60 log frames)
-    tfed_output_file_prefix = "tfed Fri Jan 25 12:41:"
+    ''''''
+    # output_subfolder = "take9/"
+    # op_output_file_prefix = "OP Fri Jan 25 12:41:"
+    # raw_output_file_prefix = "raw Fri Jan 25 12:41:"   # to go from 13:06:00 to 13:06:59 (60 files -- 60 log frames)
+    # tfed_output_file_prefix = "tfed Fri Jan 25 12:4"
+    ''''''
     output_folder_path = output_path + output_subfolder
     csv_folder_path = output_folder_path + "csv/"
     plots_folder_path = output_folder_path + "plots/"
     statistics_folder_path = output_folder_path + "statistics/"
-    # label_postfix = "pix"
-    label_postfix = "cam"
-    # label_postfix = "rob"
+    # label_postfix, output_file_prefix = "pix", op_output_file_prefix
+    # label_postfix, output_file_prefix = "cam", raw_output_file_prefix
+    label_postfix, output_file_prefix = "rob", tfed_output_file_prefix
+    
+    # create our 3d report matrix for 10 log frames: [BodyPart][x/y/z/prob][t0,...,t9,mean,nobs,min,max,variance,skewness,kurtosis,std_dev] --> 25 * 4 * 18
+    part, elem, val = 25, 4, 18
+    max_files = 10
+    stat_analysis_idx, mean_idx, nobs_idx, min_idx, max_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 10, 10, 11, 12, 13, 14, 15, 16, 17
+    report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
+    ''''''
+    # part, elem, val = 25, 4, 48
+    # max_files = 40
+    # stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 40, 40, 41, 42, 43, 44, 45, 46, 47
+    # report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
+    ''''''
+    # part, elem, val = 25, 4, 68
+    # max_files = 60
+    # stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 60, 60, 61, 62, 63, 64, 65, 66, 67
+    # report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
 
     # create CSVs directory
     if not os.path.exists(csv_folder_path):
@@ -363,22 +386,6 @@ if __name__ == "__main__":
     fp.close()
     fp = open(statistics_folder_path + "z_table.txt", 'w')
     fp.close()
-    
-    # create our 3d report matrix for 10 log frames: [BodyPart][x/y/z/prob][t0,...,t9,mean,nobs,min,max,variance,skewness,kurtosis,std_dev] --> 25 * 4 * 18
-    part, elem, val = 25, 4, 18
-    max_files = 10
-    stat_analysis_idx, mean_idx, nobs_idx, min_idx, max_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 10, 10, 11, 12, 13, 14, 15, 16, 17
-    report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
-    # # create our 3d report matrix for 40 log frames: [BodyPart][x/y/z/prob][t0,...,t39,mean,variance,skewness,kurtosis,std_dev] --> 25 * 4 * 48
-    # part, elem, val = 25, 4, 48
-    # max_files = 40
-    # stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 40, 40, 41, 42, 43, 44, 45, 46, 47
-    # report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
-    # # create our 3d report matrix for 60 log frames: [BodyPart][x/y/z/prob][t0,...,t59,mean,variance,skewness,kurtosis,std_dev] --> 25 * 4 * 68
-    # part, elem, val = 25, 4, 68
-    # max_files = 60
-    # stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 60, 60, 61, 62, 63, 64, 65, 66, 67
-    # report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
 
     # access the files of the output directory
     file_counter = 0
@@ -386,7 +393,7 @@ if __name__ == "__main__":
 
         try:
 
-            if os.path.isfile(os.path.join(output_folder_path, file)) and raw_output_file_prefix in file:
+            if os.path.isfile(os.path.join(output_folder_path, file)) and output_file_prefix in file:
 
                 # read from file
                 with open( os.path.join(output_folder_path, file), 'r' ) as fp:
@@ -521,7 +528,7 @@ if __name__ == "__main__":
     # Do a boxplot for each body parts' element
     boxplot(    data=x_data_LR,
                 data_label="BODY_25 human pose model body parts",
-                title="Boxplot of x values for all BODY_25 human pose model body parts",
+                title="Boxplot of x value for all BODY_25 human pose model body parts",
                 directory=plots_folder_path,
                 x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in x_x_tick_labels_LR ]
             )
