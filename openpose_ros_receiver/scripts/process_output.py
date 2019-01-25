@@ -34,22 +34,24 @@ def reorderList(lst, rule, values=None):
 
 
 # Define a function for a plot
-def plot(x, y, directory, x_label=None, y_label=None, title=None, y_lim_min=None, y_lim_max=None, x_tick_labels=None):
+def plot(x, y, directory, x_label=None, y_label=None, title=None, x_lim_min=None, x_lim_max=None, y_lim_min=None, y_lim_max=None, x_tick_labels=None):
     fig, ax = plt.subplots()
     ax.plot(x, y, marker='o', linestyle='None')
     # number of index to markers
     i = 0
     for x_i, y_i in zip(x, y):
-        ax.text(x_i, y_i, str(i), fontsize=10)
+        ax.text(x_i, y_i, str(i), fontsize=8)
         i = i+1
     if x_label:
-        ax.set_xlabel(x_label)
+        ax.set_xlabel(x_label, fontsize=8)
     if y_label:
-        ax.set_ylabel(y_label)
+        ax.set_ylabel(y_label, fontsize=8)
     if x_tick_labels:
-        ax.set_xticklabels(x_tick_labels)
+        ax.set_xticklabels(x_tick_labels, fontsize=8)
     if title:
-        ax.set_title(title)
+        ax.set_title(title, fontsize=10)
+    if x_lim_min and x_lim_max:
+        plt.xlim(x_lim_min, x_lim_max)
     if y_lim_min and y_lim_max:
         plt.ylim(y_lim_min, y_lim_max)
     plt.savefig(directory+title+".png")
@@ -57,7 +59,7 @@ def plot(x, y, directory, x_label=None, y_label=None, title=None, y_lim_min=None
 
 
 # Define a function for multiple plots
-def multiplot(x, y_data, directory, y_names=None, x_label=None, y_label=None, title=None, y_lim_min=None, y_lim_max=None, x_tick_labels=None):
+def multiplot(x, y_data, directory, y_names=None, x_label=None, y_label=None, title=None, x_lim_min=None, x_lim_max=None, y_lim_min=None, y_lim_max=None, x_tick_labels=None):
     if y_names:
         fig, (ax, lax) = plt.subplots(ncols=2, gridspec_kw={"width_ratios":[5,1]})
         for i in range(len(y_data)):
@@ -65,7 +67,7 @@ def multiplot(x, y_data, directory, y_names=None, x_label=None, y_label=None, ti
             # number of index to markers
             j = 0
             for x_j, y_j in zip(x, y_data[i]):
-                ax.text(x_j, y_j, str(j), fontsize=10)
+                ax.text(x_j, y_j, str(j), fontsize=8)
                 j = j+1
     else:
         fig, ax = plt.subplots()
@@ -74,21 +76,23 @@ def multiplot(x, y_data, directory, y_names=None, x_label=None, y_label=None, ti
             # number of index to markers
             i = 0
             for x_i, y_i in zip(x, y):
-                ax.text(x_i, y_i, str(i), fontsize=10)
+                ax.text(x_i, y_i, str(i), fontsize=8)
                 i = i+1
     if x_label:
-        ax.set_xlabel(x_label)
+        ax.set_xlabel(x_label, fontsize=8)
     if y_label:
-        ax.set_ylabel(y_label)
+        ax.set_ylabel(y_label, fontsize=8)
     if x_tick_labels:
-        ax.set_xticklabels(x_tick_labels)
+        ax.set_xticklabels(x_tick_labels, fontsize=8)
     if title:
-        ax.set_title(title)
+        ax.set_title(title, fontsize=10)
     if y_names:
         h,l = ax.get_legend_handles_labels()
-        lax.legend(h, l, borderaxespad=0, prop={'size': 10})
+        lax.legend(h, l, borderaxespad=0, prop={'size': 8})
         lax.axis("off")
         plt.tight_layout()
+    if x_lim_min and x_lim_max:
+        plt.xlim(x_lim_min, x_lim_max)
     if y_lim_min and y_lim_max:
         plt.ylim(y_lim_min, y_lim_max)
     plt.savefig(directory+title+".png")
@@ -96,23 +100,23 @@ def multiplot(x, y_data, directory, y_names=None, x_label=None, y_label=None, ti
 
 
 # Define a function for a 3D scatterplot
-def scatterplot(x, y, z, directory, x_label=None, y_label=None, z_label=None, title=None, x_lim_min=None, x_lim_max=None, y_lim_min=None, y_lim_max=None, z_lim_min=None, z_lim_max=None):
+def scatterplot3D(x, y, z, directory, x_label=None, y_label=None, z_label=None, title=None, x_lim_min=None, x_lim_max=None, y_lim_min=None, y_lim_max=None, z_lim_min=None, z_lim_max=None):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     ax.scatter(x, y, z, c='r', marker='o')
     # number of index to markers
     i = 0
     for x_i, y_i, z_i in zip(np.array(x)[~np.isnan(np.array(x))], np.array(y)[~np.isnan(np.array(y))], np.array(z)[~np.isnan(np.array(z))]):
-        ax.text(x_i, y_i, z_i, str(i), fontsize=10)
+        ax.text(x_i, y_i, z_i, str(i), fontsize=8)
         i = i+1
     if x_label:
-        ax.set_xlabel(x_label)
+        ax.set_xlabel(x_label, fontsize=8)
     if y_label:
-        ax.set_ylabel(y_label)
+        ax.set_ylabel(y_label, fontsize=8)
     if z_label:
-        ax.set_zlabel(z_label)
+        ax.set_zlabel(z_label, fontsize=8)
     if title:
-        ax.set_title(title)
+        ax.set_title(title, fontsize=10)
     if x_lim_min and x_lim_max and y_lim_min and y_lim_max and z_lim_min and z_lim_max:
         if x_lim_min != x_lim_max:
             ax.set_xlim3d(x_lim_min, x_lim_max)
@@ -124,8 +128,67 @@ def scatterplot(x, y, z, directory, x_label=None, y_label=None, z_label=None, ti
     plt.close(fig)
 
 
+# Define a function for a 2D multi-scatterplot
+def multiscatterplot2D(data, directory, names=None, x_label=None, y_label=None, title=None, x_lim_min=None, x_lim_max=None, y_lim_min=None, y_lim_max=None, border_idx=None):
+    colors = ['red', 'green', 'silver', 'rosybrown', 'firebrick',
+            'grey', 'darksalmon', 'sienna', 'sandybrown', 'darkkhaki',
+            'palegreen', 'lightseagreen', 'darkcyan', 'paleturquoise', 'deepskyblue',
+            'royalblue', 'navy', 'lightcoral', 'brown', 'y',
+            'limegreen', 'teal', 'steelblue', 'darkmagenta', 'peru']
+    # print len(data)
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    if border_idx:
+        if names:
+            b, j = 0, 0
+            for d, name in zip(data, names):
+                x, y, _ = d
+                if b <= border_idx:
+                    ax.scatter(x, y, marker='o', label=name, c=colors[j])
+                    j = j + 1
+                else:
+                    ax.plot(x, y, marker='o', label=name)
+                b = b + 1
+
+        else:
+            b = 0
+            for d in data:
+                x, y, _ = d
+                if b <= border_idx:
+                    ax.scatter(x, y, marker='o')
+                else:
+                    ax.plot(x, y, marker='o')
+                b = b + 1
+    else:
+        if names:
+            j = 0
+            for d, name in zip(data, names):
+                x, y, _ = d
+                ax.scatter(x, y, marker='o', label=name, c=colors[j])
+                j = j + 1
+        else:
+            for d in data:
+                x, y, _ = d
+                ax.scatter(x, y, marker='o')
+    if x_label:
+        ax.set_xlabel(x_label, fontsize=8)
+    if y_label:
+        ax.set_ylabel(y_label, fontsize=8)
+    if title:
+        ax.set_title(title, fontsize=10)
+    if names:
+        chartBox = ax.get_position()
+        ax.set_position([chartBox.x0, chartBox.y0, chartBox.width*0.85, chartBox.height])
+        ax.legend(loc='center', bbox_to_anchor=(1.15, 0.5), shadow=True, ncol=1, borderaxespad=0, prop={'size':6})
+    if x_lim_min and x_lim_max and y_lim_min and y_lim_max:
+        plt.xlim(x_lim_min, x_lim_max)
+        plt.ylim(y_lim_min, y_lim_max)
+    plt.savefig(directory+title+".png")
+    plt.close(fig)
+
+
 # Define a function for a 3D multi-scatterplot
-def multiscatterplot(data, directory, names=None, x_label=None, y_label=None, z_label=None, title=None, x_lim_min=None, x_lim_max=None, y_lim_min=None, y_lim_max=None, z_lim_min=None, z_lim_max=None, border_idx=None):
+def multiscatterplot3D(data, directory, names=None, x_label=None, y_label=None, z_label=None, title=None, x_lim_min=None, x_lim_max=None, y_lim_min=None, y_lim_max=None, z_lim_min=None, z_lim_max=None, border_idx=None):
     colors = ['red', 'green', 'silver', 'rosybrown', 'firebrick',
             'grey', 'darksalmon', 'sienna', 'sandybrown', 'darkkhaki',
             'palegreen', 'lightseagreen', 'darkcyan', 'paleturquoise', 'deepskyblue',
@@ -168,13 +231,13 @@ def multiscatterplot(data, directory, names=None, x_label=None, y_label=None, z_
                 x, y, z = d
                 ax.scatter(x, y, z, marker='o')
     if x_label:
-        ax.set_xlabel(x_label)
+        ax.set_xlabel(x_label, fontsize=8)
     if y_label:
-        ax.set_ylabel(y_label)
+        ax.set_ylabel(y_label, fontsize=8)
     if z_label:
-        ax.set_zlabel(z_label)
+        ax.set_zlabel(z_label, fontsize=8)
     if title:
-        ax.set_title(title)
+        ax.set_title(title, fontsize=10)
     if names:
         chartBox = ax.get_position()
         ax.set_position([chartBox.x0, chartBox.y0, chartBox.width*0.85, chartBox.height])
@@ -187,6 +250,8 @@ def multiscatterplot(data, directory, names=None, x_label=None, y_label=None, z_
         if z_lim_min != z_lim_max:
             ax.set_zlim3d(z_lim_min, z_lim_max)
     plt.savefig(directory+title+".png")
+    if len(data) > 2:
+        plt.show(fig)
     plt.close(fig)
 
 
@@ -195,11 +260,11 @@ def histogram(data, directory, x_label=None, y_label=None, title=None):
     fig, ax = plt.subplots()
     ax.hist(np.array(data)[~np.isnan(np.array(data))], color = '#539caf')
     if x_label:
-        ax.set_xlabel(x_label)
+        ax.set_xlabel(x_label, fontsize=8)
     if y_label:
-        ax.set_ylabel(y_label)
+        ax.set_ylabel(y_label, fontsize=8)
     if title:
-        ax.set_title(title)
+        ax.set_title(title, fontsize=10)
     plt.savefig(directory+title+".png")
     plt.close(fig)
 
@@ -210,13 +275,13 @@ def boxplot(data, directory, data_label=None, y_label=None, title=None, x_tick_l
     ax = fig.add_subplot(111)
     ax.boxplot(data)
     if data_label:
-        ax.set_xlabel(data_label)
+        ax.set_xlabel(data_label, fontsize=8)
     if y_label:
-        ax.set_ylabel(y_label)
+        ax.set_ylabel(y_label, fontsize=8)
     if x_tick_labels:
-        ax.set_xticklabels(x_tick_labels)
+        ax.set_xticklabels(x_tick_labels, rotation=45, ha="right", fontsize=8)
     if title:
-        ax.set_title(title)
+        ax.set_title(title, fontsize=10)
     plt.savefig(directory+title+".png")
     plt.close(fig)
 
@@ -238,7 +303,7 @@ if __name__ == "__main__":
                                     ])
     body_25_body_part_pairs = [ [1, 8], [1, 2], [1, 5], [2, 3], [3, 4], [5, 6], [6, 7],
                                 [8, 9], [9, 10], [10, 11], [8, 12], [12, 13], [13, 14], [1, 0],
-                                [0, 15], [15, 17], [0, 16], [16, 18], [2, 17], [5, 18], [14, 19],
+                                [0, 15], [15, 17], [0, 16], [16, 18], [14, 19],
                                 [19, 20], [14, 21], [11, 22], [22, 23], [11, 24]
                             ]
     body_25_body_parts_LR_order_of_appearance = [ '4', '23', '3', '22', '11', '2', '10', '9', '24', '17', '15', '8', '1', '0', '16', '18', '21', '12', '13', '14', '19', '5', '6', '20', '7' ]
@@ -248,16 +313,30 @@ if __name__ == "__main__":
 
     # File I/O specific variables
     output_path = "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/"
-    output_subfolder = "take1/"
-    # output_subfolder = "take4/"
+    # output_subfolder = "take1/"
+    # raw_output_file_prefix = "raw Tue Jan 15 14:21:2"   # to go from 14:21:20 to 14:21:29 (10 files -- 10 log frames)
+    # tfed_output_file_prefix = "tfed Tue Jan 15 14:21:"
+    # output_subfolder = "take6/"
+    # raw_output_file_prefix = "raw Thu Jan 24 12:10:"   # to go from 12:10:00 to 11:10:39 (40 files -- 40 log frames)
+    # tfed_output_file_prefix = "tfed Thu Jan 24 12:10:"
+    # output_subfolder = "take7/"
+    # raw_output_file_prefix = "raw Thu Jan 24 12:47:4"   # to go from 12:47:40 to 12:47:49 (10 files -- 10 log frames)
+    # tfed_output_file_prefix = "tfed Thu Jan 24 12:47:"
+    # output_subfolder = "take8/"
+    # raw_output_file_prefix = "raw Thu Jan 24 13:06:"   # to go from 13:06:00 to 13:06:59 (60 files -- 60 log frames)
+    # tfed_output_file_prefix = "tfed Thu Jan 24 13:06:"
+    # output_folder_path = output_path + output_subfolder
+    output_subfolder = "take9/"
+    op_output_file_prefix = "OP Fri Jan 25 12:41:"
+    raw_output_file_prefix = "raw Fri Jan 25 12:41:"   # to go from 13:06:00 to 13:06:59 (60 files -- 60 log frames)
+    tfed_output_file_prefix = "tfed Fri Jan 25 12:41:"
     output_folder_path = output_path + output_subfolder
-    raw_output_file_prefix = "raw Tue Jan 15 14:21:2"   # to go from 14:21:20 to 14:21:29 (10 files -- 10 log frames)
-    tfed_output_file_prefix = "tfed Tue Jan 15 14:21:"
-    # raw_output_file_prefix = "raw Fri Jan 15 15:18:0"   # to go from 15:18:00 to 15:18:20 (20 files -- 20 log frames)
-    # tfed_output_file_prefix = "tfed Fri Jan 15 15:18:"
     csv_folder_path = output_folder_path + "csv/"
     plots_folder_path = output_folder_path + "plots/"
     statistics_folder_path = output_folder_path + "statistics/"
+    # label_postfix = "pix"
+    label_postfix = "cam"
+    # label_postfix = "rob"
 
     # create CSVs directory
     if not os.path.exists(csv_folder_path):
@@ -287,11 +366,18 @@ if __name__ == "__main__":
     
     # create our 3d report matrix for 10 log frames: [BodyPart][x/y/z/prob][t0,...,t9,mean,nobs,min,max,variance,skewness,kurtosis,std_dev] --> 25 * 4 * 18
     part, elem, val = 25, 4, 18
+    max_files = 10
     stat_analysis_idx, mean_idx, nobs_idx, min_idx, max_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 10, 10, 11, 12, 13, 14, 15, 16, 17
     report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
-    # # create our 3d report matrix for 20 log frames: [BodyPart][x/y/z/prob][t0,...,t19,mean,variance,skewness,kurtosis,std_dev] --> 25 * 4 * 28
-    # part, elem, val = 25, 4, 28
-    # stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 20, 20, 21, 22, 23, 24, 25, 26, 27
+    # # create our 3d report matrix for 40 log frames: [BodyPart][x/y/z/prob][t0,...,t39,mean,variance,skewness,kurtosis,std_dev] --> 25 * 4 * 48
+    # part, elem, val = 25, 4, 48
+    # max_files = 40
+    # stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 40, 40, 41, 42, 43, 44, 45, 46, 47
+    # report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
+    # # create our 3d report matrix for 60 log frames: [BodyPart][x/y/z/prob][t0,...,t59,mean,variance,skewness,kurtosis,std_dev] --> 25 * 4 * 68
+    # part, elem, val = 25, 4, 68
+    # max_files = 60
+    # stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 60, 60, 61, 62, 63, 64, 65, 66, 67
     # report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
 
     # access the files of the output directory
@@ -328,6 +414,9 @@ if __name__ == "__main__":
                                 fp.write(string)
             
                 file_counter = file_counter + 1
+
+                if file_counter == max_files:
+                    break
             
         except Exception as e:
             raise e
@@ -367,9 +456,9 @@ if __name__ == "__main__":
 
         # Do a scatterplot of a certain body part's keypoints detected in space
         if (~np.isnan(report_matrix[i][0][0:stat_analysis_idx])).sum(0) and (~np.isnan(report_matrix[i][1][0:stat_analysis_idx])).sum(0) and (~np.isnan(report_matrix[i][2][0:stat_analysis_idx])).sum(0):
-            scatterplot(    x=report_matrix[i][0][0:stat_analysis_idx], y=report_matrix[i][1][0:stat_analysis_idx], z=report_matrix[i][2][0:stat_analysis_idx],
-                            x_label='X', y_label='Y', z_label='Z',
-                            title="Scatterplot of X, Y, Z at "+body_25_body_parts_dict.get(i),
+            scatterplot3D(    x=report_matrix[i][0][0:stat_analysis_idx], y=report_matrix[i][1][0:stat_analysis_idx], z=report_matrix[i][2][0:stat_analysis_idx],
+                            x_label='X'+label_postfix, y_label='Y'+label_postfix, z_label='Z'+label_postfix,
+                            title="Scatterplot of X"+label_postfix+", Y"+label_postfix+", Z"+label_postfix+" at "+body_25_body_parts_dict.get(i),
                             directory=plots_folder_path,
                             x_lim_min=np.nanmin(report_matrix[i][0][0:stat_analysis_idx]), x_lim_max=np.nanmax(report_matrix[i][0][0:stat_analysis_idx]),
                             y_lim_min=np.nanmin(report_matrix[i][1][0:stat_analysis_idx]), y_lim_max=np.nanmax(report_matrix[i][1][0:stat_analysis_idx]),
@@ -384,9 +473,9 @@ if __name__ == "__main__":
         # second, plot them
         boxplot(    data=[x, y, z],
                     data_label=body_25_body_parts_dict.get(i),
-                    title="Boxplot of X, Y, Z at "+body_25_body_parts_dict.get(i),
+                    title="Boxplot of X"+label_postfix+", Y"+label_postfix+", Z"+label_postfix+" at "+body_25_body_parts_dict.get(i),
                     directory=plots_folder_path,
-                    x_tick_labels=["X", "Y", "Z"]
+                    x_tick_labels=["X"+label_postfix, "Y"+label_postfix, "Z"+label_postfix]
                 )
 
         # Count occurences accross log frames
@@ -396,44 +485,6 @@ if __name__ == "__main__":
         for k in range(stat_analysis_idx):
             if ~np.isnan(report_matrix[i][ getKeysByValue(element_dict, "certainty")[0] ][k]):
                 certainty_accross_frames[i][k] = report_matrix[i][ getKeysByValue(element_dict, "certainty")[0] ][k]
-
-
-    # variances, means, skewnesses, kurtoses = [], [], [], []
-    # x_variances, y_variances, z_variances, certainty_variances = [], [], [], []
-    # x_means, y_means, z_means, certainty_means = [], [], [], []
-    # x_skewnesses, y_skewnesses, z_skewnesses, certainty_skewnesses = [], [], [], []
-    # x_kurtoses, y_kurtoses, z_kurtoses, certainty_kurtoses = [], [], [], []
-    # for i in range(part):
-
-    #     local_variances, local_means, local_skewnesses, local_kurtoses = [], [], [], []
-    #     for j in range(elem):
-    #         variances.append(report_matrix[i][j][variance_idx])
-    #         means.append(report_matrix[i][j][mean_idx])
-    #         skewnesses.append(report_matrix[i][j][skewness_idx])
-    #         kurtoses.append(report_matrix[i][j][kurtosis_idx])
-    #         local_variances.append(report_matrix[i][j][variance_idx])
-    #         local_means.append(report_matrix[i][j][mean_idx])
-    #         local_skewnesses.append(report_matrix[i][j][skewness_idx])
-    #         local_kurtoses.append(report_matrix[i][j][kurtosis_idx])
-
-
-    #     # collect x,y,z,certainty means, variances, skewnesses and kurtoses
-    #     x_variances.append(report_matrix[i][getKeysByValue(element_dict, "x")[0]][variance_idx])
-    #     y_variances.append(report_matrix[i][getKeysByValue(element_dict, "y")[0]][variance_idx])
-    #     z_variances.append(report_matrix[i][getKeysByValue(element_dict, "z")[0]][variance_idx])
-    #     certainty_variances.append(report_matrix[i][getKeysByValue(element_dict, "certainty")[0]][variance_idx])
-    #     x_means.append(report_matrix[i][getKeysByValue(element_dict, "x")[0]][mean_idx])
-    #     y_means.append(report_matrix[i][getKeysByValue(element_dict, "y")[0]][mean_idx])
-    #     z_means.append(report_matrix[i][getKeysByValue(element_dict, "z")[0]][mean_idx])
-    #     certainty_means.append(report_matrix[i][getKeysByValue(element_dict, "certainty")[0]][mean_idx])
-    #     x_skewnesses.append(report_matrix[i][getKeysByValue(element_dict, "x")[0]][skewness_idx])
-    #     y_skewnesses.append(report_matrix[i][getKeysByValue(element_dict, "y")[0]][skewness_idx])
-    #     z_skewnesses.append(report_matrix[i][getKeysByValue(element_dict, "z")[0]][skewness_idx])
-    #     certainty_skewnesses.append(report_matrix[i][getKeysByValue(element_dict, "certainty")[0]][skewness_idx])
-    #     x_kurtoses.append(report_matrix[i][getKeysByValue(element_dict, "x")[0]][kurtosis_idx])
-    #     y_kurtoses.append(report_matrix[i][getKeysByValue(element_dict, "y")[0]][kurtosis_idx])
-    #     z_kurtoses.append(report_matrix[i][getKeysByValue(element_dict, "z")[0]][kurtosis_idx])
-    #     certainty_kurtoses.append(report_matrix[i][getKeysByValue(element_dict, "certainty")[0]][kurtosis_idx])
 
 
     # Collect the elements of each body part
@@ -472,25 +523,25 @@ if __name__ == "__main__":
                 data_label="BODY_25 human pose model body parts",
                 title="Boxplot of x values for all BODY_25 human pose model body parts",
                 directory=plots_folder_path,
-                x_tick_labels=x_x_tick_labels_LR
+                x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in x_x_tick_labels_LR ]
             )
     boxplot(    data=y_data_LR,
                 data_label="BODY_25 human pose model body parts",
                 title="Boxplot of y value for all BODY_25 human pose model body parts",
                 directory=plots_folder_path,
-                x_tick_labels=y_x_tick_labels_LR
+                x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in y_x_tick_labels_LR ]
             )
     boxplot(    data=z_data_LR,
                 data_label="BODY_25 human pose model body parts",
                 title="Boxplot of z value for all BODY_25 human pose model body parts",
                 directory=plots_folder_path,
-                x_tick_labels=z_x_tick_labels_LR
+                x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in z_x_tick_labels_LR ]
             )
     boxplot(    data=certainty_data_LR,
                 data_label="BODY_25 human pose model body parts",
                 title="Boxplot of certainty value for all BODY_25 human pose model body parts",
                 directory=plots_folder_path,
-                x_tick_labels=certainty_x_tick_labels_LR
+                x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in certainty_x_tick_labels_LR ]
             )
 
     # Repeat, with median normalization
@@ -542,25 +593,25 @@ if __name__ == "__main__":
                 data_label="BODY_25 human pose model body parts",
                 title="Boxplot of x values for all BODY_25 human pose model body parts after median normalization",
                 directory=plots_folder_path,
-                x_tick_labels=x_x_tick_labels_LR
+                x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in x_x_tick_labels_LR ]
             )
     boxplot(    data=y_data_LR,
                 data_label="BODY_25 human pose model body parts",
                 title="Boxplot of y value for all BODY_25 human pose model body parts after median normalization",
                 directory=plots_folder_path,
-                x_tick_labels=y_x_tick_labels_LR
+                x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in y_x_tick_labels_LR ]
             )
     boxplot(    data=z_data_LR,
                 data_label="BODY_25 human pose model body parts",
                 title="Boxplot of z value for all BODY_25 human pose model body parts after median normalization",
                 directory=plots_folder_path,
-                x_tick_labels=z_x_tick_labels_LR
+                x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in z_x_tick_labels_LR ]
             )
     boxplot(    data=certainty_data_LR,
                 data_label="BODY_25 human pose model body parts",
                 title="Boxplot of certainty value for all BODY_25 human pose model body parts after median normalization",
                 directory=plots_folder_path,
-                x_tick_labels=certainty_x_tick_labels_LR
+                x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in certainty_x_tick_labels_LR ]
             )
 
 
@@ -607,9 +658,9 @@ if __name__ == "__main__":
             x2 = np.array(report_matrix[ pair[1] ][0][0:stat_analysis_idx])[~np.isnan(report_matrix[ pair[1] ][0][0:stat_analysis_idx])]
             y2 = np.array(report_matrix[ pair[1] ][1][0:stat_analysis_idx])[~np.isnan(report_matrix[ pair[1] ][1][0:stat_analysis_idx])]
             z2 = np.array(report_matrix[ pair[1] ][2][0:stat_analysis_idx])[~np.isnan(report_matrix[ pair[1] ][2][0:stat_analysis_idx])]
-            multiscatterplot(   data=[[x1, y1, z1], [x2, y2, z2]],
-                                x_label='X', y_label='Y', z_label='Z',
-                                title="Scatterplot of X, Y, Z at "+body_25_body_parts_dict.get(pair[0])+" and "+body_25_body_parts_dict.get(pair[1])+" pair",
+            multiscatterplot3D(   data=[[x1, y1, z1], [x2, y2, z2]],
+                                x_label='X'+label_postfix, y_label='Y'+label_postfix, z_label='Z'+label_postfix,
+                                title="Scatterplot of X"+label_postfix+", Y"+label_postfix+", Z"+label_postfix+" at "+body_25_body_parts_dict.get(pair[0])+" and "+body_25_body_parts_dict.get(pair[1])+" pair",
                                 directory=plots_folder_path,
                                 x_lim_min=np.min([np.min(x1), np.min(x2)]), x_lim_max=np.max([np.max(x1), np.max(x2)]),
                                 y_lim_min=np.min([np.min(y1), np.min(y2)]), y_lim_max=np.max([np.max(y1), np.max(y2)]),
@@ -646,13 +697,25 @@ if __name__ == "__main__":
             all_data = all_data + 1
             pair_data = pair_data + 1
 
-    multiscatterplot(   data=data,
-                        x_label='X', y_label='Y', z_label='Z',
-                        title="Scatterplot of X, Y, Z for all body parts detected in space",
+    # 3D scatterplot
+    multiscatterplot3D( data=data,
+                        x_label='X'+label_postfix, y_label='Y'+label_postfix, z_label='Z'+label_postfix,
+                        title="Scatterplot of X"+label_postfix+", Y"+label_postfix+", Z"+label_postfix+" for all body parts detected in space",
                         directory=plots_folder_path,
                         x_lim_min=np.min(x_mins), x_lim_max=np.max(x_maxes),
                         y_lim_min=np.min(y_mins), y_lim_max=np.max(y_maxes),
                         z_lim_min=np.min(z_mins), z_lim_max=np.max(z_maxes),
+                        names=names,
+                        border_idx=all_data-pair_data-1
+                    )
+
+    # 2D scatterplot
+    multiscatterplot2D( data=data,
+                        x_label='X'+label_postfix, y_label='Y'+label_postfix,
+                        title="Scatterplot of X"+label_postfix+", Y"+label_postfix+" for all body parts detected in space",
+                        directory=plots_folder_path,
+                        x_lim_min=np.min(x_mins), x_lim_max=np.max(x_maxes),
+                        y_lim_min=np.min(y_mins), y_lim_max=np.max(y_maxes),
                         names=names,
                         border_idx=all_data-pair_data-1
                     )

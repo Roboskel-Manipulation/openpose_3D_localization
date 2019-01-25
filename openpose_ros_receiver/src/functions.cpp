@@ -38,7 +38,7 @@ void humanListPointcloudSkeletonCallback(const pcl::PointCloud<pcl::PointXYZ>::C
         openpose_ros_msgs::OpenPoseHumanList temp_list_msg = *list_msg;
 
         /* log skeletons to file */
-        std::ofstream outfile, logfile;
+        std::ofstream outfile, logfile, opfile;
         int writen = 0;
 
         for (uint32_t i = 0; i < list_msg->num_humans; i++)
@@ -52,13 +52,16 @@ void humanListPointcloudSkeletonCallback(const pcl::PointCloud<pcl::PointXYZ>::C
                     time_t now = time(0);
                     /* convert now to string form */
                     char* dt = ctime(&now);
-                    std::stringstream strstream;
-                    strstream << "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/raw " << dt << ".txt";
-                    logfile.open(strstream.str(), std::ofstream::out);
+                    std::stringstream strstream1, strstream2;
+                    strstream1 << "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/raw " << dt << ".txt";
+                    logfile.open(strstream1.str(), std::ofstream::out);
+                    strstream2 << "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/OP " << dt << ".txt";
+                    opfile.open(strstream2.str(), std::ofstream::out);
                 }
 
                 outfile << "Body " << i << " keypoints:" << std::endl;
                 logfile << "Body " << i << " keypoints:" << std::endl;
+                opfile << "Body " << i << " keypoints:" << std::endl;
 
                 /* Probabilities check, do not log invalid "ghost" skeletons */
                 double bodyAvgProb, bodyTotalProb = 0.0;
@@ -80,11 +83,21 @@ void humanListPointcloudSkeletonCallback(const pcl::PointCloud<pcl::PointXYZ>::C
                             zVec.push_back(list_msg->human_list[i].body_key_points_with_prob[j].z);
                             probVec.push_back(list_msg->human_list[i].body_key_points_with_prob[j].prob);
                         }
+                        else
+                        {
+                            xVec.push_back(0.0);
+                            yVec.push_back(0.0);
+                            zVec.push_back(0.0);
+                            probVec.push_back(0.0);
+                        }
                     }
 
                     static tf::TransformBroadcaster br;
                     tf::Transform transform;
                     double x, y, z, prob;
+
+                    /* for debugging */
+                    assert(xVec.size() == 25);
 
                     for (uint32_t k = 0; k < xVec.size(); k++)
                     {
@@ -95,7 +108,7 @@ void humanListPointcloudSkeletonCallback(const pcl::PointCloud<pcl::PointXYZ>::C
                         else
                         {
                             pcl::PointXYZ p1 = pPCL->at(xVec.at(k), yVec.at(k));
-                            x = p1.x; y = p1.y; z = p1.z; prob = zVec.at(k);
+                            x = p1.x; y = p1.y; z = p1.z; prob = probVec.at(k);
 
                             if (std::isnan(x) || std::isnan(y) || std::isnan(z))
                                 continue;
@@ -106,17 +119,14 @@ void humanListPointcloudSkeletonCallback(const pcl::PointCloud<pcl::PointXYZ>::C
                             transform.setRotation(q);
                             br.sendTransform( tf::StampedTransform(transform, ros::Time::now(), "zed_left_camera_frame", getPoseBodyPartMappingBody25(k)) );
 
-                            // /* log */
-                            // temp_list_msg.human_list[i].body_key_points_with_prob[k].x = x;
-                            // temp_list_msg.human_list[i].body_key_points_with_prob[k].y = y;
-                            // temp_list_msg.human_list[i].body_key_points_with_prob[k].z = z;
-
                             /* report */
                             ROS_INFO("SEND time=%f, from=%s, to=%s, x=%f, y=%f, z=%f",
                                     ros::Time::now().toSec(), "zed_left_camera_frame", getPoseBodyPartMappingBody25(k).c_str(), transform.getOrigin().x(), transform.getOrigin().y(), transform.getOrigin().z());
-                        
+
+                            /* log */
                             outfile << "raw kp " << getPoseBodyPartMappingBody25(k) << ": x=" << x << " y=" <<  y << " z=" <<  z << " prob=" <<  prob << std::endl;
                             logfile << "raw kp " << getPoseBodyPartMappingBody25(k) << ": x=" << x << " y=" <<  y << " z=" <<  z << " prob=" <<  prob << std::endl;
+                            opfile << "OP kp " << getPoseBodyPartMappingBody25(k) << ": x=" << xVec.at(k) << " y=" << yVec.at(k) << " z=" << zVec.at(k) << " prob=" << probVec.at(k) << std::endl;      
                         }
                     }
 
@@ -126,6 +136,7 @@ void humanListPointcloudSkeletonCallback(const pcl::PointCloud<pcl::PointXYZ>::C
 
                 outfile << std::endl << std::endl;
                 logfile << std::endl << std::endl;
+                opfile << std::endl << std::endl;
 
                 writen++;
             }
@@ -133,6 +144,7 @@ void humanListPointcloudSkeletonCallback(const pcl::PointCloud<pcl::PointXYZ>::C
         
         outfile.close();
         logfile.close();
+        opfile.close();
         // ROS_WARN("humanListBroadcastCallback OUT");
     }
 }
