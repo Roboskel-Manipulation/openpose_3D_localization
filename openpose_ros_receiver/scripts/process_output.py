@@ -22,6 +22,30 @@ def getKeysByValue(dictOfElements, valueToFind):
     return listOfKeys
 
 
+# Bubble sort up to three parallel lists based on the first list's values
+def bubbleSortParallelLists(a_list, b_list, c_list=None):
+    # sanity check
+    if c_list:
+        assert ( len(a_list) == len(b_list) and len(b_list) == len(c_list) )
+    else:
+        assert ( len(a_list) == len(b_list) )
+
+    for passnum in range(len(a_list)-1, 0, -1):
+        for i in range(passnum):
+            if a_list[i] < a_list[i+1]:
+                temp = a_list[i]
+                a_list[i] = a_list[i+1]
+                a_list[i+1] = temp
+                # similarly sort the parallel lists
+                temp = b_list[i]
+                b_list[i] = b_list[i+1]
+                b_list[i+1] = temp
+                if c_list:
+                    temp = c_list[i]
+                    c_list[i] = c_list[i+1]
+                    c_list[i+1] = temp
+
+
 # Re-order a list's element under a specific rule
 def reorderList(lst, rule, values=None):
     new_list, new_values = [], []
@@ -38,10 +62,10 @@ def plot(x, y, directory, x_label=None, y_label=None, title=None, x_lim_min=None
     fig, ax = plt.subplots()
     ax.plot(x, y, marker='o', linestyle='None')
     # number of index to markers
-    i = 0
-    for x_i, y_i in zip(x, y):
-        ax.text(x_i, y_i, str(i), fontsize=8)
-        i = i+1
+    # i = 0
+    # for x_i, y_i in zip(x, y):
+    #     ax.text(x_i, y_i, str(i), fontsize=8)
+    #     i = i+1
     if x_label:
         ax.set_xlabel(x_label, fontsize=8)
     if y_label:
@@ -50,9 +74,9 @@ def plot(x, y, directory, x_label=None, y_label=None, title=None, x_lim_min=None
         ax.set_xticklabels(x_tick_labels, fontsize=8)
     if title:
         ax.set_title(title, fontsize=10)
-    if x_lim_min and x_lim_max:
+    if x_lim_min and x_lim_max and x_lim_min != x_lim_max:
         plt.xlim(x_lim_min, x_lim_max)
-    if y_lim_min and y_lim_max:
+    if y_lim_min and y_lim_max and y_lim_min != y_lim_max:
         plt.ylim(y_lim_min, y_lim_max)
     plt.savefig(directory+title+".png")
     plt.close(fig)
@@ -64,25 +88,28 @@ def multiplot(x, y_data, directory, y_names=None, x_label=None, y_label=None, ti
         fig, (ax, lax) = plt.subplots(ncols=2, gridspec_kw={"width_ratios":[5,1]})
         for i in range(len(y_data)):
             ax.plot(x, y_data[i], label=y_names[i], linestyle='None', marker='o')
-            # number of index to markers
-            j = 0
-            for x_j, y_j in zip(x, y_data[i]):
-                ax.text(x_j, y_j, str(j), fontsize=8)
-                j = j+1
+            # # number of index to markers
+            # j = 0
+            # for x_j, y_j in zip(x, y_data[i]):
+            #     ax.text(x_j, y_j, str(j), fontsize=8)
+            #     j = j+1
     else:
         fig, ax = plt.subplots()
         for y in y_data:
             ax.plot(x, y, linestyle='--', marker='o')
-            # number of index to markers
-            i = 0
-            for x_i, y_i in zip(x, y):
-                ax.text(x_i, y_i, str(i), fontsize=8)
-                i = i+1
+            # # number of index to markers
+            # i = 0
+            # for x_i, y_i in zip(x, y):
+            #     ax.text(x_i, y_i, str(i), fontsize=8)
+            #     i = i+1
     if x_label:
         ax.set_xlabel(x_label, fontsize=8)
     if y_label:
         ax.set_ylabel(y_label, fontsize=8)
     if x_tick_labels:
+        print x_tick_labels
+        print "--------------------"
+        print y_data
         ax.set_xticklabels(x_tick_labels, fontsize=8)
     if title:
         ax.set_title(title, fontsize=10)
@@ -91,9 +118,9 @@ def multiplot(x, y_data, directory, y_names=None, x_label=None, y_label=None, ti
         lax.legend(h, l, borderaxespad=0, prop={'size': 8})
         lax.axis("off")
         plt.tight_layout()
-    if x_lim_min and x_lim_max:
+    if x_lim_min and x_lim_max and x_lim_min != x_lim_max:
         plt.xlim(x_lim_min, x_lim_max)
-    if y_lim_min and y_lim_max:
+    if y_lim_min and y_lim_max and y_lim_min != y_lim_max:
         plt.ylim(y_lim_min, y_lim_max)
     plt.savefig(directory+title+".png")
     plt.close(fig)
@@ -181,8 +208,10 @@ def multiscatterplot2D(data, directory, names=None, x_label=None, y_label=None, 
         ax.set_position([chartBox.x0, chartBox.y0, chartBox.width*0.85, chartBox.height])
         ax.legend(loc='center', bbox_to_anchor=(1.15, 0.5), shadow=True, ncol=1, borderaxespad=0, prop={'size':6})
     if x_lim_min and x_lim_max and y_lim_min and y_lim_max:
-        plt.xlim(x_lim_min, x_lim_max)
-        plt.ylim(y_lim_min, y_lim_max)
+        if x_lim_min != x_lim_max:
+            plt.xlim(x_lim_min, x_lim_max)
+        if y_lim_min != y_lim_max:
+            plt.ylim(y_lim_min, y_lim_max)
     plt.savefig(directory+title+".png")
     plt.close(fig)
 
@@ -207,7 +236,7 @@ def multiscatterplot3D(data, directory, names=None, x_label=None, y_label=None, 
                     ax.scatter(x, y, z, marker='o', label=name, c=colors[j])
                     j = j + 1
                 else:
-                    ax.plot(x, y, z, marker='o', label=name)
+                    ax.plot(x, y, z, marker='^', label=name)
                 b = b + 1
 
         else:
@@ -217,7 +246,7 @@ def multiscatterplot3D(data, directory, names=None, x_label=None, y_label=None, 
                 if b <= border_idx:
                     ax.scatter(x, y, z, marker='o')
                 else:
-                    ax.plot(x, y, z, marker='o')
+                    ax.plot(x, y, z, marker='^')
                 b = b + 1
     else:
         if names:
@@ -270,12 +299,20 @@ def histogram(data, directory, x_label=None, y_label=None, title=None):
 
 
 # Define a function for a boxplot
-def boxplot(data, directory, data_label=None, y_label=None, title=None, x_tick_labels=None):
+def boxplot(data, directory, data_label=None, y_label=None, title=None, x_tick_labels=None, y_lim_min=None, y_lim_max=None):
     if not data:
         return
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.boxplot(data)
+    bp_dict = ax.boxplot(data, showfliers=False)
+    # top_points = bp_dict["fliers"][0].get_data()[1]
+    # new_max = np.nanmin([ np.nanmin(l) for l in top_points if len(l) ])
+    # bottom_points = bp_dict["fliers"][2].get_data()[1]
+    # new_min = np.nanmax([ np.nanmax(l) for l in bottom_points if len(l) ])
+    # if new_min < y_lim_min:
+    #     y_lim_min = new_min
+    # if new_max > y_lim_max:
+    #     y_lim_max = new_max
     if data_label:
         ax.set_xlabel(data_label, fontsize=8)
     if y_label:
@@ -284,6 +321,9 @@ def boxplot(data, directory, data_label=None, y_label=None, title=None, x_tick_l
         ax.set_xticklabels(x_tick_labels, rotation=45, ha="right", fontsize=8)
     if title:
         ax.set_title(title, fontsize=10)
+    if y_lim_min and y_lim_max and y_lim_min != y_lim_max:
+        plt.ylim(y_lim_min, y_lim_max)
+    ax.margins(y=0)
     plt.savefig(directory+title+".png")
     plt.close(fig)
 
@@ -316,36 +356,46 @@ if __name__ == "__main__":
     # File I/O specific variables
     output_path = "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/"
     ''''''
-    # output_subfolder = "take1/"
-    # raw_output_file_prefix = "raw Tue Jan 15 14:21:2"   # to go from 14:21:20 to 14:21:29 (10 files -- 10 log frames)
-    # tfed_output_file_prefix = "tfed Tue Jan 15 14:21:"
-    ''''''
-    output_subfolder = "take6/"
-    raw_output_file_prefix = "raw Thu Jan 24 12:10:"   # to go from 12:10:00 to 11:10:39 (40 files -- 40 log frames)
-    tfed_output_file_prefix = "tfed Thu Jan 24 12:10:"
-    ''''''
-    # output_subfolder = "take7/"
-    # raw_output_file_prefix = "raw Thu Jan 24 12:47:4"   # to go from 12:47:40 to 12:47:49 (10 files -- 10 log frames)
-    # tfed_output_file_prefix = "tfed Thu Jan 24 12:47:"
-    ''''''
-    # output_subfolder = "take8/"
-    # raw_output_file_prefix = "raw Thu Jan 24 13:06:"   # to go from 13:06:00 to 13:06:59 (60 files -- 60 log frames)
-    # tfed_output_file_prefix = "tfed Thu Jan 24 13:06:"
+    # output_subfolder = "take6/"
+    # raw_output_file_prefix = "raw Thu Jan 24 12:10:"   # to go from 12:10:00 to 11:10:39 (40 files -- 40 log frames)
+    # tfed_output_file_prefix = "tfed Thu Jan 24 12:10:"
     ''''''
     # output_subfolder = "take9/"
     # op_output_file_prefix = "OP Fri Jan 25 12:41:"
-    # raw_output_file_prefix = "raw Fri Jan 25 12:41:"   # to go from 13:06:00 to 13:06:59 (60 files -- 60 log frames)
+    # raw_output_file_prefix = "raw Fri Jan 25 12:41:"
     # tfed_output_file_prefix = "tfed Fri Jan 25 12:4"
     ''''''
-    output_folder_path = output_path + output_subfolder
-    csv_folder_path = output_folder_path + "csv/"
-    plots_folder_path = output_folder_path + "plots/"
-    statistics_folder_path = output_folder_path + "statistics/"
-    # label_postfix, output_file_prefix = "pix", op_output_file_prefix
-    # label_postfix, output_file_prefix = "cam", raw_output_file_prefix
-    label_postfix, output_file_prefix = "rob", tfed_output_file_prefix
+    # output_subfolder = "take12/"
+    # op_output_file_prefix = "OP Mon Jan 28 13:43:"
+    # raw_output_file_prefix = "raw Mon Jan 28 13:43:"
+    # tfed_output_file_prefix = "tfed Mon Jan 28 13:43:"
+    ''''''
+    output_subfolder = "take13/"
+    op_output_file_prefix = "OP Mon Jan 28 16:30:"
+    raw_output_file_prefix = "raw Mon Jan 28 16:30:"
+    tfed_output_file_prefix = "tfed Mon Jan 28 16:30:"
+    ''''''
     
-    # create our 3d report matrix for 10 log frames: [BodyPart][x/y/z/prob][t0,...,t9,mean,nobs,min,max,variance,skewness,kurtosis,std_dev] --> 25 * 4 * 18
+    output_folder_path = output_path + output_subfolder
+
+    ''''''
+    # label_postfix, output_file_prefix = "pix", op_output_file_prefix
+    # csv_folder_path = output_folder_path + "csvOP/"
+    # plots_folder_path = output_folder_path + "plotsOP/"
+    # statistics_folder_path = output_folder_path + "statisticsOP/"
+    ''''''
+    # label_postfix, output_file_prefix = "cam", raw_output_file_prefix
+    # csv_folder_path = output_folder_path + "csvRAW/"
+    # plots_folder_path = output_folder_path + "plotsRAW/"
+    # statistics_folder_path = output_folder_path + "statisticsRAW/"
+    ''''''
+    label_postfix, output_file_prefix = "rob", tfed_output_file_prefix
+    csv_folder_path = output_folder_path + "csvTFED/"
+    plots_folder_path = output_folder_path + "plotsTFED/"
+    statistics_folder_path = output_folder_path + "statisticsTFED/"
+    
+    # create our 3d report matrix, e.g. for 10 log frames: [BodyPart][x/y/z/prob][t0,...,t9,mean,nobs,min,max,variance,skewness,kurtosis,std_dev] --> 25 * 4 * 18
+    ''''''
     part, elem, val = 25, 4, 18
     max_files = 10
     stat_analysis_idx, mean_idx, nobs_idx, min_idx, max_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 10, 10, 11, 12, 13, 14, 15, 16, 17
@@ -360,6 +410,7 @@ if __name__ == "__main__":
     # max_files = 60
     # stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 60, 60, 61, 62, 63, 64, 65, 66, 67
     # report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
+    ''''''
 
     # create CSVs directory
     if not os.path.exists(csv_folder_path):
@@ -432,6 +483,7 @@ if __name__ == "__main__":
     # do statistical analysis
     occurences_accross_frames = [ 0 for i in range(part) ]
     certainty_accross_frames = [ [ 0.0 for j in range(stat_analysis_idx) ] for i in range(part) ]
+    mean_certainty_accross_frames = [ 0.0 for i in range(part) ]
     z_table = [ [ [ np.nan for k in range(stat_analysis_idx) ] for j in range(elem) ] for i in range(part) ]
 
     for i in range(part):
@@ -492,6 +544,10 @@ if __name__ == "__main__":
         for k in range(stat_analysis_idx):
             if ~np.isnan(report_matrix[i][ getKeysByValue(element_dict, "certainty")[0] ][k]):
                 certainty_accross_frames[i][k] = report_matrix[i][ getKeysByValue(element_dict, "certainty")[0] ][k]
+        
+        # Log mean certainty accross frames
+        if ~np.isnan(report_matrix[i][ getKeysByValue(element_dict, "certainty")[0] ][mean_idx]):
+            mean_certainty_accross_frames[i] = report_matrix[i][ getKeysByValue(element_dict, "certainty")[0] ][mean_idx]
 
 
     # Collect the elements of each body part
@@ -558,7 +614,6 @@ if __name__ == "__main__":
         x_col.append(report_matrix[i][ getKeysByValue(element_dict, "x")[0] ][0:stat_analysis_idx])
         y_col.append(report_matrix[i][ getKeysByValue(element_dict, "y")[0] ][0:stat_analysis_idx])
         z_col.append(report_matrix[i][ getKeysByValue(element_dict, "z")[0] ][0:stat_analysis_idx])
-        certainty_col.append(report_matrix[i][ getKeysByValue(element_dict, "certainty")[0] ][0:stat_analysis_idx])
 
     # Perform median normalization to the collected data
     for i in range(len(x_col)):
@@ -569,56 +624,56 @@ if __name__ == "__main__":
                 y_col[i][j] = y_col[i][j] - report_matrix[i][ getKeysByValue(element_dict, "y")[0] ][mean_idx]
             if not np.isnan(z_col[i][j]):
                 z_col[i][j] = z_col[i][j] - report_matrix[i][ getKeysByValue(element_dict, "z")[0] ][mean_idx]
-            if not np.isnan(certainty_col[i][j]):
-                certainty_col[i][j] = certainty_col[i][j] - report_matrix[i][ getKeysByValue(element_dict, "certainty")[0] ][mean_idx]
 
     # Sanitize collected data
     for i in range(len(x_col)):
         x_col[i] = np.array(x_col[i])[~np.isnan(x_col[i])]
         y_col[i] = np.array(y_col[i])[~np.isnan(y_col[i])]
         z_col[i] = np.array(z_col[i])[~np.isnan(z_col[i])]
-        certainty_col[i] = np.array(certainty_col[i])[~np.isnan(certainty_col[i])]
     
     # Trim data to what is not empty
+    y_axis_min_list, y_axis_max_list = [], []
     x_data = [ x_c for x_c in x_col if len(x_c) ]
+    y_axis_min_list.append( np.nanmin( [ np.nanmin(l) for l in x_data ] ) )
+    y_axis_max_list.append( np.nanmax( [ np.nanmax(l) for l in x_data ] ) )
     x_x_tick_labels = [ str(i) for i in body_25_body_parts_dict if i < len(x_col) and len(x_col[i]) ]
     y_data = [ y_c for y_c in y_col if len(y_c) ]
+    y_axis_min_list.append( np.nanmin( [ np.nanmin(l) for l in y_data ] ) )
+    y_axis_max_list.append( np.nanmax( [ np.nanmax(l) for l in y_data ] ) )
     y_x_tick_labels = [ str(i) for i in body_25_body_parts_dict if i < len(y_col) and len(y_col[i]) ]
     z_data = [ z_c for z_c in z_col if len(z_c) ]
+    y_axis_min_list.append( np.nanmin( [ np.nanmin(l) for l in z_data ] ) )
+    y_axis_max_list.append( np.nanmax( [ np.nanmax(l) for l in z_data ] ) )
     z_x_tick_labels = [ str(i) for i in body_25_body_parts_dict if i < len(z_col) and len(z_col[i]) ]
-    certainty_data = [ certainty_c for certainty_c in certainty_col if len(certainty_c) ]
-    certainty_x_tick_labels = [ str(i) for i in body_25_body_parts_dict if i < len(certainty_col) and len(certainty_col[i]) ]
+    y_axis_min = np.nanmin(y_axis_min_list)
+    y_axis_max = np.nanmax(y_axis_max_list)
 
     # Re-order data in order of appearance
     x_x_tick_labels_LR, x_data_LR = reorderList(x_x_tick_labels, body_25_body_parts_LR_order_of_appearance, x_data)
     y_x_tick_labels_LR, y_data_LR = reorderList(y_x_tick_labels, body_25_body_parts_LR_order_of_appearance, y_data)
     z_x_tick_labels_LR, z_data_LR = reorderList(z_x_tick_labels, body_25_body_parts_LR_order_of_appearance, z_data)
-    certainty_x_tick_labels_LR, certainty_data_LR = reorderList(certainty_x_tick_labels, body_25_body_parts_LR_order_of_appearance, certainty_data)
 
     # Do a boxplot for each body parts' element
     boxplot(    data=x_data_LR,
                 data_label="BODY_25 human pose model body parts",
-                title="Boxplot of x values for all BODY_25 human pose model body parts after median normalization",
+                title="Boxplot of x value for all BODY_25 human pose model body parts after median normalization",
                 directory=plots_folder_path,
-                x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in x_x_tick_labels_LR ]
+                x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in x_x_tick_labels_LR ],
+                y_lim_min=y_axis_min, y_lim_max=y_axis_max
             )
     boxplot(    data=y_data_LR,
                 data_label="BODY_25 human pose model body parts",
                 title="Boxplot of y value for all BODY_25 human pose model body parts after median normalization",
                 directory=plots_folder_path,
-                x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in y_x_tick_labels_LR ]
+                x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in y_x_tick_labels_LR ],
+                y_lim_min=y_axis_min, y_lim_max=y_axis_max
             )
     boxplot(    data=z_data_LR,
                 data_label="BODY_25 human pose model body parts",
                 title="Boxplot of z value for all BODY_25 human pose model body parts after median normalization",
                 directory=plots_folder_path,
-                x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in z_x_tick_labels_LR ]
-            )
-    boxplot(    data=certainty_data_LR,
-                data_label="BODY_25 human pose model body parts",
-                title="Boxplot of certainty value for all BODY_25 human pose model body parts after median normalization",
-                directory=plots_folder_path,
-                x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in certainty_x_tick_labels_LR ]
+                x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in z_x_tick_labels_LR ],
+                y_lim_min=y_axis_min, y_lim_max=y_axis_max
             )
 
 
@@ -630,8 +685,7 @@ if __name__ == "__main__":
                 x_label="Frame",
                 y_label=body_25_body_parts_dict.get(i) + " certainty",
                 title="Plot of " + body_25_body_parts_dict.get(i) + " certainty accross frames",
-                directory=plots_folder_path,
-                x_tick_labels=[str(j) for j in range(stat_analysis_idx)]
+                directory=plots_folder_path
             )
     # second, for all body part pairs
     for pair in body_25_body_part_pairs:
@@ -643,16 +697,18 @@ if __name__ == "__main__":
                 directory=plots_folder_path
             )
     # third, for all body parts collectivelly
+    y_data_list = certainty_accross_frames
+    names_list = [ body_25_body_parts_dict.get(i) for i in range(part) ]
+    bubbleSortParallelLists(mean_certainty_accross_frames, y_data_list, names_list)
     multiplot(  x=[ i for i in range(stat_analysis_idx) ],
-                y_data=certainty_accross_frames,
-                y_names=[ body_25_body_parts_dict.get(i) for i in range(part) ],
+                y_data=y_data_list,
+                y_names=names_list,
                 y_lim_min=0.0,
                 y_lim_max=1.0,
                 x_label="Frame",
                 y_label="Body parts certainty",
                 title="Plot of body parts certainty accross frames",
-                directory=plots_folder_path,
-                x_tick_labels=[str(j) for j in range(stat_analysis_idx)]
+                directory=plots_folder_path
             )
 
 

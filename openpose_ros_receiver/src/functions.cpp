@@ -149,6 +149,117 @@ void humanListPointcloudSkeletonCallback(const pcl::PointCloud<pcl::PointXYZ>::C
     }
 }
 
+// void initGlobalVars()
+// {
+//     pointcloud_flag = false;
+// }
+
+// void reInitGlobalVars() {}
+
+// void humanListPointcloudSkeletonCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& pPCL, const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& list_msg)
+// {
+//     if (pPCL)
+//     {
+//         // ROS_WARN("pointcloudCallback IN");
+//         pclCp = *pPCL;
+//         pointcloud_flag = true;
+//         // ROS_WARN("pointcloudCallback OUT");
+//     }
+
+//     if (list_msg && pointcloud_flag)
+//     {
+//         // ROS_WARN("humanListBroadcastCallback IN");
+//         openpose_ros_msgs::OpenPoseHumanList temp_list_msg = *list_msg;
+
+//         /* log skeletons to file */
+//         std::ofstream outfile, logfile, opfile;
+//         int writen = 0;
+
+//         for (uint32_t i = 0; i < list_msg->num_humans; i++)
+//         {
+//             if (list_msg->human_list[i].num_body_key_points_with_non_zero_prob)
+//             {
+//                 if (writen == 0)
+//                 {
+//                     outfile.open("/home/gkamaras/openpose_ros_receiver_raw.txt", std::ofstream::out);
+//                     /* current date/time based on current system */
+//                     time_t now = time(0);
+//                     /* convert now to string form */
+//                     char* dt = ctime(&now);
+//                     std::stringstream strstream1, strstream2;
+//                     strstream1 << "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/raw " << dt << ".txt";
+//                     logfile.open(strstream1.str(), std::ofstream::out);
+//                     strstream2 << "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/OP " << dt << ".txt";
+//                     opfile.open(strstream2.str(), std::ofstream::out);
+//                 }
+
+//                 outfile << "Body " << i << " keypoints:" << std::endl;
+//                 logfile << "Body " << i << " keypoints:" << std::endl;
+//                 opfile << "Body " << i << " keypoints:" << std::endl;
+
+//                 /* Probabilities check, do not log invalid "ghost" skeletons */
+//                 double bodyAvgProb, bodyTotalProb = 0.0;
+
+//                 for (uint32_t j = 0; j < 25; j++)
+//                     bodyTotalProb += list_msg->human_list[i].body_key_points_with_prob[j].prob;
+
+//                 bodyAvgProb = bodyTotalProb / ((float) list_msg->human_list[i].num_body_key_points_with_non_zero_prob);
+
+//                 if (bodyAvgProb > MIN_PROB_THRESHOLD)
+//                 {
+//                     for (uint32_t j = 0; j < 25; j++)
+//                     {
+//                         if (!std::isnan(list_msg->human_list[i].body_key_points_with_prob[j].x) && !std::isnan(list_msg->human_list[i].body_key_points_with_prob[j].y) && !std::isnan(list_msg->human_list[i].body_key_points_with_prob[j].z))
+//                         {
+//                             /* PERFORMANCE FIX */
+//                             double  x_op = list_msg->human_list[i].body_key_points_with_prob[j].x,
+//                                     y_op = list_msg->human_list[i].body_key_points_with_prob[j].y,
+//                                     z_op = list_msg->human_list[i].body_key_points_with_prob[j].z,
+//                                     prob_op = list_msg->human_list[i].body_key_points_with_prob[j].prob;
+
+//                             static tf::TransformBroadcaster br;
+//                             tf::Transform transform;
+//                             double x, y, z, prob;
+
+//                             pcl::PointXYZ p1 = pPCL->at(x_op, y_op);
+//                             x = p1.x; y = p1.y; z = p1.z; prob = prob_op;
+
+//                             if (std::isnan(x) || std::isnan(y) || std::isnan(z))
+//                                 continue;
+
+//                             /* BROADCAST TRANSFORMATIONS */
+//                             transform.setOrigin( tf::Vector3(x, y, z) );
+//                             tf::Quaternion q(0, 0, 0, 1);
+//                             transform.setRotation(q);
+//                             br.sendTransform( tf::StampedTransform(transform, ros::Time::now(), "zed_left_camera_frame", getPoseBodyPartMappingBody25(j)) );
+
+//                             /* report */
+//                             ROS_INFO("SEND time=%f, from=%s, to=%s, x=%f, y=%f, z=%f",
+//                                     ros::Time::now().toSec(), "zed_left_camera_frame", getPoseBodyPartMappingBody25(j).c_str(), transform.getOrigin().x(), transform.getOrigin().y(), transform.getOrigin().z());
+
+//                             /* log */
+//                             outfile << "raw kp " << getPoseBodyPartMappingBody25(j) << ": x=" << x << " y=" <<  y << " z=" <<  z << " prob=" <<  prob << std::endl;
+//                             logfile << "raw kp " << getPoseBodyPartMappingBody25(j) << ": x=" << x << " y=" <<  y << " z=" <<  z << " prob=" <<  prob << std::endl;
+//                             opfile << "OP kp " << getPoseBodyPartMappingBody25(j) << ": x=" << x_op << " y=" << y_op << " z=" << z_op << " prob=" << prob_op << std::endl;      
+//                         }
+//                     }
+//                 }
+
+//                 outfile << std::endl << std::endl;
+//                 logfile << std::endl << std::endl;
+//                 opfile << std::endl << std::endl;
+
+//                 writen++;
+//             }
+//         }
+        
+//         outfile.close();
+//         logfile.close();
+//         opfile.close();
+//         // ROS_WARN("humanListBroadcastCallback OUT");
+//     }
+// }
+
 void listenForSkeleton(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg)
 {
     // ROS_WARN("listenForSkeleton IN");
