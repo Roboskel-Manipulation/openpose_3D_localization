@@ -61,11 +61,6 @@ def reorderList(lst, rule, values=None):
 def plot(x, y, directory, x_label=None, y_label=None, title=None, x_lim_min=None, x_lim_max=None, y_lim_min=None, y_lim_max=None, x_tick_labels=None):
     fig, ax = plt.subplots()
     ax.plot(x, y, marker='o', linestyle='None')
-    # number of index to markers
-    # i = 0
-    # for x_i, y_i in zip(x, y):
-    #     ax.text(x_i, y_i, str(i), fontsize=8)
-    #     i = i+1
     if x_label:
         ax.set_xlabel(x_label, fontsize=8)
     if y_label:
@@ -88,20 +83,10 @@ def multiplot(x, y_data, directory, y_names=None, x_label=None, y_label=None, ti
         fig, (ax, lax) = plt.subplots(ncols=2, gridspec_kw={"width_ratios":[5,1]})
         for i in range(len(y_data)):
             ax.plot(x, y_data[i], label=y_names[i], linestyle='None', marker='o')
-            # # number of index to markers
-            # j = 0
-            # for x_j, y_j in zip(x, y_data[i]):
-            #     ax.text(x_j, y_j, str(j), fontsize=8)
-            #     j = j+1
     else:
         fig, ax = plt.subplots()
         for y in y_data:
             ax.plot(x, y, linestyle='--', marker='o')
-            # # number of index to markers
-            # i = 0
-            # for x_i, y_i in zip(x, y):
-            #     ax.text(x_i, y_i, str(i), fontsize=8)
-            #     i = i+1
     if x_label:
         ax.set_xlabel(x_label, fontsize=8)
     if y_label:
@@ -304,15 +289,7 @@ def boxplot(data, directory, data_label=None, y_label=None, title=None, x_tick_l
         return
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    bp_dict = ax.boxplot(data, showfliers=False)
-    # top_points = bp_dict["fliers"][0].get_data()[1]
-    # new_max = np.nanmin([ np.nanmin(l) for l in top_points if len(l) ])
-    # bottom_points = bp_dict["fliers"][2].get_data()[1]
-    # new_min = np.nanmax([ np.nanmax(l) for l in bottom_points if len(l) ])
-    # if new_min < y_lim_min:
-    #     y_lim_min = new_min
-    # if new_max > y_lim_max:
-    #     y_lim_max = new_max
+    ax.boxplot(data, showfliers=False)
     if data_label:
         ax.set_xlabel(data_label, fontsize=8)
     if y_label:
@@ -365,34 +342,29 @@ if __name__ == "__main__":
     # raw_output_file_prefix = "raw Fri Jan 25 12:41:"
     # tfed_output_file_prefix = "tfed Fri Jan 25 12:4"
     ''''''
-    # output_subfolder = "take12/"
-    # op_output_file_prefix = "OP Mon Jan 28 13:43:"
-    # raw_output_file_prefix = "raw Mon Jan 28 13:43:"
-    # tfed_output_file_prefix = "tfed Mon Jan 28 13:43:"
-    ''''''
-    output_subfolder = "take13/"
-    op_output_file_prefix = "OP Mon Jan 28 16:30:"
-    raw_output_file_prefix = "raw Mon Jan 28 16:30:"
-    tfed_output_file_prefix = "tfed Mon Jan 28 16:30:"
+    output_subfolder = "take14/"
+    op_output_file_prefix = "OP Wed Jan 30 16:42:"
+    raw_output_file_prefix = "raw Wed Jan 30 16:42:"
+    tfed_output_file_prefix = "tfed Wed Jan 30 16:42:"
     ''''''
     
     output_folder_path = output_path + output_subfolder
 
     ''''''
-    # label_postfix, output_file_prefix = "pix", op_output_file_prefix
-    # csv_folder_path = output_folder_path + "csvOP/"
-    # plots_folder_path = output_folder_path + "plotsOP/"
-    # statistics_folder_path = output_folder_path + "statisticsOP/"
+    label_postfix, output_file_prefix = "pix", op_output_file_prefix
+    csv_folder_path = output_folder_path + "csvOP/"
+    plots_folder_path = output_folder_path + "plotsOP/"
+    statistics_folder_path = output_folder_path + "statisticsOP/"
     ''''''
     # label_postfix, output_file_prefix = "cam", raw_output_file_prefix
     # csv_folder_path = output_folder_path + "csvRAW/"
     # plots_folder_path = output_folder_path + "plotsRAW/"
     # statistics_folder_path = output_folder_path + "statisticsRAW/"
     ''''''
-    label_postfix, output_file_prefix = "rob", tfed_output_file_prefix
-    csv_folder_path = output_folder_path + "csvTFED/"
-    plots_folder_path = output_folder_path + "plotsTFED/"
-    statistics_folder_path = output_folder_path + "statisticsTFED/"
+    # label_postfix, output_file_prefix = "rob", tfed_output_file_prefix
+    # csv_folder_path = output_folder_path + "csvTFED/"
+    # plots_folder_path = output_folder_path + "plotsTFED/"
+    # statistics_folder_path = output_folder_path + "statisticsTFED/"
     
     # create our 3d report matrix, e.g. for 10 log frames: [BodyPart][x/y/z/prob][t0,...,t9,mean,nobs,min,max,variance,skewness,kurtosis,std_dev] --> 25 * 4 * 18
     ''''''
