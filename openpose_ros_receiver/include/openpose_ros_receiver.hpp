@@ -38,7 +38,7 @@
 #define MIN_PROB_THRESHOLD 0.00     // probability -> float in [0..1]
 #define RELIABILITY_THRESHOLD 3.0   // seconds -> float
 #define MAX_RETRY 2                 // number of repetitions -> int
-#define TF_WAIT 0.1                 // seconds -> float
+#define TF_WAIT 10                  // seconds -> float
 
 /* OpenPose BODY_25 Body Parts Mapping */
 const std::map<unsigned int, std::string> POSE_BODY_25_BODY_PARTS
