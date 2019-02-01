@@ -1,6 +1,8 @@
 #include "openpose_ros_receiver.hpp"
 
-void humanListPointcloudSkeletonCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& pPCL, const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& list_msg)
+bool tfSubtree;
+
+void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& pPCL, const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& list_msg, bool &tfSubtree)
 {
     if (list_msg && pPCL)
     {
@@ -11,15 +13,20 @@ void humanListPointcloudSkeletonCallback(const pcl::PointCloud<pcl::PointXYZ>::C
         static tf::TransformListener tfListener;
         static tf::StampedTransform baseLinkTransform;
 
-        try
+        if (!tfSubtree)
         {
-            /* take the TF subtree that we want for the transformations */
-            tfListener.waitForTransform("base_link", "zed_left_camera_frame", ros::Time(0), ros::Duration(TF_WAIT));
-            tfListener.lookupTransform("base_link", "zed_left_camera_frame", ros::Time(0), baseLinkTransform);
-        }
-        catch (tf::TransformException &ex)
-        {
-            ROS_ERROR("%s", ex.what());
+            try
+            {
+                /* take the TF subtree that we want for the transformations */
+                tfListener.waitForTransform("base_link", "zed_left_camera_frame", ros::Time(0), ros::Duration(TF_WAIT));
+                tfListener.lookupTransform("base_link", "zed_left_camera_frame", ros::Time(0), baseLinkTransform);
+
+                tfSubtree = true;
+            }
+            catch (tf::TransformException &ex)
+            {
+                ROS_ERROR("%s", ex.what());
+            }
         }
 
         for (uint32_t i = 0; i < list_msg->num_humans; i++)
@@ -129,15 +136,10 @@ void humanListPointcloudSkeletonCallback(const pcl::PointCloud<pcl::PointXYZ>::C
 
 void listenForSkeleton(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg)
 {
-    // ROS_WARN("listenForSkeleton IN");
-    // /* log skeletons to file */
-    // std::ofstream logfile;
-
     tf::TransformListener listener;
     tf::StampedTransform transform;
 
-    int retry = 0/*, writen = 0*/;
-    // ROS_WARN("PERSON keypoints:");
+    int retry = 0;
     for (uint32_t j = 0; j < 25; j++)
     {
         try
@@ -171,35 +173,10 @@ void listenForSkeleton(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg
             else
             {
                 retry = 0;
-                // ROS_ERROR("%s",ex.what());
             }
             continue;
         }
-
-        // if (writen == 0)
-        // {
-        //     /* current date/time based on current system */
-        //     time_t now = time(0);
-        //     /* convert now to string form */
-        //     char* dt = ctime(&now);
-        //     std::stringstream strstream;
-        //     strstream << "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/tfed " << dt << ".txt";
-        //     logfile.open(strstream.str(), std::ofstream::out);
-        //     logfile << "Body keypoints:" << std::endl;
-        // }
-
-        // if (!std::isnan(transform.getOrigin().x()) && !std::isnan(transform.getOrigin().y()) && !std::isnan(transform.getOrigin().z()))
-        // {
-        //     logfile << "kp " << getPoseBodyPartMappingBody25(j) << ": x=" << transform.getOrigin().x() << " y=" <<  transform.getOrigin().y()
-        //             << " z=" <<  transform.getOrigin().z() << std::endl;
-        // }
-
-        // writen++;
     }
-    // ROS_WARN("---");
-
-    // logfile.close();
-    // ROS_WARN("listenForSkeleton OUT");
 }
 
 std::string getPoseBodyPartMappingBody25(unsigned int idx)

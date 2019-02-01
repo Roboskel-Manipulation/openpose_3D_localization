@@ -40,6 +40,8 @@
 #define MAX_RETRY 2                 // number of repetitions -> int
 #define TF_WAIT 10                  // seconds -> float
 
+extern bool tfSubtree;
+
 /* OpenPose BODY_25 Body Parts Mapping */
 const std::map<unsigned int, std::string> POSE_BODY_25_BODY_PARTS
 {
@@ -72,9 +74,7 @@ const std::map<unsigned int, std::string> POSE_BODY_25_BODY_PARTS
 };
 
 /* Broadcaster's and Receiver's functions */
-void initGlobalVars();
-void reInitGlobalVars();
-void humanListPointcloudSkeletonCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& pPCL2, const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& list_msg);
+void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& pPCL, const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& list_msg, bool &tfSubtree);
 void listenForSkeleton(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg);
 std::string getPoseBodyPartMappingBody25(unsigned int idx);
 

@@ -14,6 +14,8 @@ int main (int argc, char** argv)
     nh.param("openpose_ros_receiver_broadcaster_node/queue_size", queue_size, 2);
     nh.param("openpose_ros_receiver_broadcaster_node/sync_buffer_size", sync_buffer_size, 2);
 
+    tfSubtree = false;
+
     /* Read human list topic, process it and broadcast its keypoints to tf */
     /* Create message filters */
     message_filters::Subscriber<pcl::PointCloud<pcl::PointXYZ>> subPointcloud(nh, pointcloud_topic, queue_size);
@@ -23,7 +25,7 @@ int main (int argc, char** argv)
     typedef message_filters::sync_policies::ApproximateTime< pcl::PointCloud<pcl::PointXYZ>, openpose_ros_msgs::OpenPoseHumanList > MySyncPolicy;
 
     message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(sync_buffer_size), subPointcloud, subHumanList);
-    sync.registerCallback(boost::bind(&humanListPointcloudSkeletonCallback, _1, _2));
+    sync.registerCallback(boost::bind(&humanListPointcloudCallback, _1, _2, tfSubtree));
 
     ros::spin();
 
