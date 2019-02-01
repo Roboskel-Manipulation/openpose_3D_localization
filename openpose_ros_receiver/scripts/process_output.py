@@ -343,9 +343,9 @@ if __name__ == "__main__":
     # tfed_output_file_prefix = "tfed Fri Jan 25 12:4"
     ''''''
     output_subfolder = "take26/"
-    op_output_file_prefix = "OP Thu Jan 31 16:37:"
-    raw_output_file_prefix = "raw Thu Jan 31 16:37:"
-    tfed_output_file_prefix = "tfed Thu Jan 31 16:37:"
+    op_output_file_prefix = "OP Fri Feb  1 11:57:"
+    raw_output_file_prefix = "raw Fri Feb  1 11:57:"
+    tfed_output_file_prefix = "tfed Fri Feb  1 11:57:"
     ''''''
     
     output_folder_path = output_path + output_subfolder
@@ -369,15 +369,15 @@ if __name__ == "__main__":
     
     # create our 3d report matrix, e.g. for 10 log frames: [BodyPart][x/y/z/prob][t0,...,t9,mean,nobs,min,max,variance,skewness,kurtosis,std_dev] --> 25 * 4 * 18
     ''''''
-    # part, elem, val = 25, 4, 18
-    # max_files = 10
-    # stat_analysis_idx, mean_idx, nobs_idx, min_idx, max_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 10, 10, 11, 12, 13, 14, 15, 16, 17
-    # report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
-    ''''''
-    part, elem, val = 25, 4, 48
-    max_files = 40
-    stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 40, 40, 41, 42, 43, 44, 45, 46, 47
+    part, elem, val = 25, 4, 18
+    max_files = 10
+    stat_analysis_idx, mean_idx, nobs_idx, min_idx, max_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 10, 10, 11, 12, 13, 14, 15, 16, 17
     report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
+    ''''''
+    # part, elem, val = 25, 4, 48
+    # max_files = 40
+    # stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 40, 40, 41, 42, 43, 44, 45, 46, 47
+    # report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
     ''''''
     # part, elem, val = 25, 4, 68
     # max_files = 60

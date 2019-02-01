@@ -8,6 +8,20 @@ void humanListPointcloudSkeletonCallback(const pcl::PointCloud<pcl::PointXYZ>::C
         std::ofstream /*logfile, opfile,*/ tfedFile;
         int writen = 0;
 
+        static tf::TransformListener tfListener;
+        static tf::StampedTransform baseLinkTransform;
+
+        try
+        {
+            /* take the TF subtree that we want for the transformations */
+            tfListener.waitForTransform("base_link", "zed_left_camera_frame", ros::Time(0), ros::Duration(TF_WAIT));
+            tfListener.lookupTransform("base_link", "zed_left_camera_frame", ros::Time(0), baseLinkTransform);
+        }
+        catch (tf::TransformException &ex)
+        {
+            ROS_ERROR("%s", ex.what());
+        }
+
         for (uint32_t i = 0; i < list_msg->num_humans; i++)
         {
             if (list_msg->human_list[i].num_body_key_points_with_non_zero_prob)
@@ -31,40 +45,26 @@ void humanListPointcloudSkeletonCallback(const pcl::PointCloud<pcl::PointXYZ>::C
                 // opfile << "Body " << i << " keypoints:" << std::endl;
                 tfedFile << "Body " << i << " keypoints:" << std::endl;
 
-                /* Probabilities check, do not log invalid "ghost" skeletons */
-                double bodyAvgProb, bodyTotalProb = 0.0;
+                // /* Probabilities check, do not log invalid "ghost" skeletons */
+                // double bodyAvgProb, bodyTotalProb = 0.0;
 
-                for (uint32_t j = 0; j < 25; j++)
-                    bodyTotalProb += list_msg->human_list[i].body_key_points_with_prob[j].prob;
+                // for (uint32_t j = 0; j < 25; j++)
+                //     bodyTotalProb += list_msg->human_list[i].body_key_points_with_prob[j].prob;
 
-                bodyAvgProb = bodyTotalProb / ((float) list_msg->human_list[i].num_body_key_points_with_non_zero_prob);
+                // bodyAvgProb = bodyTotalProb / ((float) list_msg->human_list[i].num_body_key_points_with_non_zero_prob);
 
-                if (bodyAvgProb > MIN_PROB_THRESHOLD)
+                if (1 /*bodyAvgProb > MIN_PROB_THRESHOLD*/)
                 {
                     /* broadcast transform locally */
-                    static tf::TransformListener tfListener;
                     static tf::Transform localTransform;
-                    static tf::StampedTransform baseLinkTransform;
                     double x = 0.0, y = 0.0, z = 0.0, prob = 0.0;
-
-                    try
-                    {
-                        /* take the TF subtree that we want for the transformations */
-                        tfListener.waitForTransform("base_link", "zed_left_camera_frame", ros::Time(0), ros::Duration(TF_WAIT));
-                        tfListener.lookupTransform("base_link", "zed_left_camera_frame", ros::Time(0), baseLinkTransform);
-                    }
-                    catch (tf::TransformException &ex)
-                    {
-                        ROS_ERROR("%s", ex.what());
-                        continue;
-                    }
 
                     for (uint32_t j = 0; j < 25; j++)
                     {
                         if (!std::isnan(list_msg->human_list[i].body_key_points_with_prob[j].x) && !std::isnan(list_msg->human_list[i].body_key_points_with_prob[j].y) && !std::isnan(list_msg->human_list[i].body_key_points_with_prob[j].z))
                         {
                             pcl::PointXYZ p1 = pPCL->at(std::roundl(list_msg->human_list[i].body_key_points_with_prob[j].x), std::roundl(list_msg->human_list[i].body_key_points_with_prob[j].y));
-                            x = -p1.x; y = -p1.y; z = p1.z;
+                            x = p1.x; y = p1.y; z = p1.z;
 
                             if (std::isnan(x) || std::isnan(y) || std::isnan(z))
                                 continue;
