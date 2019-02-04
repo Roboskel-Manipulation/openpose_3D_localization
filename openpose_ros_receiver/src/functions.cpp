@@ -70,7 +70,7 @@ void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr&
                     {
                         if (!std::isnan(list_msg->human_list[i].body_key_points_with_prob[j].x) && !std::isnan(list_msg->human_list[i].body_key_points_with_prob[j].y) && !std::isnan(list_msg->human_list[i].body_key_points_with_prob[j].z))
                         {
-                            pcl::PointXYZ p1 = pPCL->at(std::roundl(list_msg->human_list[i].body_key_points_with_prob[j].x), std::roundl(list_msg->human_list[i].body_key_points_with_prob[j].y));
+                            pcl::PointXYZ p1 = pPCL->at(list_msg->human_list[i].body_key_points_with_prob[j].x, list_msg->human_list[i].body_key_points_with_prob[j].y);
                             x = p1.x; y = p1.y; z = p1.z;
 
                             if (std::isnan(x) || std::isnan(y) || std::isnan(z))
@@ -85,10 +85,6 @@ void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr&
                                 tfListener.setTransform( tf::StampedTransform(localTransform, ros::Time::now(), "zed_left_camera_frame", getPoseBodyPartMappingBody25(j)) );
 
                                 /* LOOKUP LOCAL TRANSFORM */
-                                // std::vector<std::string> strVec;
-                                // tfListener.getFrameStrings(strVec);
-                                // for (std::string s : strVec)
-                                //     ROS_INFO("%s", s.c_str());
                                 tfListener.waitForTransform("base_link", getPoseBodyPartMappingBody25(j), ros::Time(0), ros::Duration(TF_WAIT));
                                 tfListener.lookupTransform("base_link", getPoseBodyPartMappingBody25(j), ros::Time(0), baseLinkTransform);
 

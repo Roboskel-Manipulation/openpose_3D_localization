@@ -147,7 +147,7 @@ def multiscatterplot2D(data, directory, names=None, x_label=None, y_label=None, 
             'palegreen', 'lightseagreen', 'darkcyan', 'paleturquoise', 'deepskyblue',
             'royalblue', 'navy', 'lightcoral', 'brown', 'y',
             'limegreen', 'teal', 'steelblue', 'darkmagenta', 'peru']
-    # print len(data)
+
     fig = plt.figure()
     ax = fig.add_subplot(111)
     if border_idx:
@@ -208,7 +208,7 @@ def multiscatterplot3D(data, directory, names=None, x_label=None, y_label=None, 
             'palegreen', 'lightseagreen', 'darkcyan', 'paleturquoise', 'deepskyblue',
             'royalblue', 'navy', 'lightcoral', 'brown', 'y',
             'limegreen', 'teal', 'steelblue', 'darkmagenta', 'peru']
-    # print len(data)
+
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax = fig.gca(projection='3d')
@@ -244,6 +244,109 @@ def multiscatterplot3D(data, directory, names=None, x_label=None, y_label=None, 
             for d in data:
                 x, y, z = d
                 ax.scatter(x, y, z, marker='o')
+    if x_label:
+        ax.set_xlabel(x_label, fontsize=8)
+    if y_label:
+        ax.set_ylabel(y_label, fontsize=8)
+    if z_label:
+        ax.set_zlabel(z_label, fontsize=8)
+    if title:
+        ax.set_title(title, fontsize=10)
+    if names:
+        chartBox = ax.get_position()
+        ax.set_position([chartBox.x0, chartBox.y0, chartBox.width*0.85, chartBox.height])
+        ax.legend(loc='center', bbox_to_anchor=(1.15, 0.5), shadow=True, ncol=1, borderaxespad=0, prop={'size':6})
+    if x_lim_min and x_lim_max and y_lim_min and y_lim_max and z_lim_min and z_lim_max:
+        if x_lim_min != x_lim_max:
+            ax.set_xlim3d(x_lim_min, x_lim_max)
+        if y_lim_min != y_lim_max:
+            ax.set_ylim3d(y_lim_min, y_lim_max)
+        if z_lim_min != z_lim_max:
+            ax.set_zlim3d(z_lim_min, z_lim_max)
+    plt.savefig(directory+title+".png")
+    if len(data) > 2:
+        plt.show(fig)
+    plt.close(fig)
+
+
+# Define a function for a 2D multi-skeletonplot
+def multiscatterplot2D(data, directory, names=None, x_label=None, y_label=None, title=None, x_lim_min=None, x_lim_max=None, y_lim_min=None, y_lim_max=None, border_idx=None):
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    if border_idx:
+        if names:
+            b = 0
+            for d, name in zip(data, names):
+                x, y, _ = d
+                if b > border_idx:
+                    ax.plot(x, y, linestyle='-', marker='o', label=name)
+                b = b + 1
+
+        else:
+            b = 0
+            for d in data:
+                x, y, _ = d
+                if b > border_idx:
+                    ax.plot(x, y, linestyle='-', marker='o')
+                b = b + 1
+    else:
+        if names:
+            j = 0
+            for d, name in zip(data, names):
+                x, y, _ = d
+                j = j + 1
+        else:
+            for d in data:
+                x, y, _ = d
+    if x_label:
+        ax.set_xlabel(x_label, fontsize=8)
+    if y_label:
+        ax.set_ylabel(y_label, fontsize=8)
+    if title:
+        ax.set_title(title, fontsize=10)
+    if names:
+        chartBox = ax.get_position()
+        ax.set_position([chartBox.x0, chartBox.y0, chartBox.width*0.85, chartBox.height])
+        ax.legend(loc='center', bbox_to_anchor=(1.15, 0.5), shadow=True, ncol=1, borderaxespad=0, prop={'size':6})
+    if x_lim_min and x_lim_max and y_lim_min and y_lim_max:
+        if x_lim_min != x_lim_max:
+            plt.xlim(x_lim_min, x_lim_max)
+        if y_lim_min != y_lim_max:
+            plt.ylim(y_lim_min, y_lim_max)
+    plt.savefig(directory+title+".png")
+    plt.close(fig)
+
+
+# Define a function for a 3D skeleton plot
+def skeletonplot3D(data, directory, names=None, x_label=None, y_label=None, z_label=None, title=None, x_lim_min=None, x_lim_max=None, y_lim_min=None, y_lim_max=None, z_lim_min=None, z_lim_max=None, border_idx=None):
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax = fig.gca(projection='3d')
+    if border_idx:
+        if names:
+            b = 0
+            for d, name in zip(data, names):
+                x, y, z = d
+                if b > border_idx:
+                    ax.plot(x, y, z, linestyle='-', marker='^', label=name)
+                b = b + 1
+
+        else:
+            b = 0
+            for d in data:
+                x, y, z = d
+                if b > border_idx:
+                    ax.plot(x, y, z, linestyle='-', marker='^')
+                b = b + 1
+    else:
+        if names:
+            j = 0
+            for d, name in zip(data, names):
+                x, y, z = d
+                j = j + 1
+        else:
+            for d in data:
+                x, y, z = d
     if x_label:
         ax.set_xlabel(x_label, fontsize=8)
     if y_label:
@@ -342,12 +445,12 @@ if __name__ == "__main__":
     # raw_output_file_prefix = "raw Fri Jan 25 12:41:"
     # tfed_output_file_prefix = "tfed Fri Jan 25 12:4"
     ''''''
-    output_subfolder = "take28/"
-    op_output_file_prefix = "OP Fri Feb  1 15:20:"
-    raw_output_file_prefix = "raw Fri Feb  1 15:20:"
-    tfed_output_file_prefix = "tfed Fri Feb  1 15:20:"
+    output_subfolder = "take32/"
+    op_output_file_prefix = "OP Mon Feb  4 16:25:"
+    raw_output_file_prefix = "raw Mon Feb  4 16:25:"
+    tfed_output_file_prefix = "tfed Mon Feb  4 16:25:"
     ''''''
-    
+
     output_folder_path = output_path + output_subfolder
 
     ''''''
@@ -369,20 +472,20 @@ if __name__ == "__main__":
     
     # create our 3d report matrix, e.g. for 10 log frames: [BodyPart][x/y/z/prob][t0,...,t9,mean,nobs,min,max,variance,skewness,kurtosis,std_dev] --> 25 * 4 * 18
     ''''''
-    # part, elem, val = 25, 4, 18
-    # max_files = 10
-    # stat_analysis_idx, mean_idx, nobs_idx, min_idx, max_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 10, 10, 11, 12, 13, 14, 15, 16, 17
-    # report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
+    part, elem, val = 25, 4, 18
+    max_logs = 10
+    stat_analysis_idx, mean_idx, nobs_idx, min_idx, max_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 10, 10, 11, 12, 13, 14, 15, 16, 17
+    report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
     ''''''
     # part, elem, val = 25, 4, 48
-    # max_files = 40
+    # max_logs = 40
     # stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 40, 40, 41, 42, 43, 44, 45, 46, 47
     # report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
     ''''''
-    part, elem, val = 25, 4, 68
-    max_files = 60
-    stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 60, 60, 61, 62, 63, 64, 65, 66, 67
-    report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
+    # part, elem, val = 25, 4, 68
+    # max_logs = 60
+    # stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 60, 60, 61, 62, 63, 64, 65, 66, 67
+    # report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
     ''''''
 
     # create CSVs directory
@@ -446,7 +549,7 @@ if __name__ == "__main__":
             
                 file_counter = file_counter + 1
 
-                if file_counter == max_files:
+                if file_counter == max_logs:
                     break
             
         except Exception as e:
@@ -511,7 +614,10 @@ if __name__ == "__main__":
                 )
 
         # Count occurences accross log frames
-        occurences_accross_frames[i] = (~np.isnan(report_matrix[i][ getKeysByValue(element_dict, "certainty")[0] ][0:stat_analysis_idx])).sum(0)
+        if label_postfix != "rob":
+            occurences_accross_frames[i] = (~np.isnan(report_matrix[i][ getKeysByValue(element_dict, "certainty")[0] ][0:stat_analysis_idx])).sum(0)
+        else:
+            occurences_accross_frames[i] = (~np.isnan(report_matrix[i][ getKeysByValue(element_dict, "x")[0] ][0:stat_analysis_idx])).sum(0)
 
         # Log certainty accross frames
         for k in range(stat_analysis_idx):
@@ -694,7 +800,7 @@ if __name__ == "__main__":
             x2 = np.array(report_matrix[ pair[1] ][0][0:stat_analysis_idx])[~np.isnan(report_matrix[ pair[1] ][0][0:stat_analysis_idx])]
             y2 = np.array(report_matrix[ pair[1] ][1][0:stat_analysis_idx])[~np.isnan(report_matrix[ pair[1] ][1][0:stat_analysis_idx])]
             z2 = np.array(report_matrix[ pair[1] ][2][0:stat_analysis_idx])[~np.isnan(report_matrix[ pair[1] ][2][0:stat_analysis_idx])]
-            multiscatterplot3D(   data=[[x1, y1, z1], [x2, y2, z2]],
+            multiscatterplot3D( data=[[x1, y1, z1], [x2, y2, z2]],
                                 x_label='X'+label_postfix, y_label='Y'+label_postfix, z_label='Z'+label_postfix,
                                 title="Scatterplot of X"+label_postfix+", Y"+label_postfix+", Z"+label_postfix+" at "+body_25_body_parts_dict.get(pair[0])+" and "+body_25_body_parts_dict.get(pair[1])+" pair",
                                 directory=plots_folder_path,
@@ -710,28 +816,30 @@ if __name__ == "__main__":
     all_data, normal_data = 0, 0
     for i in range(part):
         if (~np.isnan(report_matrix[i][0][0:stat_analysis_idx])).sum(0) and (~np.isnan(report_matrix[i][1][0:stat_analysis_idx])).sum(0) and (~np.isnan(report_matrix[i][2][0:stat_analysis_idx])).sum(0):
-            x = np.array(report_matrix[i][0][0:stat_analysis_idx])[~np.isnan(report_matrix[i][0][0:stat_analysis_idx])]
-            y = np.array(report_matrix[i][1][0:stat_analysis_idx])[~np.isnan(report_matrix[i][1][0:stat_analysis_idx])]
-            z = np.array(report_matrix[i][2][0:stat_analysis_idx])[~np.isnan(report_matrix[i][2][0:stat_analysis_idx])]
-            x_mins.append(np.min(x))
-            x_maxes.append(np.max(x))
-            y_mins.append(np.min(y))
-            y_maxes.append(np.max(y))
-            z_mins.append(np.min(z))
-            z_maxes.append(np.max(z))
-            data.append([x, y, z])
-            names.append(body_25_body_parts_dict.get(i))
-            all_data = all_data + 1
-            normal_data = normal_data + 1
+            if occurences_accross_frames[i] >= max_logs / 3:
+                x = np.array(report_matrix[i][0][0:stat_analysis_idx])[~np.isnan(report_matrix[i][0][0:stat_analysis_idx])]
+                y = np.array(report_matrix[i][1][0:stat_analysis_idx])[~np.isnan(report_matrix[i][1][0:stat_analysis_idx])]
+                z = np.array(report_matrix[i][2][0:stat_analysis_idx])[~np.isnan(report_matrix[i][2][0:stat_analysis_idx])]
+                x_mins.append(np.min(x))
+                x_maxes.append(np.max(x))
+                y_mins.append(np.min(y))
+                y_maxes.append(np.max(y))
+                z_mins.append(np.min(z))
+                z_maxes.append(np.max(z))
+                data.append([x, y, z])
+                names.append(body_25_body_parts_dict.get(i))
+                all_data = all_data + 1
+                normal_data = normal_data + 1
         
     # Add to the scatterplot a skeleton of the means of the body part pairs detected in space
     pair_data = 0
     for pair in body_25_body_part_pairs:
         if not np.isnan(report_matrix[pair[0]][0][mean_idx]) and not np.isnan(report_matrix[pair[0]][1][mean_idx]) and not np.isnan(report_matrix[pair[0]][2][mean_idx]) and not np.isnan(report_matrix[pair[1]][0][mean_idx]) and not np.isnan(report_matrix[pair[1]][1][mean_idx]) and not np.isnan(report_matrix[pair[1]][2][mean_idx]):
-            data.append([[report_matrix[pair[0]][0][mean_idx], report_matrix[pair[1]][0][mean_idx]], [report_matrix[pair[0]][1][mean_idx], report_matrix[pair[1]][1][mean_idx]], [report_matrix[pair[0]][2][mean_idx], report_matrix[pair[1]][2][mean_idx]]])
-            names.append(body_25_body_parts_dict.get(pair[0])+" and "+body_25_body_parts_dict.get(pair[1])+" pair")
-            all_data = all_data + 1
-            pair_data = pair_data + 1
+            if occurences_accross_frames[pair[0]] >= max_logs / 3 and occurences_accross_frames[pair[1]] >= max_logs / 3:
+                data.append([[report_matrix[pair[0]][0][mean_idx], report_matrix[pair[1]][0][mean_idx]], [report_matrix[pair[0]][1][mean_idx], report_matrix[pair[1]][1][mean_idx]], [report_matrix[pair[0]][2][mean_idx], report_matrix[pair[1]][2][mean_idx]]])
+                names.append(body_25_body_parts_dict.get(pair[0])+" and "+body_25_body_parts_dict.get(pair[1])+" pair")
+                all_data = all_data + 1
+                pair_data = pair_data + 1
 
     # 3D scatterplot
     multiscatterplot3D( data=data,
@@ -755,6 +863,29 @@ if __name__ == "__main__":
                         names=names,
                         border_idx=all_data-pair_data-1
                     )
+
+     # 3D skeletonplot
+    skeletonplot3D( data=data,
+                    x_label='X'+label_postfix, y_label='Y'+label_postfix, z_label='Z'+label_postfix,
+                    title="Skeleton plot of X"+label_postfix+", Y"+label_postfix+", Z"+label_postfix+" for all body parts detected in space",
+                    directory=plots_folder_path,
+                    x_lim_min=np.min(x_mins), x_lim_max=np.max(x_maxes),
+                    y_lim_min=np.min(y_mins), y_lim_max=np.max(y_maxes),
+                    z_lim_min=np.min(z_mins), z_lim_max=np.max(z_maxes),
+                    names=names,
+                    border_idx=all_data-pair_data-1
+                )
+
+    # 2D skeletonplot
+    skeletonplot2D( data=data,
+                    x_label='X'+label_postfix, y_label='Y'+label_postfix,
+                    title="Skeleton plot of X"+label_postfix+", Y"+label_postfix+" for all body parts detected in space",
+                    directory=plots_folder_path,
+                    x_lim_min=np.min(x_mins), x_lim_max=np.max(x_maxes),
+                    y_lim_min=np.min(y_mins), y_lim_max=np.max(y_maxes),
+                    names=names,
+                    border_idx=all_data-pair_data-1
+                )
 
     # write statistical analysis report
     for i in range(part):

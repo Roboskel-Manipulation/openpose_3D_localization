@@ -1,12 +1,69 @@
 <launch>
 
-  <!-- Start openpose_ros_receiver_broadcaster node -->
+  <!-- Launch ZED wrapper node -->
+  <arg name="svo_file"                default="" /> <!-- <arg name="svo_file" default="path/to/svo/file.svo"> -->
+
+
+  <!-- Launch ZED camera wrapper -->
+  <include file="$(find zed_wrapper)/launch/zed.launch">
+    <arg name="camera_model"        value="0" /> <!-- 0=ZED, 1=ZEDM-->
+    <arg name="svo_file"            value="$(arg svo_file)" />
+  </include>
+
+
+  <!-- Launch openpose_ros -->
+  <node pkg="openpose_ros" type="openpose_ros_node" name="openpose_ros_node" output="screen">
+    <rosparam command="load" file="$(find openpose_ros)/config/config.yaml"/>
+  </node>
+
+
+  <!-- Launch UR3 description publishing node -->
+  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find manos_description)/urdf/ur3_pg70.urdf.xacro'" />
+	<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+
+
+  <!-- Launch AR marker calibration node -->
+  <arg name="camera" default="camera" />
+
+  <node pkg="tf" type="static_transform_publisher" name="dummy_tf_publisher"
+        args="0 0 0 0 0 0 /dummy_link /zed_left_camera_frame 100" />
+
+  <!-- <node pkg="tf" type="static_transform_publisher" name="static_marker_link_publisher"
+        args="-0.41 0.41 0 0 0 0 /base_link /ar_marker_link 100" /> -->
+  <node pkg="tf" type="static_transform_publisher" name="static_marker_link_publisher"
+        args="-0.406 0.406 0 0 0 0 /base_link /ar_marker_link 100" />
+
+  <!-- <arg name="marker_size" default="14.4" /> -->
+  <arg name="marker_size" default="18.8" />
+  <arg name="max_new_marker_error" default="0.08" />
+  <arg name="max_track_error" default="0.2" />
+  <arg name="cam_image_topic" default="/zed/rgb/image_rect_color" />
+  <arg name="cam_info_topic" default="/zed/rgb/camera_info" />
+  <arg name="output_frame" default="/zed_left_camera_frame" />
+
+  <node name="ar_track_alvar" pkg="ar_track_alvar" type="individualMarkersNoKinect" respawn="false" output="screen">
+    <param name="marker_size"           type="double" value="$(arg marker_size)" />
+    <param name="max_new_marker_error"  type="double" value="$(arg max_new_marker_error)" />
+    <param name="max_track_error"       type="double" value="$(arg max_track_error)" />
+    <param name="output_frame"          type="string" value="$(arg output_frame)" />
+
+    <remap from="camera_image"  to="$(arg cam_image_topic)" />
+    <remap from="camera_info"   to="$(arg cam_info_topic)" />
+  </node>
+
+  <node pkg="tf_based_on_ar_marker" type="tf_based_on_ar_marker.py" respawn="false" name="tf_based_on_ar_marker" output="screen">
+    <rosparam file="$(find manos_vision)/config/connect_trees.yaml" command="load" />
+  </node>
+
+
+  <!-- Launch openpose_ros_receiver_broadcaster node -->
   <node pkg="openpose_ros_receiver" type="openpose_ros_receiver_broadcaster_node" name="openpose_ros_receiver_broadcaster_node" output="screen">
     <rosparam command="load" file="$(find openpose_ros_receiver)/config/config.yaml"/>
   </node>
 
 
-  <!-- Start openpose_ros_receiver_listener node -->
+  <!-- Launch openpose_ros_receiver_listener node -->
   <!-- <node pkg="openpose_ros_receiver" type="openpose_ros_receiver_listener_node" name="openpose_ros_receiver_listener_node" output="screen">
     <rosparam command="load" file="$(find openpose_ros_receiver)/config/config.yaml"/>
   </node> -->
