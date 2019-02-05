@@ -35,7 +35,6 @@
 #include <openpose/pose/poseParameters.hpp>
 
 /* Important definitions */
-#define MIN_PROB_THRESHOLD 0.00     // probability -> float in [0..1]
 #define RELIABILITY_THRESHOLD 3.0   // seconds -> float
 #define MAX_RETRY 2                 // number of repetitions -> int
 #define TF_WAIT 10                  // seconds -> float
@@ -74,8 +73,9 @@ const std::map<unsigned int, std::string> POSE_BODY_25_BODY_PARTS
 };
 
 /* Broadcaster's and Receiver's functions */
-void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& pPCL, const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& list_msg, bool &tfSubtree);
+void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& pPCL, const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& list_msg);
 void listenForSkeleton(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg);
 std::string getPoseBodyPartMappingBody25(unsigned int idx);
+double Average(std::vector<double> v);
 
 #endif

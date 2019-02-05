@@ -270,7 +270,7 @@ def multiscatterplot3D(data, directory, names=None, x_label=None, y_label=None, 
 
 
 # Define a function for a 2D multi-skeletonplot
-def multiscatterplot2D(data, directory, names=None, x_label=None, y_label=None, title=None, x_lim_min=None, x_lim_max=None, y_lim_min=None, y_lim_max=None, border_idx=None):
+def skeletonplot2D(data, directory, names=None, x_label=None, y_label=None, title=None, x_lim_min=None, x_lim_max=None, y_lim_min=None, y_lim_max=None, border_idx=None):
     fig = plt.figure()
     ax = fig.add_subplot(111)
     if border_idx:
@@ -445,10 +445,10 @@ if __name__ == "__main__":
     # raw_output_file_prefix = "raw Fri Jan 25 12:41:"
     # tfed_output_file_prefix = "tfed Fri Jan 25 12:4"
     ''''''
-    output_subfolder = "take32/"
-    op_output_file_prefix = "OP Mon Feb  4 16:25:"
-    raw_output_file_prefix = "raw Mon Feb  4 16:25:"
-    tfed_output_file_prefix = "tfed Mon Feb  4 16:25:"
+    output_subfolder = "take35/"
+    op_output_file_prefix = "OP Tue Feb  5 16:13:5"
+    raw_output_file_prefix = "raw Tue Feb  5 16:13:5"
+    tfed_output_file_prefix = "tfed Tue Feb  5 16:13:5"
     ''''''
 
     output_folder_path = output_path + output_subfolder

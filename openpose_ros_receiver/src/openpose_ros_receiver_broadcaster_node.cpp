@@ -25,7 +25,7 @@ int main (int argc, char** argv)
     typedef message_filters::sync_policies::ApproximateTime< pcl::PointCloud<pcl::PointXYZ>, openpose_ros_msgs::OpenPoseHumanList > MySyncPolicy;
 
     message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(sync_buffer_size), subPointcloud, subHumanList);
-    sync.registerCallback(boost::bind(&humanListPointcloudCallback, _1, _2, tfSubtree));
+    sync.registerCallback(boost::bind(&humanListPointcloudCallback, _1, _2));
 
     ros::spin();
 
