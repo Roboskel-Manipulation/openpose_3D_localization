@@ -21,6 +21,7 @@
 #include <sensor_msgs/PointCloud2.h>
 #include <pcl_ros/point_cloud.h>
 #include <pcl/point_types.h>
+#include <pcl/common/common.h>
 
 /* C++ headers */
 #include <fstream>
@@ -35,9 +36,13 @@
 #include <openpose/pose/poseParameters.hpp>
 
 /* Important definitions */
-#define RELIABILITY_THRESHOLD 3.0   // seconds -> float
-#define MAX_RETRY 2                 // number of repetitions -> int
-#define TF_WAIT 10                  // seconds -> float
+#define RELIABILITY_THRESHOLD 3.0           // seconds -> float
+#define MAX_RETRY 2                         // number of repetitions -> int
+#define TF_WAIT 10                          // seconds -> float
+#define IMG_PIXEL_WIDTH 672                 // pixels
+#define IMG_PIXEL_HEIGHT 376                // pixels
+#define UPPER_VARIATION_THRESH 1.15         // how much different is the avg neighborhood value allowed to be in contrast to the point value --> float
+#define LOWER_VARIATION_THRESH 0.85         // how much different is the avg neighborhood value allowed to be in contrast to the point value --> float
 
 extern bool tfSubtree;
 
@@ -76,6 +81,5 @@ const std::map<unsigned int, std::string> POSE_BODY_25_BODY_PARTS
 void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& pPCL, const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& list_msg);
 void listenForSkeleton(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg);
 std::string getPoseBodyPartMappingBody25(unsigned int idx);
-double Average(std::vector<double> v);
 
 #endif

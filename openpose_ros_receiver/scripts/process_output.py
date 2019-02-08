@@ -386,8 +386,22 @@ def histogram(data, directory, x_label=None, y_label=None, title=None):
     plt.close(fig)
 
 
+# Simulate a function for a boxplot to find mins and maxes of caps
+def simboxplot(data):
+    if not data:
+        return
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    data_dict = ax.boxplot(data)
+    temp_y_lim_min = np.nanmin([c.get_ydata()[0] for c in data_dict["caps"]])    # caps: the horizontal lines at the ends of the whiskers.
+    temp_y_lim_max = np.nanmax([c.get_ydata()[0] for c in data_dict["caps"]])    # caps: the horizontal lines at the ends of the whiskers.
+    plt.close(fig)
+
+    return temp_y_lim_min, temp_y_lim_max
+
+
 # Define a function for a boxplot
-def boxplot(data, directory, data_label=None, y_label=None, title=None, x_tick_labels=None, y_lim_min=None, y_lim_max=None):
+def boxplot(data, directory, data_label=None, y_label=None, title=None, x_tick_labels=None, y_lim_min=None, y_lim_max=None, optimize_lims=False):
     if not data:
         return
     fig = plt.figure()
@@ -402,6 +416,10 @@ def boxplot(data, directory, data_label=None, y_label=None, title=None, x_tick_l
     if title:
         ax.set_title(title, fontsize=10)
     if y_lim_min and y_lim_max and y_lim_min != y_lim_max:
+        # to distance a bit the margins of the plot from the caps
+        if optimize_lims:
+            y_lim_min = y_lim_min - abs(y_lim_max - y_lim_min) / 100
+            y_lim_max = y_lim_max + abs(y_lim_max - y_lim_min) / 100
         plt.ylim(y_lim_min, y_lim_max)
     ax.margins(y=0)
     plt.savefig(directory+title+".png")
@@ -429,6 +447,7 @@ if __name__ == "__main__":
                                 [19, 20], [14, 21], [11, 22], [22, 23], [11, 24]
                             ]
     body_25_body_parts_LR_order_of_appearance = [ '4', '23', '3', '22', '11', '2', '10', '9', '24', '17', '15', '8', '1', '0', '16', '18', '21', '12', '13', '14', '19', '5', '6', '20', '7' ]
+    body_25_upper_body_parts_LR_order_of_appearance = [ '4', '3', '11', '2', '10', '9', '17', '15', '8', '1', '0', '16', '18', '12', '5', '6', '7' ]
 
     # OpenPose specific variables
     element_dict = dict([ (0, "x"), (1, "y"), (2, "z"), (3, "certainty") ])
@@ -445,10 +464,10 @@ if __name__ == "__main__":
     # raw_output_file_prefix = "raw Fri Jan 25 12:41:"
     # tfed_output_file_prefix = "tfed Fri Jan 25 12:4"
     ''''''
-    output_subfolder = "take35/"
-    op_output_file_prefix = "OP Tue Feb  5 16:13:5"
-    raw_output_file_prefix = "raw Tue Feb  5 16:13:5"
-    tfed_output_file_prefix = "tfed Tue Feb  5 16:13:5"
+    output_subfolder = "take37Simple/"
+    op_output_file_prefix = "OP Fri Feb  8 14:38:"
+    raw_output_file_prefix = "raw Fri Feb  8 14:38:"
+    tfed_output_file_prefix = "tfed Fri Feb  8 14:38:"
     ''''''
 
     output_folder_path = output_path + output_subfolder
@@ -469,23 +488,23 @@ if __name__ == "__main__":
     plots_folder_path = output_folder_path + "plotsTFED/"
     statistics_folder_path = output_folder_path + "statisticsTFED/"
     ''''''
-    
+
     # create our 3d report matrix, e.g. for 10 log frames: [BodyPart][x/y/z/prob][t0,...,t9,mean,nobs,min,max,variance,skewness,kurtosis,std_dev] --> 25 * 4 * 18
     ''''''
-    part, elem, val = 25, 4, 18
-    max_logs = 10
-    stat_analysis_idx, mean_idx, nobs_idx, min_idx, max_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 10, 10, 11, 12, 13, 14, 15, 16, 17
-    report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
+    # part, elem, val = 25, 4, 18
+    # max_logs = 10
+    # stat_analysis_idx, mean_idx, nobs_idx, min_idx, max_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 10, 10, 11, 12, 13, 14, 15, 16, 17
+    # report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
     ''''''
     # part, elem, val = 25, 4, 48
     # max_logs = 40
     # stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 40, 40, 41, 42, 43, 44, 45, 46, 47
     # report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
     ''''''
-    # part, elem, val = 25, 4, 68
-    # max_logs = 60
-    # stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 60, 60, 61, 62, 63, 64, 65, 66, 67
-    # report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
+    part, elem, val = 25, 4, 68
+    max_logs = 60
+    stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 60, 60, 61, 62, 63, 64, 65, 66, 67
+    report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
     ''''''
 
     # create CSVs directory
@@ -732,27 +751,44 @@ if __name__ == "__main__":
     y_x_tick_labels_LR, y_data_LR = reorderList(y_x_tick_labels, body_25_body_parts_LR_order_of_appearance, y_data)
     z_x_tick_labels_LR, z_data_LR = reorderList(z_x_tick_labels, body_25_body_parts_LR_order_of_appearance, z_data)
 
+    # Simulate a boxplot for each body parts' element to find mins and maxes of caps
+    mins, maxes = [], []
+    new_y_axis_min, new_y_axis_max = simboxplot(data=x_data_LR)
+    mins.append(new_y_axis_min)
+    maxes.append(new_y_axis_max)
+    new_y_axis_min, new_y_axis_max = simboxplot(data=y_data_LR)
+    mins.append(new_y_axis_min)
+    maxes.append(new_y_axis_max)
+    new_y_axis_min, new_y_axis_max = simboxplot(data=z_data_LR)
+    mins.append(new_y_axis_min)
+    maxes.append(new_y_axis_max)
+    y_axis_min = np.nanmin(mins)
+    y_axis_max = np.nanmax(maxes)
+    
     # Do a boxplot for each body parts' element
     boxplot(    data=x_data_LR,
                 data_label="BODY_25 human pose model body parts",
                 title="Boxplot of x value for all BODY_25 human pose model body parts after median normalization",
                 directory=plots_folder_path,
                 x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in x_x_tick_labels_LR ],
-                y_lim_min=y_axis_min, y_lim_max=y_axis_max
+                y_lim_min=y_axis_min, y_lim_max=y_axis_max,
+                optimize_lims=True
             )
     boxplot(    data=y_data_LR,
                 data_label="BODY_25 human pose model body parts",
                 title="Boxplot of y value for all BODY_25 human pose model body parts after median normalization",
                 directory=plots_folder_path,
                 x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in y_x_tick_labels_LR ],
-                y_lim_min=y_axis_min, y_lim_max=y_axis_max
+                y_lim_min=y_axis_min, y_lim_max=y_axis_max,
+                optimize_lims=True
             )
     boxplot(    data=z_data_LR,
                 data_label="BODY_25 human pose model body parts",
                 title="Boxplot of z value for all BODY_25 human pose model body parts after median normalization",
                 directory=plots_folder_path,
                 x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in z_x_tick_labels_LR ],
-                y_lim_min=y_axis_min, y_lim_max=y_axis_max
+                y_lim_min=y_axis_min, y_lim_max=y_axis_max,
+                optimize_lims=True
             )
 
 

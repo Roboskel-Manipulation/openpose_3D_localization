@@ -7,7 +7,7 @@ void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr&
     if (list_msg && pPCL)
     {
         /* log skeletons to file */
-        std::ofstream /*logfile, opfile,*/ tfedFile;
+        std::ofstream tfedFile;
         int writen = 0;
 
         static tf::TransformListener tfListener;
@@ -39,34 +39,311 @@ void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr&
                     time_t now = time(0);
                     /* convert now to string form */
                     char* dt = ctime(&now);
-                    std::stringstream strstream/*, strstream1, strstream2*/;
+                    std::stringstream strstream;
                     strstream << "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/tfed " << dt << ".txt";
                     tfedFile.open(strstream.str(), std::ofstream::out);
-                    // strstream1 << "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/raw " << dt << ".txt";
-                    // logfile.open(strstream1.str(), std::ofstream::out);
-                    // strstream2 << "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/OP " << dt << ".txt";
-                    // opfile.open(strstream2.str(), std::ofstream::out);
                 }
 
-                // logfile << "Body " << i << " keypoints:" << std::endl;
-                // opfile << "Body " << i << " keypoints:" << std::endl;
                 tfedFile << "Body " << i << " keypoints:" << std::endl;
 
                 /* broadcast transform locally */
                 static tf::Transform localTransform;
-                double x = 0.0, y = 0.0, z = 0.0, prob = 0.0;
+                double x = 0.0, y = 0.0, z = 0.0, prob = 0.0, x_pix = 0.0, y_pix = 0.0, x0 = 0.0, y0 = 0.0, z0 = 0.0;
 
                 for (uint32_t j = 0; j < 25; j++)
                 {
-                    if (!std::isnan(list_msg->human_list[i].body_key_points_with_prob[j].x) && !std::isnan(list_msg->human_list[i].body_key_points_with_prob[j].y) && !std::isnan(list_msg->human_list[i].body_key_points_with_prob[j].z))
-                    {
-                        pcl::PointXYZ p1 = pPCL->at(list_msg->human_list[i].body_key_points_with_prob[j].x, list_msg->human_list[i].body_key_points_with_prob[j].y);
-                        x = p1.x; y = p1.y; z = p1.z;
+                    x_pix = list_msg->human_list[i].body_key_points_with_prob[j].x; y_pix = list_msg->human_list[i].body_key_points_with_prob[j].y;
 
-                        // /* NEW */
-                        // x = list_msg->human_list[i].body_key_points_with_prob[j].x; y = list_msg->human_list[i].body_key_points_with_prob[j].y;
-                        // int index = 672 * y + x + 1;
-                        // x = pPCL->points[index].x; y = pPCL->points[index].y; z = pPCL->points[index].z;
+                    if (!std::isnan(x_pix) && !std::isnan(y_pix))
+                    {
+                        // pcl::PointXYZ p1 = pPCL->at(x_pix, y_pix);
+                        // x = p1.x; y = p1.y; z = p1.z;
+
+                        /* Get an average of neighboring points coordinates for more precise x, y, z */
+                        // x --> width, y --> height
+                        int divisors = 0;
+                        pcl::PointXYZ p;
+
+                        /* our point */
+                        p = pPCL->at(x_pix, y_pix);
+                        x = p.x; y = p.y; z = p.z;
+                        x0 = x; y0 = y; z0 = z;
+                        divisors++;
+                        /* P: our point, *: one of our point's neighbors
+                               * * *
+                                ***
+                               **P**
+                                ***
+                               * * *
+                        */
+                        /* our point's 1st class neighbors */
+                        if ((x_pix-1 >= 0 && x_pix-1 < IMG_PIXEL_WIDTH) && (y_pix >= 0 && y_pix < IMG_PIXEL_HEIGHT))    
+                        {    
+                            p = pPCL->at(x_pix-1, y_pix);
+                            if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
+                            {
+                                x += p.x; y += p.y; z += p.z;
+                                divisors++;
+                            }
+                            // else
+                            // {
+                            //     ROS_WARN("***");
+                            //     if (std::isnan(p.x)) ROS_WARN("at(x_pix-1, y_pix) x is nan");
+                            //     if (std::isnan(p.y)) ROS_WARN("at(x_pix-1, y_pix) y is nan");
+                            //     if (std::isnan(p.z)) ROS_WARN("at(x_pix-1, y_pix) z is nan");
+                            // }
+                        }
+                        if ((x_pix >= 0 && x_pix < IMG_PIXEL_WIDTH) && (y_pix-1 >= 0 && y_pix-1 < IMG_PIXEL_HEIGHT))    
+                        {    
+                            p = pPCL->at(x_pix, y_pix-1);
+                            if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
+                            {
+                                x += p.x; y += p.y; z += p.z;
+                                divisors++;
+                            }
+                            // else
+                            // {
+                            //     ROS_WARN("***");
+                            //     if (std::isnan(p.x)) ROS_WARN("at(x_pix, y_pix-1) x is nan");
+                            //     if (std::isnan(p.y)) ROS_WARN("at(x_pix, y_pix-1) y is nan");
+                            //     if (std::isnan(p.z)) ROS_WARN("at(x_pix, y_pix-1) z is nan");
+                            // }
+                        }
+                        if ((x_pix-1 >= 0 && x_pix-1 < IMG_PIXEL_WIDTH) && (y_pix-1 >= 0 && y_pix-1 < IMG_PIXEL_HEIGHT))    
+                        {    
+                            p = pPCL->at(x_pix-1, y_pix-1);
+                            if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
+                            {
+                                x += p.x; y += p.y; z += p.z;
+                                divisors++;
+                            }
+                        //     else
+                        //     {
+                        //         ROS_WARN("***");
+                        //         if (std::isnan(p.x)) ROS_WARN("at(x_pix-1, y_pix-1) x is nan");
+                        //         if (std::isnan(p.y)) ROS_WARN("at(x_pix-1, y_pix-1) y is nan");
+                        //         if (std::isnan(p.z)) ROS_WARN("at(x_pix-1, y_pix-1) z is nan");
+                        //     }
+                        }
+                        if ((x_pix+1 >= 0 && x_pix+1 < IMG_PIXEL_WIDTH) && (y_pix >= 0 && y_pix < IMG_PIXEL_HEIGHT))    
+                        {    
+                            p = pPCL->at(x_pix+1, y_pix);
+                            if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
+                            {
+                                x += p.x; y += p.y; z += p.z;
+                                divisors++;
+                            }
+                            // else
+                            // {
+                            //     ROS_WARN("***");
+                            //     if (std::isnan(p.x)) ROS_WARN("at(x_pix+1, y_pix) x is nan");
+                            //     if (std::isnan(p.y)) ROS_WARN("at(x_pix+1, y_pix) y is nan");
+                            //     if (std::isnan(p.z)) ROS_WARN("at(x_pix+1, y_pix) z is nan");
+                            // }
+                        }
+                        if ((x_pix >= 0 && x_pix < IMG_PIXEL_WIDTH) && (y_pix+1 >= 0 && y_pix+1 < IMG_PIXEL_HEIGHT))    
+                        {    
+                            p = pPCL->at(x_pix, y_pix+1);
+                            if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
+                            {
+                                x += p.x; y += p.y; z += p.z;
+                                divisors++;
+                            }
+                            // else
+                            // {
+                            //     ROS_WARN("***");
+                            //     if (std::isnan(p.x)) ROS_WARN("at(x_pix, y_pix+1) x is nan");
+                            //     if (std::isnan(p.y)) ROS_WARN("at(x_pix, y_pix+1) y is nan");
+                            //     if (std::isnan(p.z)) ROS_WARN("at(x_pix, y_pix+1) z is nan");
+                            // }
+                        }
+                        if ((x_pix+1 >= 0 && x_pix+1 < IMG_PIXEL_WIDTH) && (y_pix+1 >= 0 && y_pix+1 < IMG_PIXEL_HEIGHT))    
+                        {    
+                            p = pPCL->at(x_pix+1, y_pix+1);
+                            if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
+                            {
+                                x += p.x; y += p.y; z += p.z;
+                                divisors++;
+                            }
+                            // else
+                            // {
+                            //     ROS_WARN("***");
+                            //     if (std::isnan(p.x)) ROS_WARN("at(x_pix+1, y_pix+1) x is nan");
+                            //     if (std::isnan(p.y)) ROS_WARN("at(x_pix+1, y_pix+1) y is nan");
+                            //     if (std::isnan(p.z)) ROS_WARN("at(x_pix+1, y_pix+1) z is nan");
+                            // }
+                        }
+                        if ((x_pix-1 >= 0 && x_pix-1 < IMG_PIXEL_WIDTH) && (y_pix+1 >= 0 && y_pix+1 < IMG_PIXEL_HEIGHT))    
+                        {    
+                            p = pPCL->at(x_pix-1, y_pix+1);
+                            if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
+                            {
+                                x += p.x; y += p.y; z += p.z;
+                                divisors++;
+                            }
+                            // else
+                            // {
+                            //     ROS_WARN("***");
+                            //     if (std::isnan(p.x)) ROS_WARN("at(x_pix-1, y_pix+1) x is nan");
+                            //     if (std::isnan(p.y)) ROS_WARN("at(x_pix-1, y_pix+1) y is nan");
+                            //     if (std::isnan(p.z)) ROS_WARN("at(x_pix-1, y_pix+1) z is nan");
+                            // }
+                        }
+                        if ((x_pix+1 >= 0 && x_pix+1 < IMG_PIXEL_WIDTH) && (y_pix-1 >= 0 && y_pix-1 < IMG_PIXEL_HEIGHT))    
+                        {    
+                            p = pPCL->at(x_pix+1, y_pix-1);
+                            if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
+                            {
+                                x += p.x; y += p.y; z += p.z;
+                                divisors++;
+                            }
+                            // else
+                            // {
+                            //     ROS_WARN("***");
+                            //     if (std::isnan(p.x)) ROS_WARN("at(x_pix+1, y_pix-1) x is nan");
+                            //     if (std::isnan(p.y)) ROS_WARN("at(x_pix+1, y_pix-1) y is nan");
+                            //     if (std::isnan(p.z)) ROS_WARN("at(x_pix+1, y_pix-1) z is nan");
+                            // }
+                        }
+                        /* some of our point's 2nd class neighbors */
+                        if ((x_pix-2 >= 0 && x_pix-2 < IMG_PIXEL_WIDTH) && (y_pix >= 0 && y_pix < IMG_PIXEL_HEIGHT))    
+                        {    
+                            p = pPCL->at(x_pix-2, y_pix);
+                            if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
+                            {
+                                x += p.x; y += p.y; z += p.z;
+                                divisors++;
+                            }
+                            // else
+                            // {
+                            //     ROS_WARN("***");
+                            //     if (std::isnan(p.x)) ROS_WARN("at(x_pix-2, y_pix) x is nan");
+                            //     if (std::isnan(p.y)) ROS_WARN("at(x_pix-2, y_pix) y is nan");
+                            //     if (std::isnan(p.z)) ROS_WARN("at(x_pix-2, y_pix) z is nan");
+                            // }
+                        }
+                        if ((x_pix >= 0 && x_pix < IMG_PIXEL_WIDTH) && (y_pix-2 >= 0 && y_pix-2 < IMG_PIXEL_HEIGHT))    
+                        {    
+                            p = pPCL->at(x_pix, y_pix-2);
+                            if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
+                            {
+                                x += p.x; y += p.y; z += p.z;
+                                divisors++;
+                            }
+                            // else
+                            // {
+                            //     ROS_WARN("***");
+                            //     if (std::isnan(p.x)) ROS_WARN("at(x_pix, y_pix-2) x is nan");
+                            //     if (std::isnan(p.y)) ROS_WARN("at(x_pix, y_pix-2) y is nan");
+                            //     if (std::isnan(p.z)) ROS_WARN("at(x_pix, y_pix-2) z is nan");
+                            // }
+                        }
+                        if ((x_pix-2 >= 0 && x_pix-2 < IMG_PIXEL_WIDTH) && (y_pix-2 >= 0 && y_pix-2 < IMG_PIXEL_HEIGHT))    
+                        {    
+                            p = pPCL->at(x_pix-2, y_pix-2);
+                            if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
+                            {
+                                x += p.x; y += p.y; z += p.z;
+                                divisors++;
+                            }
+                            // else
+                            // {
+                            //     ROS_WARN("***");
+                            //     if (std::isnan(p.x)) ROS_WARN("at(x_pix-2, y_pix-2) x is nan");
+                            //     if (std::isnan(p.y)) ROS_WARN("at(x_pix-2, y_pix-2) y is nan");
+                            //     if (std::isnan(p.z)) ROS_WARN("at(x_pix-2, y_pix-2) z is nan");
+                            // }
+                        }
+                        if ((x_pix+2 >= 0 && x_pix+2 < IMG_PIXEL_WIDTH) && (y_pix >= 0 && y_pix < IMG_PIXEL_HEIGHT))    
+                        {    
+                            p = pPCL->at(x_pix+2, y_pix);
+                            if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
+                            {
+                                x += p.x; y += p.y; z += p.z;
+                                divisors++;
+                            }
+                            // else
+                            // {
+                            //     ROS_WARN("***");
+                            //     if (std::isnan(p.x)) ROS_WARN("at(x_pix+2, y_pix) x is nan");
+                            //     if (std::isnan(p.y)) ROS_WARN("at(x_pix+2, y_pix) y is nan");
+                            //     if (std::isnan(p.z)) ROS_WARN("at(x_pix+2, y_pix) z is nan");
+                            // }
+                        }
+                        if ((x_pix >= 0 && x_pix < IMG_PIXEL_WIDTH) && (y_pix+2 >= 0 && y_pix+2 < IMG_PIXEL_HEIGHT))    
+                        {    
+                            p = pPCL->at(x_pix, y_pix+2);
+                            if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
+                            {
+                                x += p.x; y += p.y; z += p.z;
+                                divisors++;
+                            }
+                            // else
+                            // {
+                            //     ROS_WARN("***");
+                            //     if (std::isnan(p.x)) ROS_WARN("at(x_pix, y_pix+2) x is nan");
+                            //     if (std::isnan(p.y)) ROS_WARN("at(x_pix, y_pix+2) y is nan");
+                            //     if (std::isnan(p.z)) ROS_WARN("at(x_pix, y_pix+2) z is nan");
+                            // }
+                        }
+                        if ((x_pix+2 >= 0 && x_pix+2 < IMG_PIXEL_WIDTH) && (y_pix+2 >= 0 && y_pix+2 < IMG_PIXEL_HEIGHT))    
+                        {    
+                            p = pPCL->at(x_pix+2, y_pix+2);
+                            if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
+                            {
+                                x += p.x; y += p.y; z += p.z;
+                                divisors++;
+                            }
+                            // else
+                            // {
+                            //     ROS_WARN("***");
+                            //     if (std::isnan(p.x)) ROS_WARN("at(x_pix+2, y_pix+2) x is nan");
+                            //     if (std::isnan(p.y)) ROS_WARN("at(x_pix+2, y_pix+2) y is nan");
+                            //     if (std::isnan(p.z)) ROS_WARN("at(x_pix+2, y_pix+2) z is nan");
+                            // }
+                        }
+                        if ((x_pix-2 >= 0 && x_pix-2 < IMG_PIXEL_WIDTH) && (y_pix+2 >= 0 && y_pix+2 < IMG_PIXEL_HEIGHT))    
+                        {    
+                            p = pPCL->at(x_pix-2, y_pix+2);
+                            if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
+                            {
+                                x += p.x; y += p.y; z += p.z;
+                                divisors++;
+                            }
+                            // else
+                            // {
+                            //     ROS_WARN("***");
+                            //     if (std::isnan(p.x)) ROS_WARN("at(x_pix-2, y_pix+2) x is nan");
+                            //     if (std::isnan(p.y)) ROS_WARN("at(x_pix-2, y_pix+2) y is nan");
+                            //     if (std::isnan(p.z)) ROS_WARN("at(x_pix-2, y_pix+2) z is nan");
+                            // }
+                        }
+                        if ((x_pix+2 >= 0 && x_pix+2 < IMG_PIXEL_WIDTH) && (y_pix-2 >= 0 && y_pix-2 < IMG_PIXEL_HEIGHT))    
+                        {    
+                            p = pPCL->at(x_pix+2, y_pix-2);
+                            if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
+                            {
+                                x += p.x; y += p.y; z += p.z;
+                                divisors++;
+                            }
+                            // else
+                            // {
+                            //     ROS_WARN("***");
+                            //     if (std::isnan(p.x)) ROS_WARN("at(x_pix+2, y_pix-2) x is nan");
+                            //     if (std::isnan(p.y)) ROS_WARN("at(x_pix+2, y_pix-2) y is nan");
+                            //     if (std::isnan(p.z)) ROS_WARN("at(x_pix+2, y_pix-2) z is nan");
+                            // }
+                        }
+                        // ROS_INFO("-------------------------------");
+
+                        if (divisors)
+                        {
+                            x /= (double) divisors; y /= (double) divisors; z /= (double) divisors;
+                            /* for edge cases */
+                            if (x > UPPER_VARIATION_THRESH * x0 || x < LOWER_VARIATION_THRESH * x0) x = x0;
+                            if (y > UPPER_VARIATION_THRESH * y0 || y < LOWER_VARIATION_THRESH * y0) y = y0;
+                            if (z > UPPER_VARIATION_THRESH * z0 || z < LOWER_VARIATION_THRESH * z0) z = z0;
+                        }
 
                         if (std::isnan(x) || std::isnan(y) || std::isnan(z))
                             continue;
@@ -84,8 +361,6 @@ void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr&
                             tfListener.lookupTransform("base_link", getPoseBodyPartMappingBody25(j), ros::Time(0), baseLinkTransform);
 
                             /* log */
-                            // logfile << "raw kp " << getPoseBodyPartMappingBody25(j) << ": x=" << x << " y=" << y << " z=" << z << " prob=" << list_msg->human_list[i].body_key_points_with_prob[j].prob << std::endl;
-                            // opfile << "OP kp " << getPoseBodyPartMappingBody25(j) << ": x=" << list_msg->human_list[i].body_key_points_with_prob[j].x << " y=" << list_msg->human_list[i].body_key_points_with_prob[j].y << " z=" << list_msg->human_list[i].body_key_points_with_prob[j].z << " prob=" << list_msg->human_list[i].body_key_points_with_prob[j].prob << std::endl;     
                             if (!std::isnan(baseLinkTransform.getOrigin().x()) && !std::isnan(baseLinkTransform.getOrigin().y()) && !std::isnan(baseLinkTransform.getOrigin().z()))
                             {
                                 /* process transform's timestamp */
@@ -109,16 +384,12 @@ void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr&
                     }
                 }
 
-                // logfile << std::endl << std::endl;
-                // opfile << std::endl << std::endl;
                 tfedFile << std::endl << std::endl;
 
                 writen++;
             }
         }
         
-        // logfile.close();
-        // opfile.close();
         tfedFile.close();
     }
 }
@@ -171,17 +442,4 @@ void listenForSkeleton(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg
 std::string getPoseBodyPartMappingBody25(unsigned int idx)
 {
     return POSE_BODY_25_BODY_PARTS.find(idx)->second;
-}
-
-double Average(std::vector<double> v)
-{
-    double total = 0.0, size = 0.0;
-
-    for (int n = 0; n < v.size(); n++)
-    {
-        total += v[n];
-        size++;
-    }
-
-    return total / size;
 }
