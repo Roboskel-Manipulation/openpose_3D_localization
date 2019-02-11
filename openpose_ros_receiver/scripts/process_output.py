@@ -421,6 +421,7 @@ def boxplot(data, directory, data_label=None, y_label=None, title=None, x_tick_l
             y_lim_min = y_lim_min - abs(y_lim_max - y_lim_min) / 100
             y_lim_max = y_lim_max + abs(y_lim_max - y_lim_min) / 100
         plt.ylim(y_lim_min, y_lim_max)
+        # ax.yaxis.set_ticks(np.arange(y_lim_min, y_lim_max, 0.01))
     ax.margins(y=0)
     plt.savefig(directory+title+".png")
     plt.close(fig)
@@ -447,7 +448,7 @@ if __name__ == "__main__":
                                 [19, 20], [14, 21], [11, 22], [22, 23], [11, 24]
                             ]
     body_25_body_parts_LR_order_of_appearance = [ '4', '23', '3', '22', '11', '2', '10', '9', '24', '17', '15', '8', '1', '0', '16', '18', '21', '12', '13', '14', '19', '5', '6', '20', '7' ]
-    body_25_upper_body_parts_LR_order_of_appearance = [ '4', '3', '11', '2', '10', '9', '17', '15', '8', '1', '0', '16', '18', '12', '5', '6', '7' ]
+    body_25_upper_body_parts_LR_order_of_appearance = [ '4', '3', '2', '9', '17', '15', '8', '1', '0', '16', '18', '12', '5', '6', '7' ]
 
     # OpenPose specific variables
     element_dict = dict([ (0, "x"), (1, "y"), (2, "z"), (3, "certainty") ])
@@ -496,15 +497,20 @@ if __name__ == "__main__":
     # stat_analysis_idx, mean_idx, nobs_idx, min_idx, max_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 10, 10, 11, 12, 13, 14, 15, 16, 17
     # report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
     ''''''
-    # part, elem, val = 25, 4, 48
-    # max_logs = 40
-    # stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 40, 40, 41, 42, 43, 44, 45, 46, 47
+    # part, elem, val = 25, 4, 23
+    # max_logs = 15
+    # stat_analysis_idx, mean_idx, nobs_idx, min_idx, max_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 15, 15, 16, 17, 18, 19, 20, 21, 22
     # report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
     ''''''
-    part, elem, val = 25, 4, 68
-    max_logs = 60
-    stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 60, 60, 61, 62, 63, 64, 65, 66, 67
+    part, elem, val = 25, 4, 48
+    max_logs = 40
+    stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 40, 40, 41, 42, 43, 44, 45, 46, 47
     report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
+    ''''''
+    # part, elem, val = 25, 4, 68
+    # max_logs = 60
+    # stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 60, 60, 61, 62, 63, 64, 65, 66, 67
+    # report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
     ''''''
 
     # create CSVs directory
@@ -648,9 +654,17 @@ if __name__ == "__main__":
             mean_certainty_accross_frames[i] = report_matrix[i][ getKeysByValue(element_dict, "certainty")[0] ][mean_idx]
 
 
-    # Collect the elements of each body part
+    # # Collect the elements of each body part
+    # x_col, y_col, z_col, certainty_col = [], [], [], []
+    # for i in range(part):
+    #     x_col.append(report_matrix[i][ getKeysByValue(element_dict, "x")[0] ][0:stat_analysis_idx])
+    #     y_col.append(report_matrix[i][ getKeysByValue(element_dict, "y")[0] ][0:stat_analysis_idx])
+    #     z_col.append(report_matrix[i][ getKeysByValue(element_dict, "z")[0] ][0:stat_analysis_idx])
+    #     certainty_col.append(report_matrix[i][ getKeysByValue(element_dict, "certainty")[0] ][0:stat_analysis_idx])
+
+    # Collect the elements of each upper body part
     x_col, y_col, z_col, certainty_col = [], [], [], []
-    for i in range(part):
+    for i in list(map(int, body_25_upper_body_parts_LR_order_of_appearance)):
         x_col.append(report_matrix[i][ getKeysByValue(element_dict, "x")[0] ][0:stat_analysis_idx])
         y_col.append(report_matrix[i][ getKeysByValue(element_dict, "y")[0] ][0:stat_analysis_idx])
         z_col.append(report_matrix[i][ getKeysByValue(element_dict, "z")[0] ][0:stat_analysis_idx])
@@ -663,55 +677,104 @@ if __name__ == "__main__":
         z_col[i] = np.array(z_col[i])[~np.isnan(z_col[i])]
         certainty_col[i] = np.array(certainty_col[i])[~np.isnan(certainty_col[i])]
     
-    # Trim data to what is not empty
-    x_data = [ x_c for x_c in x_col if len(x_c) ]
-    x_x_tick_labels = [ str(i) for i in body_25_body_parts_dict if i < len(x_col) and len(x_col[i]) ]
-    y_data = [ y_c for y_c in y_col if len(y_c) ]
-    y_x_tick_labels = [ str(i) for i in body_25_body_parts_dict if i < len(y_col) and len(y_col[i]) ]
-    z_data = [ z_c for z_c in z_col if len(z_c) ]
-    z_x_tick_labels = [ str(i) for i in body_25_body_parts_dict if i < len(z_col) and len(z_col[i]) ]
-    certainty_data = [ certainty_c for certainty_c in certainty_col if len(certainty_c) ]
-    certainty_x_tick_labels = [ str(i) for i in body_25_body_parts_dict if i < len(certainty_col) and len(certainty_col[i]) ]
+    # # Trim data to what is not empty
+    # x_data = [ x_c for x_c in x_col if len(x_c) ]
+    # x_x_tick_labels = [ str(i) for i in body_25_body_parts_dict if i < len(x_col) and len(x_col[i]) ]
+    # y_data = [ y_c for y_c in y_col if len(y_c) ]
+    # y_x_tick_labels = [ str(i) for i in body_25_body_parts_dict if i < len(y_col) and len(y_col[i]) ]
+    # z_data = [ z_c for z_c in z_col if len(z_c) ]
+    # z_x_tick_labels = [ str(i) for i in body_25_body_parts_dict if i < len(z_col) and len(z_col[i]) ]
+    # certainty_data = [ certainty_c for certainty_c in certainty_col if len(certainty_c) ]
+    # certainty_x_tick_labels = [ str(i) for i in body_25_body_parts_dict if i < len(certainty_col) and len(certainty_col[i]) ]
 
-    # Re-order data in order of appearance
-    x_x_tick_labels_LR, x_data_LR = reorderList(x_x_tick_labels, body_25_body_parts_LR_order_of_appearance, x_data)
-    y_x_tick_labels_LR, y_data_LR = reorderList(y_x_tick_labels, body_25_body_parts_LR_order_of_appearance, y_data)
-    z_x_tick_labels_LR, z_data_LR = reorderList(z_x_tick_labels, body_25_body_parts_LR_order_of_appearance, z_data)
-    certainty_x_tick_labels_LR, certainty_data_LR = reorderList(certainty_x_tick_labels, body_25_body_parts_LR_order_of_appearance, certainty_data)
+    # Trim upper body data to what is not empty
+    x_data = [ x_c for x_c in x_col if len(x_c) ]
+    x_x_tick_labels = [ str(i) for i in list(map(int, body_25_upper_body_parts_LR_order_of_appearance)) if i < len(x_col) and len(x_col[i]) ]
+    y_data = [ y_c for y_c in y_col if len(y_c) ]
+    y_x_tick_labels = [ str(i) for i in list(map(int, body_25_upper_body_parts_LR_order_of_appearance)) if i < len(y_col) and len(y_col[i]) ]
+    z_data = [ z_c for z_c in z_col if len(z_c) ]
+    z_x_tick_labels = [ str(i) for i in list(map(int, body_25_upper_body_parts_LR_order_of_appearance)) if i < len(z_col) and len(z_col[i]) ]
+    certainty_data = [ certainty_c for certainty_c in certainty_col if len(certainty_c) ]
+    certainty_x_tick_labels = [ str(i) for i in list(map(int, body_25_upper_body_parts_LR_order_of_appearance)) if i < len(certainty_col) and len(certainty_col[i]) ]
+
+    # # Re-order data in order of appearance
+    # x_x_tick_labels_LR, x_data_LR = reorderList(x_x_tick_labels, body_25_body_parts_LR_order_of_appearance, x_data)
+    # y_x_tick_labels_LR, y_data_LR = reorderList(y_x_tick_labels, body_25_body_parts_LR_order_of_appearance, y_data)
+    # z_x_tick_labels_LR, z_data_LR = reorderList(z_x_tick_labels, body_25_body_parts_LR_order_of_appearance, z_data)
+    # certainty_x_tick_labels_LR, certainty_data_LR = reorderList(certainty_x_tick_labels, body_25_body_parts_LR_order_of_appearance, certainty_data)
+
+    # Re-order upper body data in order of appearance
+    x_x_tick_labels_LR, x_data_LR = reorderList(x_x_tick_labels, body_25_upper_body_parts_LR_order_of_appearance, x_data)
+    y_x_tick_labels_LR, y_data_LR = reorderList(y_x_tick_labels, body_25_upper_body_parts_LR_order_of_appearance, y_data)
+    z_x_tick_labels_LR, z_data_LR = reorderList(z_x_tick_labels, body_25_upper_body_parts_LR_order_of_appearance, z_data)
+    certainty_x_tick_labels_LR, certainty_data_LR = reorderList(certainty_x_tick_labels, body_25_upper_body_parts_LR_order_of_appearance, certainty_data)
+
+    # # Do a boxplot for each body parts' element
+    # boxplot(    data=x_data_LR,
+    #             data_label="BODY_25 human pose model body parts",
+    #             title="Boxplot of x value for all BODY_25 human pose model body parts",
+    #             directory=plots_folder_path,
+    #             x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in x_x_tick_labels_LR ]
+    #         )
+    # boxplot(    data=y_data_LR,
+    #             data_label="BODY_25 human pose model body parts",
+    #             title="Boxplot of y value for all BODY_25 human pose model body parts",
+    #             directory=plots_folder_path,
+    #             x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in y_x_tick_labels_LR ]
+    #         )
+    # boxplot(    data=z_data_LR,
+    #             data_label="BODY_25 human pose model body parts",
+    #             title="Boxplot of z value for all BODY_25 human pose model body parts",
+    #             directory=plots_folder_path,
+    #             x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in z_x_tick_labels_LR ]
+    #         )
+    # boxplot(    data=certainty_data_LR,
+    #             data_label="BODY_25 human pose model body parts",
+    #             title="Boxplot of certainty value for all BODY_25 human pose model body parts",
+    #             directory=plots_folder_path,
+    #             x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in certainty_x_tick_labels_LR ]
+    #         )
 
     # Do a boxplot for each body parts' element
     boxplot(    data=x_data_LR,
                 data_label="BODY_25 human pose model body parts",
-                title="Boxplot of x value for all BODY_25 human pose model body parts",
+                title="Boxplot of x value for all BODY_25 human pose model upper body parts",
                 directory=plots_folder_path,
                 x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in x_x_tick_labels_LR ]
             )
     boxplot(    data=y_data_LR,
                 data_label="BODY_25 human pose model body parts",
-                title="Boxplot of y value for all BODY_25 human pose model body parts",
+                title="Boxplot of y value for all BODY_25 human pose model upper body parts",
                 directory=plots_folder_path,
                 x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in y_x_tick_labels_LR ]
             )
     boxplot(    data=z_data_LR,
                 data_label="BODY_25 human pose model body parts",
-                title="Boxplot of z value for all BODY_25 human pose model body parts",
+                title="Boxplot of z value for all BODY_25 human pose model upper body parts",
                 directory=plots_folder_path,
                 x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in z_x_tick_labels_LR ]
             )
     boxplot(    data=certainty_data_LR,
                 data_label="BODY_25 human pose model body parts",
-                title="Boxplot of certainty value for all BODY_25 human pose model body parts",
+                title="Boxplot of certainty value for all BODY_25 human pose model upper body parts",
                 directory=plots_folder_path,
                 x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in certainty_x_tick_labels_LR ]
             )
 
     # Repeat, with median normalization
     # Collect the elements of each body part
-    x_col, y_col, z_col, certainty_col = [], [], [], []
+    x_col, y_col, z_col = [], [], []
     for i in range(part):
         x_col.append(report_matrix[i][ getKeysByValue(element_dict, "x")[0] ][0:stat_analysis_idx])
         y_col.append(report_matrix[i][ getKeysByValue(element_dict, "y")[0] ][0:stat_analysis_idx])
         z_col.append(report_matrix[i][ getKeysByValue(element_dict, "z")[0] ][0:stat_analysis_idx])
+
+    # # Collect the elements of each upper body part
+    # x_col, y_col, z_col = [], [], []
+    # for i in list(map(int, body_25_upper_body_parts_LR_order_of_appearance)).sort():
+    #     x_col.append(report_matrix[i][ getKeysByValue(element_dict, "x")[0] ][0:stat_analysis_idx])
+    #     y_col.append(report_matrix[i][ getKeysByValue(element_dict, "y")[0] ][0:stat_analysis_idx])
+    #     z_col.append(report_matrix[i][ getKeysByValue(element_dict, "z")[0] ][0:stat_analysis_idx])
 
     # Perform median normalization to the collected data
     for i in range(len(x_col)):
@@ -729,27 +792,49 @@ if __name__ == "__main__":
         y_col[i] = np.array(y_col[i])[~np.isnan(y_col[i])]
         z_col[i] = np.array(z_col[i])[~np.isnan(z_col[i])]
     
-    # Trim data to what is not empty
+    # # Trim data to what is not empty
+    # y_axis_min_list, y_axis_max_list = [], []
+    # x_data = [ x_c for x_c in x_col if len(x_c) ]
+    # y_axis_min_list.append( np.nanmin( [ np.nanmin(l) for l in x_data ] ) )
+    # y_axis_max_list.append( np.nanmax( [ np.nanmax(l) for l in x_data ] ) )
+    # x_x_tick_labels = [ str(i) for i in body_25_body_parts_dict if i < len(x_col) and len(x_col[i]) ]
+    # y_data = [ y_c for y_c in y_col if len(y_c) ]
+    # y_axis_min_list.append( np.nanmin( [ np.nanmin(l) for l in y_data ] ) )
+    # y_axis_max_list.append( np.nanmax( [ np.nanmax(l) for l in y_data ] ) )
+    # y_x_tick_labels = [ str(i) for i in body_25_body_parts_dict if i < len(y_col) and len(y_col[i]) ]
+    # z_data = [ z_c for z_c in z_col if len(z_c) ]
+    # y_axis_min_list.append( np.nanmin( [ np.nanmin(l) for l in z_data ] ) )
+    # y_axis_max_list.append( np.nanmax( [ np.nanmax(l) for l in z_data ] ) )
+    # z_x_tick_labels = [ str(i) for i in body_25_body_parts_dict if i < len(z_col) and len(z_col[i]) ]
+    # y_axis_min = np.nanmin(y_axis_min_list)
+    # y_axis_max = np.nanmax(y_axis_max_list)
+
+    # Trim data to what is not empty or lower body
     y_axis_min_list, y_axis_max_list = [], []
-    x_data = [ x_c for x_c in x_col if len(x_c) ]
+    x_data = [ x_col[i] for i in body_25_body_parts_dict if i < len(x_col) and len(x_col[i]) and i in list(map(int, body_25_upper_body_parts_LR_order_of_appearance)) ]
     y_axis_min_list.append( np.nanmin( [ np.nanmin(l) for l in x_data ] ) )
     y_axis_max_list.append( np.nanmax( [ np.nanmax(l) for l in x_data ] ) )
-    x_x_tick_labels = [ str(i) for i in body_25_body_parts_dict if i < len(x_col) and len(x_col[i]) ]
-    y_data = [ y_c for y_c in y_col if len(y_c) ]
+    x_x_tick_labels = [ str(i) for i in body_25_body_parts_dict if i < len(x_col) and len(x_col[i]) and i in list(map(int, body_25_upper_body_parts_LR_order_of_appearance)) ]
+    y_data = [ y_col[i] for i in body_25_body_parts_dict if i < len(y_col) and len(y_col[i]) and i in list(map(int, body_25_upper_body_parts_LR_order_of_appearance)) ]
     y_axis_min_list.append( np.nanmin( [ np.nanmin(l) for l in y_data ] ) )
     y_axis_max_list.append( np.nanmax( [ np.nanmax(l) for l in y_data ] ) )
-    y_x_tick_labels = [ str(i) for i in body_25_body_parts_dict if i < len(y_col) and len(y_col[i]) ]
-    z_data = [ z_c for z_c in z_col if len(z_c) ]
+    y_x_tick_labels = [ str(i) for i in body_25_body_parts_dict if i < len(y_col) and len(y_col[i]) and i in list(map(int, body_25_upper_body_parts_LR_order_of_appearance)) ]
+    z_data = [ z_col[i] for i in body_25_body_parts_dict if i < len(z_col) and len(z_col[i]) and i in list(map(int, body_25_upper_body_parts_LR_order_of_appearance)) ]
     y_axis_min_list.append( np.nanmin( [ np.nanmin(l) for l in z_data ] ) )
     y_axis_max_list.append( np.nanmax( [ np.nanmax(l) for l in z_data ] ) )
-    z_x_tick_labels = [ str(i) for i in body_25_body_parts_dict if i < len(z_col) and len(z_col[i]) ]
+    z_x_tick_labels = [ str(i) for i in body_25_body_parts_dict if i < len(z_col) and len(z_col[i]) and i in list(map(int, body_25_upper_body_parts_LR_order_of_appearance)) ]
     y_axis_min = np.nanmin(y_axis_min_list)
     y_axis_max = np.nanmax(y_axis_max_list)
 
     # Re-order data in order of appearance
-    x_x_tick_labels_LR, x_data_LR = reorderList(x_x_tick_labels, body_25_body_parts_LR_order_of_appearance, x_data)
-    y_x_tick_labels_LR, y_data_LR = reorderList(y_x_tick_labels, body_25_body_parts_LR_order_of_appearance, y_data)
-    z_x_tick_labels_LR, z_data_LR = reorderList(z_x_tick_labels, body_25_body_parts_LR_order_of_appearance, z_data)
+    # x_x_tick_labels_LR, x_data_LR = reorderList(x_x_tick_labels, body_25_body_parts_LR_order_of_appearance, x_data)
+    # y_x_tick_labels_LR, y_data_LR = reorderList(y_x_tick_labels, body_25_body_parts_LR_order_of_appearance, y_data)
+    # z_x_tick_labels_LR, z_data_LR = reorderList(z_x_tick_labels, body_25_body_parts_LR_order_of_appearance, z_data)
+
+    # # Re-order data in order of appearance
+    x_x_tick_labels_LR, x_data_LR = reorderList(x_x_tick_labels, body_25_upper_body_parts_LR_order_of_appearance, x_data)
+    y_x_tick_labels_LR, y_data_LR = reorderList(y_x_tick_labels, body_25_upper_body_parts_LR_order_of_appearance, y_data)
+    z_x_tick_labels_LR, z_data_LR = reorderList(z_x_tick_labels, body_25_upper_body_parts_LR_order_of_appearance, z_data)
 
     # Simulate a boxplot for each body parts' element to find mins and maxes of caps
     mins, maxes = [], []
@@ -765,10 +850,36 @@ if __name__ == "__main__":
     y_axis_min = np.nanmin(mins)
     y_axis_max = np.nanmax(maxes)
     
-    # Do a boxplot for each body parts' element
+    # # Do a boxplot for each body parts' element
+    # boxplot(    data=x_data_LR,
+    #             data_label="BODY_25 human pose model body parts",
+    #             title="Boxplot of x value for all BODY_25 human pose model body parts after median normalization",
+    #             directory=plots_folder_path,
+    #             x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in x_x_tick_labels_LR ],
+    #             y_lim_min=y_axis_min, y_lim_max=y_axis_max,
+    #             optimize_lims=True
+    #         )
+    # boxplot(    data=y_data_LR,
+    #             data_label="BODY_25 human pose model body parts",
+    #             title="Boxplot of y value for all BODY_25 human pose model body parts after median normalization",
+    #             directory=plots_folder_path,
+    #             x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in y_x_tick_labels_LR ],
+    #             y_lim_min=y_axis_min, y_lim_max=y_axis_max,
+    #             optimize_lims=True
+    #         )
+    # boxplot(    data=z_data_LR,
+    #             data_label="BODY_25 human pose model body parts",
+    #             title="Boxplot of z value for all BODY_25 human pose model body parts after median normalization",
+    #             directory=plots_folder_path,
+    #             x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in z_x_tick_labels_LR ],
+    #             y_lim_min=y_axis_min, y_lim_max=y_axis_max,
+    #             optimize_lims=True
+    #         )
+    
+    # Do a boxplot for each upper body parts' element
     boxplot(    data=x_data_LR,
                 data_label="BODY_25 human pose model body parts",
-                title="Boxplot of x value for all BODY_25 human pose model body parts after median normalization",
+                title="Boxplot of x value for all BODY_25 human pose model upper body parts after median normalization",
                 directory=plots_folder_path,
                 x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in x_x_tick_labels_LR ],
                 y_lim_min=y_axis_min, y_lim_max=y_axis_max,
@@ -776,7 +887,7 @@ if __name__ == "__main__":
             )
     boxplot(    data=y_data_LR,
                 data_label="BODY_25 human pose model body parts",
-                title="Boxplot of y value for all BODY_25 human pose model body parts after median normalization",
+                title="Boxplot of y value for all BODY_25 human pose model upper body parts after median normalization",
                 directory=plots_folder_path,
                 x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in y_x_tick_labels_LR ],
                 y_lim_min=y_axis_min, y_lim_max=y_axis_max,
@@ -784,7 +895,7 @@ if __name__ == "__main__":
             )
     boxplot(    data=z_data_LR,
                 data_label="BODY_25 human pose model body parts",
-                title="Boxplot of z value for all BODY_25 human pose model body parts after median normalization",
+                title="Boxplot of z value for all BODY_25 human pose model upper body parts after median normalization",
                 directory=plots_folder_path,
                 x_tick_labels=[ body_25_body_parts_dict.get(int(i)) for i in z_x_tick_labels_LR ],
                 y_lim_min=y_axis_min, y_lim_max=y_axis_max,

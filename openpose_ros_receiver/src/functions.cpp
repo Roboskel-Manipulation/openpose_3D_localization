@@ -48,7 +48,7 @@ void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr&
 
                 /* broadcast transform locally */
                 static tf::Transform localTransform;
-                double x = 0.0, y = 0.0, z = 0.0, prob = 0.0, x_pix = 0.0, y_pix = 0.0, x0 = 0.0, y0 = 0.0, z0 = 0.0;
+                double x = 0.0, y = 0.0, z = 0.0, prob = 0.0, x_pix = 0.0, y_pix = 0.0, /*x0 = 0.0, y0 = 0.0,*/ z0 = 0.0;
 
                 for (uint32_t j = 0; j < 25; j++)
                 {
@@ -67,7 +67,8 @@ void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr&
                         /* our point */
                         p = pPCL->at(x_pix, y_pix);
                         x = p.x; y = p.y; z = p.z;
-                        x0 = x; y0 = y; z0 = z;
+                        // x0 = x; y0 = y; 
+                        z0 = z;
                         divisors++;
                         /* P: our point, *: one of our point's neighbors
                                * * *
@@ -82,7 +83,8 @@ void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr&
                             p = pPCL->at(x_pix-1, y_pix);
                             if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                             {
-                                x += p.x; y += p.y; z += p.z;
+                                // x += p.x; y += p.y;
+                                z += p.z;
                                 divisors++;
                             }
                             // else
@@ -98,7 +100,8 @@ void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr&
                             p = pPCL->at(x_pix, y_pix-1);
                             if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                             {
-                                x += p.x; y += p.y; z += p.z;
+                                // x += p.x; y += p.y;
+                                z += p.z;
                                 divisors++;
                             }
                             // else
@@ -114,7 +117,8 @@ void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr&
                             p = pPCL->at(x_pix-1, y_pix-1);
                             if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                             {
-                                x += p.x; y += p.y; z += p.z;
+                                // x += p.x; y += p.y;
+                                z += p.z;
                                 divisors++;
                             }
                         //     else
@@ -130,7 +134,8 @@ void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr&
                             p = pPCL->at(x_pix+1, y_pix);
                             if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                             {
-                                x += p.x; y += p.y; z += p.z;
+                                // x += p.x; y += p.y;
+                                z += p.z;
                                 divisors++;
                             }
                             // else
@@ -146,7 +151,8 @@ void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr&
                             p = pPCL->at(x_pix, y_pix+1);
                             if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                             {
-                                x += p.x; y += p.y; z += p.z;
+                                // x += p.x; y += p.y;
+                                z += p.z;
                                 divisors++;
                             }
                             // else
@@ -162,7 +168,8 @@ void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr&
                             p = pPCL->at(x_pix+1, y_pix+1);
                             if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                             {
-                                x += p.x; y += p.y; z += p.z;
+                                // x += p.x; y += p.y;
+                                z += p.z;
                                 divisors++;
                             }
                             // else
@@ -178,7 +185,8 @@ void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr&
                             p = pPCL->at(x_pix-1, y_pix+1);
                             if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                             {
-                                x += p.x; y += p.y; z += p.z;
+                                // x += p.x; y += p.y;
+                                z += p.z;
                                 divisors++;
                             }
                             // else
@@ -194,7 +202,8 @@ void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr&
                             p = pPCL->at(x_pix+1, y_pix-1);
                             if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                             {
-                                x += p.x; y += p.y; z += p.z;
+                                // x += p.x; y += p.y;
+                                z += p.z;
                                 divisors++;
                             }
                             // else
@@ -211,7 +220,8 @@ void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr&
                             p = pPCL->at(x_pix-2, y_pix);
                             if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                             {
-                                x += p.x; y += p.y; z += p.z;
+                                // x += p.x; y += p.y;
+                                z += p.z;
                                 divisors++;
                             }
                             // else
@@ -227,7 +237,8 @@ void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr&
                             p = pPCL->at(x_pix, y_pix-2);
                             if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                             {
-                                x += p.x; y += p.y; z += p.z;
+                                // x += p.x; y += p.y;
+                                z += p.z;
                                 divisors++;
                             }
                             // else
@@ -243,7 +254,8 @@ void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr&
                             p = pPCL->at(x_pix-2, y_pix-2);
                             if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                             {
-                                x += p.x; y += p.y; z += p.z;
+                                // x += p.x; y += p.y;
+                                z += p.z;
                                 divisors++;
                             }
                             // else
@@ -259,7 +271,8 @@ void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr&
                             p = pPCL->at(x_pix+2, y_pix);
                             if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                             {
-                                x += p.x; y += p.y; z += p.z;
+                                // x += p.x; y += p.y;
+                                z += p.z;
                                 divisors++;
                             }
                             // else
@@ -275,7 +288,8 @@ void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr&
                             p = pPCL->at(x_pix, y_pix+2);
                             if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                             {
-                                x += p.x; y += p.y; z += p.z;
+                                // x += p.x; y += p.y;
+                                z += p.z;
                                 divisors++;
                             }
                             // else
@@ -291,7 +305,8 @@ void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr&
                             p = pPCL->at(x_pix+2, y_pix+2);
                             if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                             {
-                                x += p.x; y += p.y; z += p.z;
+                                // x += p.x; y += p.y;
+                                z += p.z;
                                 divisors++;
                             }
                             // else
@@ -307,7 +322,8 @@ void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr&
                             p = pPCL->at(x_pix-2, y_pix+2);
                             if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                             {
-                                x += p.x; y += p.y; z += p.z;
+                                // x += p.x; y += p.y;
+                                z += p.z;
                                 divisors++;
                             }
                             // else
@@ -323,7 +339,8 @@ void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr&
                             p = pPCL->at(x_pix+2, y_pix-2);
                             if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                             {
-                                x += p.x; y += p.y; z += p.z;
+                                // x += p.x; y += p.y;
+                                z += p.z;
                                 divisors++;
                             }
                             // else
@@ -338,10 +355,11 @@ void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr&
 
                         if (divisors)
                         {
-                            x /= (double) divisors; y /= (double) divisors; z /= (double) divisors;
+                            // x /= (double) divisors; y /= (double) divisors;
+                            z /= (double) divisors;
                             /* for edge cases */
-                            if (x > UPPER_VARIATION_THRESH * x0 || x < LOWER_VARIATION_THRESH * x0) x = x0;
-                            if (y > UPPER_VARIATION_THRESH * y0 || y < LOWER_VARIATION_THRESH * y0) y = y0;
+                            // if (x > UPPER_VARIATION_THRESH * x0 || x < LOWER_VARIATION_THRESH * x0) x = x0;
+                            // if (y > UPPER_VARIATION_THRESH * y0 || y < LOWER_VARIATION_THRESH * y0) y = y0;
                             if (z > UPPER_VARIATION_THRESH * z0 || z < LOWER_VARIATION_THRESH * z0) z = z0;
                         }
 
