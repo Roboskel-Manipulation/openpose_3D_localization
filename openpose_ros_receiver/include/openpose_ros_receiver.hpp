@@ -48,6 +48,9 @@
 /* Global Variables */
 extern bool tfSubtree, logging;
 // extern int totalNans, callbackVisits;
+extern bool pclMsg, humanListMsg;
+extern ros::Publisher robotFrameCoordsPub;
+extern pcl::PointCloud<pcl::PointXYZ>::Ptr pPCL;
 
 /* OpenPose BODY_25 Body Parts Mapping */
 const std::map<unsigned int, std::string> POSE_BODY_25_BODY_PARTS
@@ -81,7 +84,9 @@ const std::map<unsigned int, std::string> POSE_BODY_25_BODY_PARTS
 };
 
 /* Broadcaster's and Receiver's functions */
-void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& pPCL, const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& list_msg, const ros::Publisher& robotFrameCoordsPub);
+void pointCloudTopicCallback(const pcl::PointCloud<pcl::PointXYZ>::Ptr& pPCL);
+void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& list_msg);
+// void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& pPCL, const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& list_msg, const ros::Publisher& robotFrameCoordsPub);
 void listenForSkeleton(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg);
 std::string getPoseBodyPartMappingBody25(unsigned int idx);
 

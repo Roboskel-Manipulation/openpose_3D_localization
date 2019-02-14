@@ -8,5 +8,5 @@ save_openpose_video: false
 original_video_file_name: ""
 openpose_video_file_name: ""
 video_fps: 10
-depth_queue_size: 10
-human_list_queue_size: 10
+depth_queue_size: 1
+human_list_queue_size: 1
