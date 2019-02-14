@@ -12,6 +12,7 @@
 #include <message_filters/subscriber.h>
 #include <message_filters/synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
+#include <std_msgs/String.h>
 
 /* TF headers */
 #include <tf/transform_broadcaster.h>
@@ -44,7 +45,9 @@
 #define UPPER_VARIATION_THRESH 1.15         // how much different is the avg neighborhood value allowed to be in contrast to the point value --> float
 #define LOWER_VARIATION_THRESH 0.85         // how much different is the avg neighborhood value allowed to be in contrast to the point value --> float
 
-extern bool tfSubtree;
+/* Global Variables */
+extern bool tfSubtree, logging;
+// extern int totalNans, callbackVisits;
 
 /* OpenPose BODY_25 Body Parts Mapping */
 const std::map<unsigned int, std::string> POSE_BODY_25_BODY_PARTS
@@ -78,7 +81,7 @@ const std::map<unsigned int, std::string> POSE_BODY_25_BODY_PARTS
 };
 
 /* Broadcaster's and Receiver's functions */
-void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& pPCL, const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& list_msg);
+void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& pPCL, const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& list_msg, const ros::Publisher& robotFrameCoordsPub);
 void listenForSkeleton(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg);
 std::string getPoseBodyPartMappingBody25(unsigned int idx);
 

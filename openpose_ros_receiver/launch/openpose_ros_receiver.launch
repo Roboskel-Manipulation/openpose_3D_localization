@@ -1,17 +1,34 @@
 <launch>
 
-	<param name="use_sim_time" value="true" />
+  <!-- 1: Toggle simulation time utilization parameter -->
+	<!-- 2: Publish urdf zed -->
+  <!-- 3: ROS URDF description of the ZED -->
+  <!-- 4: Play ROSbag recording -->
+  <!-- <param name="use_sim_time" value="true" /> -->
+  <!-- UNCOMMENT for ROSbag reproduction -->
+
+  <!-- <arg name="publish_urdf" default="true" />
+  <arg name="camera_model" value="0" />
+  <group if="$(arg publish_urdf)">
+    <param if="$(arg camera_model)" name="zed_description" textfile="$(find zed_wrapper)/urdf/zedm.urdf" />
+    <param unless="$(arg camera_model)" name="zed_description" textfile="$(find zed_wrapper)/urdf/zed.urdf" />
+    <node name="zed_state_publisher" pkg="robot_state_publisher" type="state_publisher">
+      <remap from="robot_description" to="zed_description" />
+    </node>
+  </group> -->
+
+  <!-- <node pkg="rosbag" type="play" name="rosbag" args=" -c /home/gkamaras/catkin_ws/openpose_ros_receiver_rosbags/vga_100fps.bag" /> -->
 
 
-  <!-- Launch ZED wrapper node -->
-  <!-- <arg name="svo_file"                default="" /> -->
+  <!-- 1: Launch ZED wrapper node -->
+  <!-- 2: Launch ZED camera wrapper -->
+  <arg name="svo_file"                default="" />
 
-
-  <!-- Launch ZED camera wrapper -->
-  <!-- <include file="$(find zed_wrapper)/launch/zed.launch">
+  <include file="$(find zed_wrapper)/launch/zed.launch">
     <arg name="camera_model"        value="0" />
     <arg name="svo_file"            value="$(arg svo_file)" />
-  </include> -->
+  </include>
+  <!-- COMMENT for ROSbag reproduction -->
 
 
   <!-- Launch openpose_ros -->
@@ -21,9 +38,10 @@
 
 
   <!-- Launch UR3 description publishing node -->
-  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find manos_description)/urdf/ur3_pg70.urdf.xacro'" />
+  <param name="robot_description" command="$(find xacro)/xacro '$(find manos_description)/urdf/ur3_pg70.urdf.xacro'" />
 	<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
 	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+  <!-- COMMENT for ROSbag reproduction -->
 
 
   <!-- Launch AR marker calibration node -->
@@ -55,6 +73,7 @@
   <node pkg="tf_based_on_ar_marker" type="tf_based_on_ar_marker.py" respawn="false" name="tf_based_on_ar_marker" output="screen">
     <rosparam file="$(find manos_vision)/config/connect_trees.yaml" command="load" />
   </node>
+  <!-- COMMENT for ROSbag reproduction -->
 
 
   <!-- Launch openpose_ros_receiver_broadcaster node -->

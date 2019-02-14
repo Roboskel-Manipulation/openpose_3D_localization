@@ -1,4 +1,6 @@
 human_list_topic: "/openpose_ros/human_list"
 pointcloud_topic: "/zed/point_cloud/cloud_registered"
+robot_frame_coords_topic: "/openpose_ros_receiver/robot_frame_coords"
 queue_size: 2
 sync_buffer_size: 2
+logging: false

@@ -7,6 +7,7 @@ add_compile_options(-std=c++11)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
+  std_msgs
   pcl_ros
   message_filters
   openpose_ros_msgs
@@ -16,7 +17,7 @@ find_package(/usr/local/lib/OpenPose/OpenPose REQUIRED)
 
 catkin_package(
    INCLUDE_DIRS include
-   CATKIN_DEPENDS roscpp sensor_msgs pcl_ros message_filters
+   CATKIN_DEPENDS roscpp sensor_msgs std_msgs pcl_ros message_filters
 )
 
 include_directories( 
