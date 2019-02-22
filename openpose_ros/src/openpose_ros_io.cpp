@@ -4,6 +4,10 @@ using namespace openpose_ros;
 
 OpenPoseROSIO::OpenPoseROSIO(OpenPose &openPose): nh_("/openpose_ros_node"), it_(nh_)
 {
+    #ifdef PROFILING
+    ros::Time begin_config = ros::Time::now();
+    #endif
+
     // Subscribe to input video feed and publish human lists as output
     std::string image_topic;
     std::string output_topic;
@@ -22,6 +26,13 @@ OpenPoseROSIO::OpenPoseROSIO(OpenPose &openPose): nh_("/openpose_ros_node"), it_
     nh_.param("depth_queue_size", depth_queue_size_, 10);
     nh_.param("human_list_queue_size", human_list_queue_size_, 10);
 
+    #ifdef PROFILING
+    ros::Time end_config = ros::Time::now();
+    ROS_INFO("config: %f secs", (end_config-begin_config).toSec());
+
+    ros::Time begin_init = ros::Time::now();
+    #endif
+
     depth_sub_ = nh_.subscribe("/zed/depth/depth_registered", depth_queue_size_, &OpenPoseROSIO::storeDepth, this);
     image_sub_ = it_.subscribe(image_topic, 1, &OpenPoseROSIO::processImage, this);
     openpose_human_list_pub_ = nh_.advertise<openpose_ros_msgs::OpenPoseHumanList>(output_topic, human_list_queue_size_);
@@ -29,6 +40,13 @@ OpenPoseROSIO::OpenPoseROSIO(OpenPose &openPose): nh_("/openpose_ros_node"), it_
     depths_ptr_ = nullptr;
     img_width_ = 0;
     openpose_ = &openPose;
+
+    #ifdef PROFILING
+    ros::Time end_init = ros::Time::now();
+    ROS_INFO("initialization: %f secs", (end_init-begin_init).toSec());
+
+    ros::Time begin_save = ros::Time::now();
+    #endif
 
     if(save_original_video_flag_)
     {
@@ -54,28 +72,77 @@ OpenPoseROSIO::OpenPoseROSIO(OpenPose &openPose): nh_("/openpose_ros_node"), it_
             openpose_video_writer_initialized_ = false;
         }
     }
+
+    #ifdef PROFILING
+    ros::Time end_save = ros::Time::now();
+    ROS_INFO("saving: %f secs", (end_save-begin_save).toSec());
+    #endif
 }
 
 void OpenPoseROSIO::storeDepth(const sensor_msgs::Image::ConstPtr& msg)
 {
+    #ifdef PROFILING
+    ros::Time begin = ros::Time::now();
+    #endif
+
     // Use a pointer to the depth values, also cast the data pointer to floating point
     size_t size = msg->width * msg->height;
     if (!depths_ptr_)
+    {
+        #ifdef PROFILING
+        ros::Time begin_malloc = ros::Time::now();
+        #endif
+
         depths_ptr_ = (float*) malloc(size * sizeof(float));
-    
+
+        #ifdef PROFILING
+        ros::Time end_malloc = ros::Time::now();
+        ROS_INFO("--> storeDepth --> malloc: %f secs", (end_malloc-begin_malloc).toSec());
+        #endif
+    }
+
+    #ifdef PROFILING    
+    ros::Time begin_store = ros::Time::now();
+    #endif
+
     for (size_t i = 0; i < size; i++)
         depths_ptr_[i] = *((float*)(&msg->data[0])+i);
 
+    #ifdef PROFILING
+    ros::Time end_store = ros::Time::now();
+    ROS_INFO("--> storeDepth --> store: %f secs", (end_store-begin_store).toSec());
+    #endif
+
     img_width_ = msg->width;
+
+    #ifdef PROFILING
+    ros::Time end = ros::Time::now();
+    ROS_INFO("--> storeDepth: %f secs", (end-begin).toSec());
+    #endif
 }
 
 void OpenPoseROSIO::processImage(const sensor_msgs::ImageConstPtr& msg)
 {
+    #ifdef PROFILING
+    ros::Time begin = ros::Time::now();
+    #endif
+
     convertImage(msg);
     std::shared_ptr<std::vector<op::Datum>> datumToProcess = createDatum();
 
+    #ifdef PROFILING
+    ros::Time begin_emplaceDatum = ros::Time::now();
+    #endif
+
     bool successfullyEmplaced = openpose_->waitAndEmplace(datumToProcess);
-    
+
+    #ifdef PROFILING
+    ros::Time end_emplaceDatum = ros::Time::now();
+    ROS_INFO("--> processImage --> waitAndEmplace datum: %f secs", (end_emplaceDatum-begin_emplaceDatum).toSec());
+
+    ros::Time begin_popFrame = ros::Time::now();
+    #endif
+
     // Pop frame
     std::shared_ptr<std::vector<op::Datum>> datumProcessed;
     if (successfullyEmplaced && openpose_->waitAndPop(datumProcessed))
@@ -103,10 +170,22 @@ void OpenPoseROSIO::processImage(const sensor_msgs::ImageConstPtr& msg)
         op::log("Processed datum could not be emplaced.", op::Priority::High,
                 __LINE__, __FUNCTION__, __FILE__);
     }
+
+    #ifdef PROFILING
+    ros::Time end_popFrame = ros::Time::now();
+    ROS_INFO("--> processImage --> waitAndPop datum: %f secs", (end_popFrame-begin_popFrame).toSec());
+
+    ros::Time end = ros::Time::now();
+    ROS_INFO("--> processImage: %f secs", (end-begin).toSec());
+    #endif
 }
 
 void OpenPoseROSIO::convertImage(const sensor_msgs::ImageConstPtr& msg)
 {
+    #ifdef PROFILING
+    ros::Time begin = ros::Time::now();
+    #endif
+
     try
     {
         cv_img_ptr_ = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
@@ -117,10 +196,19 @@ void OpenPoseROSIO::convertImage(const sensor_msgs::ImageConstPtr& msg)
         ROS_ERROR("cv_bridge exception: %s", e.what());
         return;
     }
+
+    #ifdef PROFILING
+    ros::Time end = ros::Time::now();
+    ROS_INFO("--> convertImage: %f secs", (end-begin).toSec());
+    #endif
 }
 
 std::shared_ptr<std::vector<op::Datum>> OpenPoseROSIO::createDatum()
 {
+    #ifdef PROFILING
+    ros::Time begin = ros::Time::now();
+    #endif
+
     // Close program when empty frame
     if (cv_img_ptr_ == nullptr)
     {
@@ -138,27 +226,55 @@ std::shared_ptr<std::vector<op::Datum>> OpenPoseROSIO::createDatum()
 
         return datumsPtr;
     }
+
+    #ifdef PROFILING
+    ros::Time end = ros::Time::now();
+    ROS_INFO("--> createDatum: %f secs", (end-begin).toSec());
+    #endif
 }
 
 bool OpenPoseROSIO::display(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr)
 {
+    #ifdef PROFILING
+    ros::Time begin = ros::Time::now();
+    #endif
+
     // User's displaying/saving/other processing here
         // datum.cvOutputData: rendered frame with pose or heatmaps
         // datum.poseKeypoints: Array<float> with the estimated pose
     char key = ' ';
     if (datumsPtr != nullptr && !datumsPtr->empty())
     {
+        #ifdef PROFILING
+        ros::Time begin_imshow = ros::Time::now();
+        #endif
+
         cv::imshow("User worker GUI", datumsPtr->at(0).cvOutputData);
         // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
         key = (char)cv::waitKey(1);
+        
+        #ifdef PROFILING
+        ros::Time end_imshow = ros::Time::now();
+        ROS_INFO("--> display --> imshow: %f secs", (end_imshow-begin_imshow).toSec());
+        #endif
     }
     else
         op::log("Nullptr or empty datumsPtr found.", op::Priority::High, __LINE__, __FUNCTION__, __FILE__);
+
+    #ifdef PROFILING
+    ros::Time end = ros::Time::now();
+    ROS_INFO("--> display: %f secs", (end-begin).toSec());
+    #endif
+
     return (key == 27);
 }
 
 bool OpenPoseROSIO::saveOriginalVideo(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr)
 {
+    #ifdef PROFILING
+    ros::Time begin = ros::Time::now();
+    #endif
+
     char key = ' ';
     if (datumsPtr != nullptr && !datumsPtr->empty())
     {
@@ -175,11 +291,21 @@ bool OpenPoseROSIO::saveOriginalVideo(const std::shared_ptr<std::vector<op::Datu
     }
     else
         op::log("Nullptr or empty datumsPtr found.", op::Priority::High, __LINE__, __FUNCTION__, __FILE__);
+
+    #ifdef PROFILING
+    ros::Time end = ros::Time::now();
+    ROS_INFO("--> saveOriginalVideo: %f secs", (end-begin).toSec());
+    #endif
+
     return (key == 27);
 }
 
 bool OpenPoseROSIO::saveOpenPoseVideo(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr)
 {
+    #ifdef PROFILING
+    ros::Time begin = ros::Time::now();
+    #endif
+
     char key = ' ';
     if (datumsPtr != nullptr && !datumsPtr->empty())
     {
@@ -196,6 +322,12 @@ bool OpenPoseROSIO::saveOpenPoseVideo(const std::shared_ptr<std::vector<op::Datu
     }
     else
         op::log("Nullptr or empty datumsPtr found.", op::Priority::High, __LINE__, __FUNCTION__, __FILE__);
+    
+    #ifdef PROFILING
+    ros::Time end = ros::Time::now();
+    ROS_INFO("--> saveOpenPoseVideo: %f secs", (end-begin).toSec());
+    #endif
+
     return (key == 27);
 }
 
@@ -206,6 +338,10 @@ cv_bridge::CvImagePtr& OpenPoseROSIO::getCvImagePtr()
 
 void OpenPoseROSIO::printKeypoints(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr)
 {
+    #ifdef PROFILING
+    ros::Time begin = ros::Time::now();
+    #endif
+
     // Example: How to use the pose keypoints
     if (datumsPtr != nullptr && !datumsPtr->empty())
     {
@@ -254,10 +390,19 @@ void OpenPoseROSIO::printKeypoints(const std::shared_ptr<std::vector<op::Datum>>
     }
     else
         op::log("Nullptr or empty datumsPtr found.", op::Priority::High, __LINE__, __FUNCTION__, __FILE__);
+
+    #ifdef PROFILING
+    ros::Time end = ros::Time::now();
+    ROS_INFO("--> printKeypoints: %f secs", (end-begin).toSec());
+    #endif
 }
 
 void OpenPoseROSIO::publish(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr)
 {
+    #ifdef PROFILING
+    ros::Time begin = ros::Time::now();
+    #endif
+
     while (!depths_ptr_)
     {
         ROS_WARN("NO DEPTH");
@@ -394,10 +539,19 @@ void OpenPoseROSIO::publish(const std::shared_ptr<std::vector<op::Datum>>& datum
     }
     else
         op::log("Nullptr or empty datumsPtr found.", op::Priority::High, __LINE__, __FUNCTION__, __FILE__);
+
+    #ifdef PROFILING
+    ros::Time end = ros::Time::now();
+    ROS_INFO("--> publish: %f secs", (end-begin).toSec());
+    #endif
 }
 
 void OpenPoseROSIO::stop()
 {
+    #ifdef PROFILING
+    ros::Time begin = ros::Time::now();
+    #endif
+
     free(depths_ptr_);
     depths_ptr_ = nullptr;
 
@@ -409,4 +563,9 @@ void OpenPoseROSIO::stop()
     {
         openpose_video_writer_.release();
     }
+
+    #ifdef PROFILING
+    ros::Time end = ros::Time::now();
+    ROS_INFO("--> stop: %f secs", (end-begin).toSec());
+    #endif
 }

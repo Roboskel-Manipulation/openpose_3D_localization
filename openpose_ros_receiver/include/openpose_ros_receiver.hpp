@@ -84,9 +84,13 @@ const std::map<unsigned int, std::string> POSE_BODY_25_BODY_PARTS
 };
 
 /* Broadcaster's and Receiver's functions */
+
+/* Callback functions */
 void pointCloudTopicCallback(const pcl::PointCloud<pcl::PointXYZ>::Ptr& pPCL);
 void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& list_msg);
 // void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& pPCL, const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& list_msg, const ros::Publisher& robotFrameCoordsPub);
+
+/* Various functions */
 void listenForSkeleton(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg);
 std::string getPoseBodyPartMappingBody25(unsigned int idx);
 

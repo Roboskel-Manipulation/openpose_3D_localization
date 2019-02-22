@@ -8,12 +8,11 @@ int main (int argc, char** argv)
     /* Initialize node variables */
     ros::NodeHandle nh;
     std::string human_list_topic, pointcloud_topic, robot_frame_coords_topic;
-    int queue_size, sync_buffer_size;
+    int queue_size;
     nh.param("openpose_ros_receiver_broadcaster_node/human_list_topic", human_list_topic, std::string("/openpose_ros/human_list"));
     nh.param("openpose_ros_receiver_broadcaster_node/pointcloud_topic", pointcloud_topic, std::string("/zed/point_cloud/cloud_registered"));
     nh.param("openpose_ros_receiver_broadcaster_node/robot_frame_coords_topic", robot_frame_coords_topic, std::string("/openpose_ros_receiver/robot_frame_coords"));
     nh.param("openpose_ros_receiver_broadcaster_node/queue_size", queue_size, 2);
-    nh.param("openpose_ros_receiver_broadcaster_node/sync_buffer_size", sync_buffer_size, 2);
     nh.param("openpose_ros_receiver_broadcaster_node/logging", logging, false);
 
     /* Initialize Global Variables */

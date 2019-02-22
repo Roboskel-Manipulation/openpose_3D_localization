@@ -23,6 +23,9 @@
 
 #include <cstdlib>
 
+/* important definitions */
+// #define PROFILING
+
 namespace openpose_ros {
 
     class OpenPoseROSIO

@@ -1,0 +1,2 @@
+robot_frame_coords_topic: "/openpose_ros_receiver/robot_frame_coords"
+queue_size: 1
