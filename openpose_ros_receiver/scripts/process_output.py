@@ -1036,7 +1036,7 @@ if __name__ == "__main__":
 
     # write statistical analysis report
     for i in range(part):
-       # write in the appropriate CSV
+        # write in the appropriate CSV
         with open(csv_folder_path + body_25_body_parts_dict.get(i) + ".csv", 'a') as fp:
             print >> fp , "elem,t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,nobs,min,max,mean,variance,skewness,kurtosis,std_dev"
             for j in range(elem):
@@ -1058,3 +1058,6 @@ if __name__ == "__main__":
                 print >> fp , body_25_body_parts_dict.get(i) + ":" + element_dict.get(j) + "," + str(z_table[i][j])
 
             print >> fp , "\n"
+
+
+    print "SUCCESS!"
