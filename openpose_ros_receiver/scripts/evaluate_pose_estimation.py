@@ -167,17 +167,17 @@ if __name__ == "__main__":
                         ])
     complementary_scenarios_c_o_pairs = [ ["A-FV-ST-H-C", "A-FV-ST-H-O"], ["B-FV-ST-H-C", "B-FV-ST-H-O"], ["E-FV-ST-H-C", "E-FV-ST-H-O"] ]
     cube_dimensions_dict = dict([ ("l", 0.093), ("w", 0.093), ("h", 0.07) ])
-    ground_truth_dict = dict([ ("A", [-0.35, -0.35, 0.09]), ("A-right", [-0.257, -0.35, 0.09]), ("A-up", [-0.35, -0.35, 0.18]), ("A-front", [-0.35, -0.275, 0.09]),
+    ground_truth_dict = dict([ ("A", [-0.35, -0.35, 0.09]), ("A-right", [-0.257, -0.35, 0.09]), ("A-up", [-0.35, -0.35, 0.16]), ("A-front", [-0.35, -0.275, 0.09]),
                                ("B", [-0.15, -0.185, 0.09]),
-                               ("C", [0.35, -0.35, 0.09]), ("C-right", [0.443, -0.35, 0.09]), ("C-up", [0.35, -0.35, 0.18]), ("C-front", [0.35, -0.257, 0.09]),
-                               ("E", [0.417, -0.035, 0.09]), ("E-left", [0.324, -0.035, 0.09]), ("E-up", [0.417, -0.035, 0.18]), ("E-front", [0.417, 0.058, 0.09])
+                               ("C", [0.35, -0.35, 0.09]), ("C-right", [0.443, -0.35, 0.09]), ("C-up", [0.35, -0.35, 0.16]), ("C-front", [0.35, -0.257, 0.09]),
+                               ("E", [0.417, -0.035, 0.09]), ("E-left", [0.324, -0.035, 0.09]), ("E-up", [0.417, -0.035, 0.16]), ("E-front", [0.417, 0.058, 0.09])
                         ])
-    right_wrist_ground_truth_dict = dict([ (0, [-0.35, -0.35, 0.09]), (1, [-0.257, -0.35, 0.09]), (2, [-0.35, -0.35, 0.18]), (3, [-0.35, -0.275, 0.09]), (4, [-0.35, -0.35, 0.09]),
-                                           (5, [-0.35, -0.35, 0.09]), (6, [-0.35, -0.35, 0.09]), (7, [-0.35, -0.35, 0.09]), (8, [-0.35, -0.35, 0.18]), (9, [-0.35, -0.35, 0.09]),
-                                           (10, [0.35, -0.35, 0.09]), (11, [0.443, -0.35, 0.09]), (12, [0.35, -0.35, 0.18]), (13, [0.35, -0.257, 0.09]), (14, [-0.15, -0.185, 0.09]),
+    right_wrist_ground_truth_dict = dict([ (0, [-0.35, -0.35, 0.09]), (1, [-0.257, -0.35, 0.09]), (2, [-0.35, -0.35, 0.16]), (3, [-0.35, -0.275, 0.09]), (4, [-0.35, -0.35, 0.09]),
+                                           (5, [-0.35, -0.35, 0.09]), (6, [-0.35, -0.35, 0.09]), (7, [-0.35, -0.35, 0.09]), (8, [-0.35, -0.35, 0.16]), (9, [-0.35, -0.35, 0.09]),
+                                           (10, [0.35, -0.35, 0.09]), (11, [0.443, -0.35, 0.09]), (12, [0.35, -0.35, 0.16]), (13, [0.35, -0.257, 0.09]), (14, [-0.15, -0.185, 0.09]),
                                            (15, [-0.15, -0.185, 0.09]), (16, [-0.15, -0.185, 0.09]), (17, [-0.15, -0.185, 0.09]), (18, [-0.15, -0.185, 0.09]), (19, [-0.15, -0.185, 0.09]),
                                            (20, [0.417, -0.035, 0.09]), (21, [0.417, -0.035, 0.09]), (22, [0.417, -0.035, 0.09]), (23, [0.417, -0.035, 0.09]), (24, [0.324, -0.035, 0.09]),
-                                           (25, [0.417, -0.035, 0.18]), (26, [0.417, 0.058, 0.09])
+                                           (25, [0.417, -0.035, 0.16]), (26, [0.417, 0.058, 0.09])
                                     ])
 
     # File I/O specific variables
@@ -243,10 +243,11 @@ if __name__ == "__main__":
                                 for cnt, line in enumerate(fp):
                                     if "Body" not in line and line.strip():     # ignore header lines and empty lines
                                         body_part = re.search('kp (.*):', line).group(1)
-                                        coords_and_prob = re.findall(r'\d+\.\d+', line)
+                                        # source: https://stackoverflow.com/questions/678236/how-to-get-the-filename-without-the-extension-from-a-path-in-python
+                                        coords_and_prob = re.findall(r'[-+]?\d+\.\d+', line)
 
                                         # write in the appropriate CSV
-                                        with open(csvs_folder_path + scenarios_dict.get(scenario) + "/" + body_part + "CoordsAndProb" + ".csv", 'a') as fp:
+                                        with open(csvs_folder_path + os.path.splitext(os.path.basename(scenarios_logs_subfolder_path))[0] + "/" + body_part + "CoordsAndProb" + ".csv", 'a') as fp:
                                             string = ""
                                             coord_or_prob_idx = 0
                                             for i in coords_and_prob:
@@ -255,7 +256,7 @@ if __name__ == "__main__":
                                                 string = string + str(i)
 
                                                 # fill report matrix
-                                                report_matrix[scenario][ getKeysByValue(body_25_body_parts_dict, body_part)[0] ][coord_or_prob_idx][file_counter] = float(i)
+                                                report_matrix[ getKeysByValue(scenarios_dict, os.path.splitext(os.path.basename(scenarios_logs_subfolder_path))[0])[0] ][ getKeysByValue(body_25_body_parts_dict, body_part)[0] ][coord_or_prob_idx][file_counter] = float(i)
 
                                                 coord_or_prob_idx = coord_or_prob_idx + 1
 
@@ -374,22 +375,35 @@ if __name__ == "__main__":
 
         # Simulate a boxplot for each element to find mins and maxes of caps
         mins, maxes = [], []
-        new_y_axis_min, new_y_axis_max = simboxplot(data=x1)
+        new_y_axis_min, new_y_axis_max = 0, 0
+        ret = simboxplot(data=x1)
+        if ret:
+            new_y_axis_min, new_y_axis_max = ret
         mins.append(new_y_axis_min)
         maxes.append(new_y_axis_max)
-        new_y_axis_min, new_y_axis_max = simboxplot(data=x2)
+        ret = simboxplot(data=x2)
+        if ret:
+            new_y_axis_min, new_y_axis_max = ret
         mins.append(new_y_axis_min)
         maxes.append(new_y_axis_max)
-        new_y_axis_min, new_y_axis_max = simboxplot(data=y1)
+        ret = simboxplot(data=y1)
+        if ret:
+            new_y_axis_min, new_y_axis_max = ret
         mins.append(new_y_axis_min)
         maxes.append(new_y_axis_max)
-        new_y_axis_min, new_y_axis_max = simboxplot(data=y2)
+        ret = simboxplot(data=y2)
+        if ret:
+            new_y_axis_min, new_y_axis_max = ret
         mins.append(new_y_axis_min)
         maxes.append(new_y_axis_max)
-        new_y_axis_min, new_y_axis_max = simboxplot(data=z1)
+        ret = simboxplot(data=z1)
+        if ret:
+            new_y_axis_min, new_y_axis_max = ret
         mins.append(new_y_axis_min)
         maxes.append(new_y_axis_max)
-        new_y_axis_min, new_y_axis_max = simboxplot(data=z2)
+        ret = simboxplot(data=z2)
+        if ret:
+            new_y_axis_min, new_y_axis_max = ret
         mins.append(new_y_axis_min)
         maxes.append(new_y_axis_max)
         # find y axis min and max
@@ -426,22 +440,34 @@ if __name__ == "__main__":
 
         # Simulate a boxplot for each element to find mins and maxes of caps
         mins, maxes = [], []
-        new_y_axis_min, new_y_axis_max = simboxplot(data=x1)
+        ret = simboxplot(data=x1)
+        if ret:
+            new_y_axis_min, new_y_axis_max = ret
         mins.append(new_y_axis_min)
         maxes.append(new_y_axis_max)
-        new_y_axis_min, new_y_axis_max = simboxplot(data=x2)
+        ret = simboxplot(data=x2)
+        if ret:
+            new_y_axis_min, new_y_axis_max = ret
         mins.append(new_y_axis_min)
         maxes.append(new_y_axis_max)
-        new_y_axis_min, new_y_axis_max = simboxplot(data=y1)
+        ret = simboxplot(data=y1)
+        if ret:
+            new_y_axis_min, new_y_axis_max = ret
         mins.append(new_y_axis_min)
         maxes.append(new_y_axis_max)
-        new_y_axis_min, new_y_axis_max = simboxplot(data=y2)
+        ret = simboxplot(data=y2)
+        if ret:
+            new_y_axis_min, new_y_axis_max = ret
         mins.append(new_y_axis_min)
         maxes.append(new_y_axis_max)
-        new_y_axis_min, new_y_axis_max = simboxplot(data=z1)
+        ret = simboxplot(data=z1)
+        if ret:
+            new_y_axis_min, new_y_axis_max = ret
         mins.append(new_y_axis_min)
         maxes.append(new_y_axis_max)
-        new_y_axis_min, new_y_axis_max = simboxplot(data=z2)
+        ret = simboxplot(data=z2)
+        if ret:
+            new_y_axis_min, new_y_axis_max = ret
         mins.append(new_y_axis_min)
         maxes.append(new_y_axis_max)
         # find y axis min and max
@@ -478,22 +504,34 @@ if __name__ == "__main__":
 
         # Simulate a boxplot for each element to find mins and maxes of caps
         mins, maxes = [], []
-        new_y_axis_min, new_y_axis_max = simboxplot(data=x1)
+        ret = simboxplot(data=x1)
+        if ret:
+            new_y_axis_min, new_y_axis_max = ret
         mins.append(new_y_axis_min)
         maxes.append(new_y_axis_max)
-        new_y_axis_min, new_y_axis_max = simboxplot(data=x2)
+        ret = simboxplot(data=x2)
+        if ret:
+            new_y_axis_min, new_y_axis_max = ret
         mins.append(new_y_axis_min)
         maxes.append(new_y_axis_max)
-        new_y_axis_min, new_y_axis_max = simboxplot(data=y1)
+        ret = simboxplot(data=y1)
+        if ret:
+            new_y_axis_min, new_y_axis_max = ret
         mins.append(new_y_axis_min)
         maxes.append(new_y_axis_max)
-        new_y_axis_min, new_y_axis_max = simboxplot(data=y2)
+        ret = simboxplot(data=y2)
+        if ret:
+            new_y_axis_min, new_y_axis_max = ret
         mins.append(new_y_axis_min)
         maxes.append(new_y_axis_max)
-        new_y_axis_min, new_y_axis_max = simboxplot(data=z1)
+        ret = simboxplot(data=z1)
+        if ret:
+            new_y_axis_min, new_y_axis_max = ret
         mins.append(new_y_axis_min)
         maxes.append(new_y_axis_max)
-        new_y_axis_min, new_y_axis_max = simboxplot(data=z2)
+        ret = simboxplot(data=z2)
+        if ret:
+            new_y_axis_min, new_y_axis_max = ret
         mins.append(new_y_axis_min)
         maxes.append(new_y_axis_max)
         # find y axis min and max
@@ -533,5 +571,6 @@ if __name__ == "__main__":
         print >> fp, "Scenario,x_gt,y_gt,z_gt,x_mean,y_mean,z_mean,x_std_dev,y_std_dev,z_std_dev"
         for i in range(scenarios):
             print >> fp , scenarios_dict.get(i) + "," + (",".join( str(e) for e in right_wrist_stats[i] ))
+
 
     print "SUCCESS!"

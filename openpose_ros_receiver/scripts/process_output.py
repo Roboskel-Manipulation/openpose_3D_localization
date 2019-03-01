@@ -553,7 +553,8 @@ if __name__ == "__main__":
                     for cnt, line in enumerate(fp):
                         if "Body" not in line and line.strip():     # ignore header lines and empty lines
                             body_part = re.search('kp (.*):', line).group(1)
-                            coords_and_prob = re.findall(r'\d+\.\d+', line)
+                            # source: https://stackoverflow.com/questions/678236/how-to-get-the-filename-without-the-extension-from-a-path-in-python
+                            coords_and_prob = re.findall(r'[-+]?\d+\.\d+', line)
 
                             # write in the appropriate CSV
                             with open(csv_folder_path + body_part + "CoordsAndProb" + ".csv", 'a') as fp:
