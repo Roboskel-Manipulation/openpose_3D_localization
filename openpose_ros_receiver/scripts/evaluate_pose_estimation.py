@@ -48,7 +48,7 @@ def multiscatterplot3D(data, directory, names=None, x_label=None, y_label=None, 
             b = 0
             for d in data:
                 x, y, z = d
-                if b <= border_idx:
+                if b <= border_1_idx:
                     ax.scatter(x, y, z, marker='*', c='blue')
                 elif b < border_2_idx:
                     ax.scatter(x, y, z, marker="^", c='green')
@@ -354,7 +354,8 @@ if __name__ == "__main__":
         right_wrist_stats.append([
             right_wrist_ground_truth_dict.get(i)[0], right_wrist_ground_truth_dict.get(i)[1], right_wrist_ground_truth_dict.get(i)[2],
             report_matrix[i][right_wrist_idx][ getKeysByValue(element_dict, "x")[0] ][mean_idx], report_matrix[i][right_wrist_idx][ getKeysByValue(element_dict, "y")[0] ][mean_idx], report_matrix[i][right_wrist_idx][ getKeysByValue(element_dict, "z")[0] ][mean_idx],
-            report_matrix[i][right_wrist_idx][ getKeysByValue(element_dict, "x")[0] ][std_dev_idx], report_matrix[i][right_wrist_idx][ getKeysByValue(element_dict, "y")[0] ][std_dev_idx], report_matrix[i][right_wrist_idx][ getKeysByValue(element_dict, "z")[0] ][std_dev_idx] 
+            report_matrix[i][right_wrist_idx][ getKeysByValue(element_dict, "x")[0] ][std_dev_idx], report_matrix[i][right_wrist_idx][ getKeysByValue(element_dict, "y")[0] ][std_dev_idx], report_matrix[i][right_wrist_idx][ getKeysByValue(element_dict, "z")[0] ][std_dev_idx],
+            (right_wrist_ground_truth_dict.get(i)[0] - report_matrix[i][right_wrist_idx][ getKeysByValue(element_dict, "x")[0] ][mean_idx]), (right_wrist_ground_truth_dict.get(i)[1] - report_matrix[i][right_wrist_idx][ getKeysByValue(element_dict, "y")[0] ][mean_idx]), (right_wrist_ground_truth_dict.get(i)[2] - report_matrix[i][right_wrist_idx][ getKeysByValue(element_dict, "z")[0] ][mean_idx])
         ])
     
 
@@ -568,7 +569,7 @@ if __name__ == "__main__":
 
     # report right wrist statistics accross frames
     with open(statistics_folder_path + "right_wrist_statistics.csv", 'w') as fp:
-        print >> fp, "Scenario,x_gt,y_gt,z_gt,x_mean,y_mean,z_mean,x_std_dev,y_std_dev,z_std_dev"
+        print >> fp, "Scenario,x_gt,y_gt,z_gt,x_mean,y_mean,z_mean,x_std_dev,y_std_dev,z_std_dev,x_gt_dev,y_gt_dev,z_gt_dev"
         for i in range(scenarios):
             print >> fp , scenarios_dict.get(i) + "," + (",".join( str(e) for e in right_wrist_stats[i] ))
 
