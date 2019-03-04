@@ -12,12 +12,13 @@ find_package(catkin REQUIRED COMPONENTS
   message_filters
   openpose_ros_msgs
   tf
+  openpose_ros_receiver_msgs
 )
 find_package(/usr/local/lib/OpenPose/OpenPose REQUIRED)
 
 catkin_package(
    INCLUDE_DIRS include
-   CATKIN_DEPENDS roscpp sensor_msgs std_msgs pcl_ros message_filters openpose_ros_msgs
+   CATKIN_DEPENDS roscpp sensor_msgs std_msgs pcl_ros message_filters openpose_ros_msgs openpose_ros_receiver_msgs
 )
 
 include_directories( 

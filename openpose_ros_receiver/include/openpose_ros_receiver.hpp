@@ -6,6 +6,8 @@
 #include <openpose_ros_msgs/OpenPoseHuman.h>
 #include <openpose_ros_msgs/OpenPoseHumanList.h>
 #include <openpose_ros_msgs/PointWithProb.h>
+#include <openpose_ros_receiver_msgs/OpenPoseReceiverHuman.h>
+#include <openpose_ros_receiver_msgs/OpenPoseReceiverKeypoint.h>
 
 /* ROS headers */
 #include <ros/ros.h>
@@ -49,7 +51,7 @@
 extern bool tfSubtree, logging;
 // extern int totalNans, callbackVisits;
 extern bool pclMsg, humanListMsg;
-extern ros::Publisher robotFrameCoordsPub;
+extern ros::Publisher robotFrameCoordsPub, humanReceiverPub;
 extern pcl::PointCloud<pcl::PointXYZ>::Ptr pPCL;
 
 /* OpenPose BODY_25 Body Parts Mapping */
@@ -83,12 +85,11 @@ const std::map<unsigned int, std::string> POSE_BODY_25_BODY_PARTS
     {25, "Background"}
 };
 
-/* Broadcaster's and Receiver's functions */
+/* Broadcaster's and Receiver's Node functions */
 
 /* Callback functions */
 void pointCloudTopicCallback(const pcl::PointCloud<pcl::PointXYZ>::Ptr& pPCL);
 void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& list_msg);
-// void humanListPointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& pPCL, const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& list_msg, const ros::Publisher& robotFrameCoordsPub);
 
 /* Various functions */
 void listenForSkeleton(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg);
