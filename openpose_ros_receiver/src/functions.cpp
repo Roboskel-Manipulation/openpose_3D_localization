@@ -2,7 +2,6 @@
 
 /* Global Variables */
 bool tfSubtree, logging;
-// int totalNans, callbackVisits;
 bool pclMsg, humanListMsg;
 ros::Publisher robotFrameCoordsPub, humanReceiverPub;
 pcl::PointCloud<pcl::PointXYZ>::Ptr pPCL;
@@ -33,8 +32,6 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
         std::stringstream strstream;
 
         openpose_ros_receiver_msgs::OpenPoseReceiverHuman humanMsg;
-        // humanMsg.header.stamp = ros::Time::now();
-        // humanMsg.image_header = list_msg->image_header;
         if (list_msg->num_humans)
             humanMsg.num_body_key_points_with_non_zero_prob = list_msg->human_list[0].num_body_key_points_with_non_zero_prob;
         
@@ -81,10 +78,11 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                     /* broadcast transform locally */
                     static tf::Transform localTransform;
-                    double x = 0.0, y = 0.0, z = 0.0, prob = 0.0, x_pix = 0.0, y_pix = 0.0, z0 = 0.0;
 
                     for (uint32_t j = 0; j < 25; j++)
                     {
+                        double x = 0.0, y = 0.0, z = 0.0, prob = 0.0, x_pix = 0.0, y_pix = 0.0, z_pix = 0.0, z0 = 0.0;
+                        
                         x_pix = list_msg->human_list[i].body_key_points_with_prob[j].x; y_pix = list_msg->human_list[i].body_key_points_with_prob[j].y;
 
                         if (!std::isnan(x_pix) && !std::isnan(y_pix))
@@ -96,17 +94,21 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                             /* our point */
                             p = pPCL->at(x_pix, y_pix);
-                            x = p.x; y = p.y; z = p.z;
-                            z0 = z;
-                            divisors++;
+                            if (!std::isnan(p.x) && !std::isnan(p.y))
+                            {
+                                x = p.x; y = p.y; z = p.z;
+                                z0 = z;
+                                divisors++;
+                            }
+                            else
+                                continue;
                             /* P: our point, *: one of our point's neighbors
                                 * * *
-                                    ***
+                                 ***
                                 **P**
-                                    ***
+                                 ***
                                 * * *
                             */
-                            // int localNans = 0;
                             /* our point's 1st class neighbors */
                             if ((x_pix-1 >= 0 && x_pix-1 < IMG_PIXEL_WIDTH) && (y_pix >= 0 && y_pix < IMG_PIXEL_HEIGHT))    
                             {    
@@ -116,14 +118,6 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                     z += p.z;
                                     divisors++;
                                 }
-                                // else
-                                // {
-                                //     ROS_WARN("***");
-                                //     if (std::isnan(p.x)) ROS_WARN("%s: at(x_pix-1, y_pix) x is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.y)) ROS_WARN("%s: at(x_pix-1, y_pix) y is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.z)) ROS_WARN("%s: at(x_pix-1, y_pix) z is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     localNans++; totalNans++;
-                                // }
                             }
                             if ((x_pix >= 0 && x_pix < IMG_PIXEL_WIDTH) && (y_pix-1 >= 0 && y_pix-1 < IMG_PIXEL_HEIGHT))    
                             {    
@@ -133,14 +127,6 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                     z += p.z;
                                     divisors++;
                                 }
-                                // else
-                                // {
-                                //     ROS_WARN("***");
-                                //     if (std::isnan(p.x)) ROS_WARN("%s: at(x_pix, y_pix-1) x is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.y)) ROS_WARN("%s: at(x_pix, y_pix-1) y is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.z)) ROS_WARN("%s: at(x_pix, y_pix-1) z is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     localNans++; totalNans++;
-                                // }
                             }
                             if ((x_pix-1 >= 0 && x_pix-1 < IMG_PIXEL_WIDTH) && (y_pix-1 >= 0 && y_pix-1 < IMG_PIXEL_HEIGHT))    
                             {    
@@ -150,14 +136,6 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                     z += p.z;
                                     divisors++;
                                 }
-                                // else
-                                // {
-                                //     ROS_WARN("***");
-                                //     if (std::isnan(p.x)) ROS_WARN("%s: at(x_pix-1, y_pix-1) x is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.y)) ROS_WARN("%s: at(x_pix-1, y_pix-1) y is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.z)) ROS_WARN("%s: at(x_pix-1, y_pix-1) z is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     localNans++; totalNans++;
-                                // }
                             }
                             if ((x_pix+1 >= 0 && x_pix+1 < IMG_PIXEL_WIDTH) && (y_pix >= 0 && y_pix < IMG_PIXEL_HEIGHT))    
                             {    
@@ -167,14 +145,6 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                     z += p.z;
                                     divisors++;
                                 }
-                                // else
-                                // {
-                                //     ROS_WARN("***");
-                                //     if (std::isnan(p.x)) ROS_WARN("%s: at(x_pix+1, y_pix) x is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.y)) ROS_WARN("%s: at(x_pix+1, y_pix) y is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.z)) ROS_WARN("%s: at(x_pix+1, y_pix) z is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     localNans++; totalNans++;
-                                // }
                             }
                             if ((x_pix >= 0 && x_pix < IMG_PIXEL_WIDTH) && (y_pix+1 >= 0 && y_pix+1 < IMG_PIXEL_HEIGHT))    
                             {    
@@ -184,14 +154,6 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                     z += p.z;
                                     divisors++;
                                 }
-                                // else
-                                // {
-                                //     ROS_WARN("***");
-                                //     if (std::isnan(p.x)) ROS_WARN("%s: at(x_pix, y_pix+1) x is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.y)) ROS_WARN("%s: at(x_pix, y_pix+1) y is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.z)) ROS_WARN("%s: at(x_pix, y_pix+1) z is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     localNans++; totalNans++;
-                                // }
                             }
                             if ((x_pix+1 >= 0 && x_pix+1 < IMG_PIXEL_WIDTH) && (y_pix+1 >= 0 && y_pix+1 < IMG_PIXEL_HEIGHT))    
                             {    
@@ -201,14 +163,6 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                     z += p.z;
                                     divisors++;
                                 }
-                                // else
-                                // {
-                                //     ROS_WARN("***");
-                                //     if (std::isnan(p.x)) ROS_WARN("%s: at(x_pix+1, y_pix+1) x is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.y)) ROS_WARN("%s: at(x_pix+1, y_pix+1) y is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.z)) ROS_WARN("%s: at(x_pix+1, y_pix+1) z is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     localNans++; totalNans++;
-                                // }
                             }
                             if ((x_pix-1 >= 0 && x_pix-1 < IMG_PIXEL_WIDTH) && (y_pix+1 >= 0 && y_pix+1 < IMG_PIXEL_HEIGHT))    
                             {    
@@ -218,14 +172,6 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                     z += p.z;
                                     divisors++;
                                 }
-                                // else
-                                // {
-                                //     ROS_WARN("***");
-                                //     if (std::isnan(p.x)) ROS_WARN("%s: at(x_pix-1, y_pix+1) x is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.y)) ROS_WARN("%s: at(x_pix-1, y_pix+1) y is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.z)) ROS_WARN("%s: at(x_pix-1, y_pix+1) z is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     localNans++; totalNans++;
-                                // }
                             }
                             if ((x_pix+1 >= 0 && x_pix+1 < IMG_PIXEL_WIDTH) && (y_pix-1 >= 0 && y_pix-1 < IMG_PIXEL_HEIGHT))    
                             {    
@@ -235,14 +181,6 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                     z += p.z;
                                     divisors++;
                                 }
-                                // else
-                                // {
-                                //     ROS_WARN("***");
-                                //     if (std::isnan(p.x)) ROS_WARN("%s: at(x_pix+1, y_pix-1) x is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.y)) ROS_WARN("%s: at(x_pix+1, y_pix-1) y is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.z)) ROS_WARN("%s: at(x_pix+1, y_pix-1) z is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     localNans++; totalNans++;
-                                // }
                             }
                             /* some of our point's 2nd class neighbors */
                             if ((x_pix-2 >= 0 && x_pix-2 < IMG_PIXEL_WIDTH) && (y_pix >= 0 && y_pix < IMG_PIXEL_HEIGHT))    
@@ -253,14 +191,6 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                     z += p.z;
                                     divisors++;
                                 }
-                                // else
-                                // {
-                                //     ROS_WARN("***");
-                                //     if (std::isnan(p.x)) ROS_WARN("%s: at(x_pix-2, y_pix) x is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.y)) ROS_WARN("%s: at(x_pix-2, y_pix) y is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.z)) ROS_WARN("%s: at(x_pix-2, y_pix) z is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     localNans++; totalNans++;
-                                // }
                             }
                             if ((x_pix >= 0 && x_pix < IMG_PIXEL_WIDTH) && (y_pix-2 >= 0 && y_pix-2 < IMG_PIXEL_HEIGHT))    
                             {    
@@ -270,14 +200,6 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                     z += p.z;
                                     divisors++;
                                 }
-                                // else
-                                // {
-                                //     ROS_WARN("***");
-                                //     if (std::isnan(p.x)) ROS_WARN("%s: at(x_pix, y_pix-2) x is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.y)) ROS_WARN("%s: at(x_pix, y_pix-2) y is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.z)) ROS_WARN("%s: at(x_pix, y_pix-2) z is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     localNans++; totalNans++;
-                                // }
                             }
                             if ((x_pix-2 >= 0 && x_pix-2 < IMG_PIXEL_WIDTH) && (y_pix-2 >= 0 && y_pix-2 < IMG_PIXEL_HEIGHT))    
                             {    
@@ -287,14 +209,6 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                     z += p.z;
                                     divisors++;
                                 }
-                                // else
-                                // {
-                                //     ROS_WARN("***");
-                                //     if (std::isnan(p.x)) ROS_WARN("%s: at(x_pix-2, y_pix-2) x is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.y)) ROS_WARN("%s: at(x_pix-2, y_pix-2) y is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.z)) ROS_WARN("%s: at(x_pix-2, y_pix-2) z is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     localNans++; totalNans++;
-                                // }
                             }
                             if ((x_pix+2 >= 0 && x_pix+2 < IMG_PIXEL_WIDTH) && (y_pix >= 0 && y_pix < IMG_PIXEL_HEIGHT))    
                             {    
@@ -304,14 +218,6 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                     z += p.z;
                                     divisors++;
                                 }
-                                // else
-                                // {
-                                //     ROS_WARN("***");
-                                //     if (std::isnan(p.x)) ROS_WARN("%s: at(x_pix+2, y_pix) x is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.y)) ROS_WARN("%s: at(x_pix+2, y_pix) y is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.z)) ROS_WARN("%s: at(x_pix+2, y_pix) z is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     localNans++; totalNans++;
-                                // }
                             }
                             if ((x_pix >= 0 && x_pix < IMG_PIXEL_WIDTH) && (y_pix+2 >= 0 && y_pix+2 < IMG_PIXEL_HEIGHT))    
                             {    
@@ -321,14 +227,6 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                     z += p.z;
                                     divisors++;
                                 }
-                                // else
-                                // {
-                                //     ROS_WARN("***");
-                                //     if (std::isnan(p.x)) ROS_WARN("%s: at(x_pix, y_pix+2) x is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.y)) ROS_WARN("%s: at(x_pix, y_pix+2) y is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.z)) ROS_WARN("%s: at(x_pix, y_pix+2) z is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     localNans++; totalNans++;
-                                // }
                             }
                             if ((x_pix+2 >= 0 && x_pix+2 < IMG_PIXEL_WIDTH) && (y_pix+2 >= 0 && y_pix+2 < IMG_PIXEL_HEIGHT))    
                             {    
@@ -338,14 +236,6 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                     z += p.z;
                                     divisors++;
                                 }
-                                // else
-                                // {
-                                //     ROS_WARN("***");
-                                //     if (std::isnan(p.x)) ROS_WARN("%s: at(x_pix+2, y_pix+2) x is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.y)) ROS_WARN("%s: at(x_pix+2, y_pix+2) y is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.z)) ROS_WARN("%s: at(x_pix+2, y_pix+2) z is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     localNans++; totalNans++;
-                                // }
                             }
                             if ((x_pix-2 >= 0 && x_pix-2 < IMG_PIXEL_WIDTH) && (y_pix+2 >= 0 && y_pix+2 < IMG_PIXEL_HEIGHT))    
                             {    
@@ -355,14 +245,6 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                     z += p.z;
                                     divisors++;
                                 }
-                                // else
-                                // {
-                                //     ROS_WARN("***");
-                                //     if (std::isnan(p.x)) ROS_WARN("%s: at(x_pix-2, y_pix+2) x is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.y)) ROS_WARN("%s: at(x_pix-2, y_pix+2) y is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.z)) ROS_WARN("%s: at(x_pix-2, y_pix+2) z is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     localNans++; totalNans++;
-                                // }
                             }
                             if ((x_pix+2 >= 0 && x_pix+2 < IMG_PIXEL_WIDTH) && (y_pix-2 >= 0 && y_pix-2 < IMG_PIXEL_HEIGHT))    
                             {    
@@ -372,16 +254,7 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                     z += p.z;
                                     divisors++;
                                 }
-                                // else
-                                // {
-                                //     ROS_WARN("***");
-                                //     if (std::isnan(p.x)) ROS_WARN("%s: at(x_pix+2, y_pix-2) x is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.y)) ROS_WARN("%s: at(x_pix+2, y_pix-2) y is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     if (std::isnan(p.z)) ROS_WARN("%s: at(x_pix+2, y_pix-2) z is nan", getPoseBodyPartMappingBody25(j).c_str());
-                                //     localNans++; totalNans++;
-                                // }
                             }
-                            // ROS_INFO("----------------** %d local nan values **----------------", localNans);
 
                             if (divisors)
                             {
@@ -470,11 +343,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                 {
                     /* broadcast transform locally */
                     static tf::Transform localTransform;
-                    double x = 0.0, y = 0.0, z = 0.0, prob = 0.0, x_pix = 0.0, y_pix = 0.0, z0 = 0.0;
 
                     for (uint32_t j = 0; j < 25; j++)
                     {
-                        x_pix = list_msg->human_list[i].body_key_points_with_prob[j].x; y_pix = list_msg->human_list[i].body_key_points_with_prob[j].y;
+                        double x = 0.0, y = 0.0, z = 0.0, prob = 0.0, x_pix = 0.0, y_pix = 0.0, z_pix = 0.0, z0 = 0.0;
+                        
+                        x_pix = list_msg->human_list[i].body_key_points_with_prob[j].x; y_pix = list_msg->human_list[i].body_key_points_with_prob[j].y; z_pix = list_msg->human_list[i].body_key_points_with_prob[j].z;
 
                         if (!std::isnan(x_pix) && !std::isnan(y_pix))
                         {
@@ -485,14 +359,19 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                             /* our point */
                             p = pPCL->at(x_pix, y_pix);
-                            x = p.x; y = p.y; z = p.z;
-                            z0 = z;
-                            divisors++;
+                            if (!std::isnan(p.x) && !std::isnan(p.y))
+                            {
+                                x = p.x; y = p.y; z = p.z;
+                                z0 = z;
+                                divisors++;
+                            }
+                            else
+                                continue;
                             /* P: our point, *: one of our point's neighbors
                                 * * *
-                                    ***
+                                 ***
                                 **P**
-                                    ***
+                                 ***
                                 * * *
                             */
                             /* our point's 1st class neighbors */

@@ -49,7 +49,6 @@
 
 /* Global Variables */
 extern bool tfSubtree, logging;
-// extern int totalNans, callbackVisits;
 extern bool pclMsg, humanListMsg;
 extern ros::Publisher robotFrameCoordsPub, humanReceiverPub;
 extern pcl::PointCloud<pcl::PointXYZ>::Ptr pPCL;

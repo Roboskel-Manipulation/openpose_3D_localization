@@ -22,6 +22,17 @@ def getKeysByValue(dictOfElements, valueToFind):
     return listOfKeys
 
 
+# Re-order a list's element under a specific rule
+def reorderList(lst, rule, values=None):
+    new_list, new_values = [], []
+    for r in rule:
+        if r in lst:
+            idx = lst.index(r)
+            new_list.append(lst[idx])
+            new_values.append(values[idx])
+    return new_list, new_values
+
+
 # Define a function for a 3D multi-scatterplot
 def multiscatterplot3D(data, directory, names=None, x_label=None, y_label=None, z_label=None, title=None, x_lim_min=None, x_lim_max=None, y_lim_min=None, y_lim_max=None, z_lim_min=None, z_lim_max=None, borders=False, border_1_idx=None, border_2_idx=None):
     # print border_1_idx, border_2_idx
@@ -153,6 +164,8 @@ if __name__ == "__main__":
                             ]
     body_25_body_parts_LR_order_of_appearance = [ '4', '23', '3', '22', '11', '2', '10', '9', '24', '17', '15', '8', '1', '0', '16', '18', '21', '12', '13', '14', '19', '5', '6', '20', '7' ]
     body_25_upper_body_parts_LR_order_of_appearance = [ '4', '3', '2', '09', '17', '15', '8', '1', '0', '16', '18', '12', '5', '6', '7' ]
+    body_25_body_parts_UL_order_of_appearance = [ '15', '16', '17', '18', '0', '2', '5', '1', '3', '6', '4', '7', '9', '12', '8', '10', '13', '11', '14', '24', '21', '23', '20', '22', '19' ]
+    body_25_upper_body_parts_UL_order_of_appearance = [ '15', '16', '17', '18', '0', '2', '5', '1', '3', '6', '4', '7', '9', '12', '8' ]
 
     # OpenPose specific variables
     element_dict = dict([ (0, "x"), (1, "y"), (2, "z")])
@@ -565,7 +578,8 @@ if __name__ == "__main__":
         print >> fp , "Occurences accross " + str(max_logs) + " log frames"
         print >> fp, "Keypoint" + "," + (",".join( str(e) for e in scenarios_dict.values() ))
         for i in range(part):
-            print >> fp , body_25_body_parts_dict.get(i) + "," + (",".join( str(e) for e in occurences_accross_frames_accross_scenarios[i] ))
+            # write in order of appearance Upper to Lower
+            print >> fp , body_25_body_parts_dict.get( int(body_25_body_parts_UL_order_of_appearance[i]) ) + "," + (",".join( str(e) for e in occurences_accross_frames_accross_scenarios[ int(body_25_body_parts_UL_order_of_appearance[i]) ] ))
 
     # report right wrist statistics accross frames
     with open(statistics_folder_path + "right_wrist_statistics.csv", 'w') as fp:
