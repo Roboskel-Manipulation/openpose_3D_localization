@@ -579,13 +579,15 @@ if __name__ == "__main__":
         print >> fp, "Keypoint" + "," + (",".join( str(e) for e in scenarios_dict.values() ))
         for i in range(part):
             # write in order of appearance Upper to Lower
-            print >> fp , body_25_body_parts_dict.get( int(body_25_body_parts_UL_order_of_appearance[i]) ) + "," + (",".join( str(e) for e in occurences_accross_frames_accross_scenarios[ int(body_25_body_parts_UL_order_of_appearance[i]) ] ))
+            # print >> fp , body_25_body_parts_dict.get( int(body_25_body_parts_UL_order_of_appearance[i]) ) + "," + (",".join( str(e) for e in occurences_accross_frames_accross_scenarios[ int(body_25_body_parts_UL_order_of_appearance[i]) ] ))
+            print >> fp , body_25_body_parts_dict.get(i) + "," + (",".join( str(e) for e in occurences_accross_frames_accross_scenarios[i] ))
 
     # report right wrist statistics accross frames
     with open(statistics_folder_path + "right_wrist_statistics.csv", 'w') as fp:
         print >> fp, "Scenario,x_gt,y_gt,z_gt,x_mean,y_mean,z_mean,x_std_dev,y_std_dev,z_std_dev,x_gt_dev,y_gt_dev,z_gt_dev"
         for i in range(scenarios):
-            print >> fp , scenarios_dict.get(i) + "," + (",".join( str(e) for e in right_wrist_stats[i] ))
+            if np.nan not in right_wrist_stats[i]:
+                print >> fp , scenarios_dict.get(i) + "," + (",".join( str(e) for e in right_wrist_stats[i] ))
 
 
     print "SUCCESS!"

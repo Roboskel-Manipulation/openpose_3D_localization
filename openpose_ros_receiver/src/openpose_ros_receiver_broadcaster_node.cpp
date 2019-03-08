@@ -18,9 +18,7 @@ int main (int argc, char** argv)
 
     /* Initialize Global Variables */
     tfSubtree = false;
-    // totalNans = 0; callbackVisits = 0;
     pclMsg = false; humanListMsg = true;
-    // pPCL = nullptr;
     /* Advertise robot frame coordinates topic */
     robotFrameCoordsPub = nh.advertise<std_msgs::String>(robot_frame_coords_str_topic, queue_size);
     humanReceiverPub = nh.advertise<openpose_ros_receiver_msgs::OpenPoseReceiverHuman>(robot_frame_coords_msg_topic, queue_size);

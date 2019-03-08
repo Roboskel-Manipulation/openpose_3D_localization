@@ -7,12 +7,14 @@ add_compile_options(-std=c++11)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   openpose_ros_receiver_msgs
+  moveit_ros_planning_interface
+  moveit_msgs
 )
 find_package(/usr/local/lib/OpenPose/OpenPose REQUIRED)
 
 catkin_package(
    INCLUDE_DIRS include
-   CATKIN_DEPENDS roscpp openpose_ros_receiver_msgs
+   CATKIN_DEPENDS roscpp openpose_ros_receiver_msgs moveit_ros_planning_interface moveit_msgs
 )
 
 include_directories( 

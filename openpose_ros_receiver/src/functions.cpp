@@ -82,10 +82,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                     for (uint32_t j = 0; j < 25; j++)
                     {
                         double x = 0.0, y = 0.0, z = 0.0, prob = 0.0, x_pix = 0.0, y_pix = 0.0, z_pix = 0.0, z0 = 0.0;
-                        
+
                         x_pix = list_msg->human_list[i].body_key_points_with_prob[j].x; y_pix = list_msg->human_list[i].body_key_points_with_prob[j].y;
 
-                        if (!std::isnan(x_pix) && !std::isnan(y_pix))
+                        ROS_INFO("j = %d: x_pix = %f, y_pix = %f", j, x_pix, y_pix);
+
+                        if (!std::isnan(x_pix) && !std::isnan(y_pix) && x_pix && y_pix)
                         {
                             /* Get an average of neighboring points coordinates for more precise x, y, z */
                             // x --> width, y --> height
@@ -94,14 +96,17 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                             /* our point */
                             p = pPCL->at(x_pix, y_pix);
+
+                            ROS_INFO("j = %d: p.x = %f, p.y = %f, p.z = %f", j, p.x, p.y, p.z);
+
                             if (!std::isnan(p.x) && !std::isnan(p.y))
                             {
                                 x = p.x; y = p.y; z = p.z;
                                 z0 = z;
                                 divisors++;
                             }
-                            else
-                                continue;
+                            // else
+                            //     continue;
                             /* P: our point, *: one of our point's neighbors
                                 * * *
                                  ***
@@ -264,7 +269,10 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                             }
 
                             if (std::isnan(x) || std::isnan(y) || std::isnan(z))
-                                continue;
+                            {
+                                x = 0.0; y = 0.0; z = 0.0;
+                                // continue;
+                            }
 
                             try
                             {
@@ -347,10 +355,10 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                     for (uint32_t j = 0; j < 25; j++)
                     {
                         double x = 0.0, y = 0.0, z = 0.0, prob = 0.0, x_pix = 0.0, y_pix = 0.0, z_pix = 0.0, z0 = 0.0;
-                        
+
                         x_pix = list_msg->human_list[i].body_key_points_with_prob[j].x; y_pix = list_msg->human_list[i].body_key_points_with_prob[j].y; z_pix = list_msg->human_list[i].body_key_points_with_prob[j].z;
 
-                        if (!std::isnan(x_pix) && !std::isnan(y_pix))
+                        if (!std::isnan(x_pix) && !std::isnan(y_pix) && x_pix && y_pix)
                         {
                             /* Get an average of neighboring points coordinates for more precise x, y, z */
                             // x --> width, y --> height
@@ -365,8 +373,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 z0 = z;
                                 divisors++;
                             }
-                            else
-                                continue;
+                            // else
+                            //     continue;
                             /* P: our point, *: one of our point's neighbors
                                 * * *
                                  ***
@@ -529,7 +537,10 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                             }
 
                             if (std::isnan(x) || std::isnan(y) || std::isnan(z))
-                                continue;
+                            {
+                                x = 0.0; y = 0.0; z = 0.0;
+                                // continue;
+                            }
 
                             try
                             {
