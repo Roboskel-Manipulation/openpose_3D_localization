@@ -103,7 +103,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                 /* debugging pointcloud */
                                 if (j == 4)
-                                    pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                    pPCL->at(x_pix, y_pix).r = 255;
+                                pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                             }
                             /* P: our point, *: one of our point's neighbors
                                 * * *
@@ -123,7 +124,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix >= 0 && x_pix < IMG_PIXEL_WIDTH) && (y_pix-1 >= 0 && y_pix-1 < IMG_PIXEL_HEIGHT))    
@@ -136,7 +138,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix-1 >= 0 && x_pix-1 < IMG_PIXEL_WIDTH) && (y_pix-1 >= 0 && y_pix-1 < IMG_PIXEL_HEIGHT))    
@@ -149,7 +152,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix+1 >= 0 && x_pix+1 < IMG_PIXEL_WIDTH) && (y_pix >= 0 && y_pix < IMG_PIXEL_HEIGHT))    
@@ -162,7 +166,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix >= 0 && x_pix < IMG_PIXEL_WIDTH) && (y_pix+1 >= 0 && y_pix+1 < IMG_PIXEL_HEIGHT))    
@@ -175,7 +180,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix+1 >= 0 && x_pix+1 < IMG_PIXEL_WIDTH) && (y_pix+1 >= 0 && y_pix+1 < IMG_PIXEL_HEIGHT))    
@@ -188,7 +194,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix-1 >= 0 && x_pix-1 < IMG_PIXEL_WIDTH) && (y_pix+1 >= 0 && y_pix+1 < IMG_PIXEL_HEIGHT))    
@@ -201,7 +208,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix+1 >= 0 && x_pix+1 < IMG_PIXEL_WIDTH) && (y_pix-1 >= 0 && y_pix-1 < IMG_PIXEL_HEIGHT))    
@@ -214,7 +222,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             /* some of our point's 2nd class neighbors */
@@ -228,7 +237,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix >= 0 && x_pix < IMG_PIXEL_WIDTH) && (y_pix-2 >= 0 && y_pix-2 < IMG_PIXEL_HEIGHT))    
@@ -241,7 +251,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix-2 >= 0 && x_pix-2 < IMG_PIXEL_WIDTH) && (y_pix-2 >= 0 && y_pix-2 < IMG_PIXEL_HEIGHT))    
@@ -254,7 +265,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix+2 >= 0 && x_pix+2 < IMG_PIXEL_WIDTH) && (y_pix >= 0 && y_pix < IMG_PIXEL_HEIGHT))    
@@ -267,7 +279,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix >= 0 && x_pix < IMG_PIXEL_WIDTH) && (y_pix+2 >= 0 && y_pix+2 < IMG_PIXEL_HEIGHT))    
@@ -280,7 +293,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix+2 >= 0 && x_pix+2 < IMG_PIXEL_WIDTH) && (y_pix+2 >= 0 && y_pix+2 < IMG_PIXEL_HEIGHT))    
@@ -293,7 +307,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix-2 >= 0 && x_pix-2 < IMG_PIXEL_WIDTH) && (y_pix+2 >= 0 && y_pix+2 < IMG_PIXEL_HEIGHT))    
@@ -306,7 +321,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix+2 >= 0 && x_pix+2 < IMG_PIXEL_WIDTH) && (y_pix-2 >= 0 && y_pix-2 < IMG_PIXEL_HEIGHT))    
@@ -319,7 +335,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
 
@@ -439,7 +456,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                 /* debugging pointcloud */
                                 if (j == 4)
-                                    pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                    pPCL->at(x_pix, y_pix).r = 255;
+                                pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                             }
                             /* P: our point, *: one of our point's neighbors
                                 * * *
@@ -459,7 +477,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix >= 0 && x_pix < IMG_PIXEL_WIDTH) && (y_pix-1 >= 0 && y_pix-1 < IMG_PIXEL_HEIGHT))    
@@ -472,7 +491,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix-1 >= 0 && x_pix-1 < IMG_PIXEL_WIDTH) && (y_pix-1 >= 0 && y_pix-1 < IMG_PIXEL_HEIGHT))    
@@ -485,7 +505,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix+1 >= 0 && x_pix+1 < IMG_PIXEL_WIDTH) && (y_pix >= 0 && y_pix < IMG_PIXEL_HEIGHT))    
@@ -498,7 +519,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix >= 0 && x_pix < IMG_PIXEL_WIDTH) && (y_pix+1 >= 0 && y_pix+1 < IMG_PIXEL_HEIGHT))    
@@ -511,7 +533,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix+1 >= 0 && x_pix+1 < IMG_PIXEL_WIDTH) && (y_pix+1 >= 0 && y_pix+1 < IMG_PIXEL_HEIGHT))    
@@ -524,7 +547,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix-1 >= 0 && x_pix-1 < IMG_PIXEL_WIDTH) && (y_pix+1 >= 0 && y_pix+1 < IMG_PIXEL_HEIGHT))    
@@ -537,7 +561,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix+1 >= 0 && x_pix+1 < IMG_PIXEL_WIDTH) && (y_pix-1 >= 0 && y_pix-1 < IMG_PIXEL_HEIGHT))    
@@ -550,7 +575,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             /* some of our point's 2nd class neighbors */
@@ -564,7 +590,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix >= 0 && x_pix < IMG_PIXEL_WIDTH) && (y_pix-2 >= 0 && y_pix-2 < IMG_PIXEL_HEIGHT))    
@@ -577,7 +604,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix-2 >= 0 && x_pix-2 < IMG_PIXEL_WIDTH) && (y_pix-2 >= 0 && y_pix-2 < IMG_PIXEL_HEIGHT))    
@@ -590,7 +618,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix+2 >= 0 && x_pix+2 < IMG_PIXEL_WIDTH) && (y_pix >= 0 && y_pix < IMG_PIXEL_HEIGHT))    
@@ -603,7 +632,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix >= 0 && x_pix < IMG_PIXEL_WIDTH) && (y_pix+2 >= 0 && y_pix+2 < IMG_PIXEL_HEIGHT))    
@@ -616,7 +646,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix+2 >= 0 && x_pix+2 < IMG_PIXEL_WIDTH) && (y_pix+2 >= 0 && y_pix+2 < IMG_PIXEL_HEIGHT))    
@@ -629,7 +660,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix-2 >= 0 && x_pix-2 < IMG_PIXEL_WIDTH) && (y_pix+2 >= 0 && y_pix+2 < IMG_PIXEL_HEIGHT))    
@@ -642,7 +674,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix+2 >= 0 && x_pix+2 < IMG_PIXEL_WIDTH) && (y_pix-2 >= 0 && y_pix-2 < IMG_PIXEL_HEIGHT))    
@@ -655,7 +688,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                                     /* debugging pointcloud */
                                     if (j == 4)
-                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
+                                        pPCL->at(x_pix, y_pix).r = 255;
+                                    pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
 
