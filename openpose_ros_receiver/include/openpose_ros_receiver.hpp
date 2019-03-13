@@ -50,8 +50,8 @@
 /* Global Variables */
 extern bool tfSubtree, logging;
 extern bool pclMsg, humanListMsg;
-extern ros::Publisher robotFrameCoordsPub, humanReceiverPub;
-extern pcl::PointCloud<pcl::PointXYZ>::Ptr pPCL;
+extern ros::Publisher robotFrameCoordsPub, humanReceiverPub, pointcloudDebugPub;
+extern pcl::PointCloud<pcl::PointXYZRGBA>::Ptr pPCL;
 
 /* OpenPose BODY_25 Body Parts Mapping */
 const std::map<unsigned int, std::string> POSE_BODY_25_BODY_PARTS
@@ -87,7 +87,7 @@ const std::map<unsigned int, std::string> POSE_BODY_25_BODY_PARTS
 /* Broadcaster's and Receiver's Node functions */
 
 /* Callback functions */
-void pointCloudTopicCallback(const pcl::PointCloud<pcl::PointXYZ>::Ptr& pPCL);
+void pointCloudTopicCallback(const pcl::PointCloud<pcl::PointXYZRGBA>::Ptr& pPCL);
 void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& list_msg);
 
 /* Various functions */

@@ -3,18 +3,16 @@
 /* Global Variables */
 bool tfSubtree, logging;
 bool pclMsg, humanListMsg;
-ros::Publisher robotFrameCoordsPub, humanReceiverPub;
-pcl::PointCloud<pcl::PointXYZ>::Ptr pPCL;
+ros::Publisher robotFrameCoordsPub, humanReceiverPub, pointcloudDebugPub;
+pcl::PointCloud<pcl::PointXYZRGBA>::Ptr pPCL;
 
-void pointCloudTopicCallback(const pcl::PointCloud<pcl::PointXYZ>::Ptr& pcl_msg)
+void pointCloudTopicCallback(const pcl::PointCloud<pcl::PointXYZRGBA>::Ptr& pcl_msg)
 {
     if (humanListMsg)
     {
-        // ROS_INFO("pointCloudTopicCallback IN");
         pclMsg = true;
         pPCL = pcl_msg;
         humanListMsg = false;
-        // ROS_INFO("pointCloudTopicCallback OUT");
     }
     else
     {
@@ -26,7 +24,6 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 {
     if (pclMsg)
     {
-        // ROS_INFO("humanListCallback IN");
         humanListMsg = true;
 
         std::stringstream strstream;
@@ -81,32 +78,33 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                     for (uint32_t j = 0; j < 25; j++)
                     {
-                        double x = 0.0, y = 0.0, z = 0.0, prob = 0.0, x_pix = 0.0, y_pix = 0.0, z_pix = 0.0, z0 = 0.0;
+                        double x = 0.0, y = 0.0, z = 0.0, prob = 0.0, x_pix = 0.0, y_pix = 0.0, z_pix = 0.0, x0 = 0.0;
 
                         x_pix = list_msg->human_list[i].body_key_points_with_prob[j].x; y_pix = list_msg->human_list[i].body_key_points_with_prob[j].y;
-
-                        ROS_INFO("j = %d: x_pix = %f, y_pix = %f", j, x_pix, y_pix);
 
                         if (!std::isnan(x_pix) && !std::isnan(y_pix) && x_pix && y_pix)
                         {
                             /* Get an average of neighboring points coordinates for more precise x, y, z */
                             // x --> width, y --> height
                             int divisors = 0;
-                            pcl::PointXYZ p;
+                            pcl::PointXYZRGBA p;
 
                             /* our point */
                             p = pPCL->at(x_pix, y_pix);
 
-                            ROS_INFO("j = %d: p.x = %f, p.y = %f, p.z = %f", j, p.x, p.y, p.z);
-
                             if (!std::isnan(p.x) && !std::isnan(p.y))
                             {
                                 x = p.x; y = p.y; z = p.z;
-                                z0 = z;
+                                x0 = x;
                                 divisors++;
+
+                                if (j == 4)
+                                    ROS_INFO("j = %d: p.x = %f, p.y = %f, p.z = %f", j, p.x, p.y, p.z);
+
+                                /* debugging pointcloud */
+                                if (j == 4)
+                                    pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                             }
-                            // else
-                            //     continue;
                             /* P: our point, *: one of our point's neighbors
                                 * * *
                                  ***
@@ -120,8 +118,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix-1, y_pix);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix >= 0 && x_pix < IMG_PIXEL_WIDTH) && (y_pix-1 >= 0 && y_pix-1 < IMG_PIXEL_HEIGHT))    
@@ -129,8 +131,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix, y_pix-1);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix-1 >= 0 && x_pix-1 < IMG_PIXEL_WIDTH) && (y_pix-1 >= 0 && y_pix-1 < IMG_PIXEL_HEIGHT))    
@@ -138,8 +144,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix-1, y_pix-1);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix+1 >= 0 && x_pix+1 < IMG_PIXEL_WIDTH) && (y_pix >= 0 && y_pix < IMG_PIXEL_HEIGHT))    
@@ -147,8 +157,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix+1, y_pix);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix >= 0 && x_pix < IMG_PIXEL_WIDTH) && (y_pix+1 >= 0 && y_pix+1 < IMG_PIXEL_HEIGHT))    
@@ -156,8 +170,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix, y_pix+1);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix+1 >= 0 && x_pix+1 < IMG_PIXEL_WIDTH) && (y_pix+1 >= 0 && y_pix+1 < IMG_PIXEL_HEIGHT))    
@@ -165,8 +183,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix+1, y_pix+1);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix-1 >= 0 && x_pix-1 < IMG_PIXEL_WIDTH) && (y_pix+1 >= 0 && y_pix+1 < IMG_PIXEL_HEIGHT))    
@@ -174,8 +196,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix-1, y_pix+1);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix+1 >= 0 && x_pix+1 < IMG_PIXEL_WIDTH) && (y_pix-1 >= 0 && y_pix-1 < IMG_PIXEL_HEIGHT))    
@@ -183,8 +209,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix+1, y_pix-1);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             /* some of our point's 2nd class neighbors */
@@ -193,8 +223,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix-2, y_pix);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix >= 0 && x_pix < IMG_PIXEL_WIDTH) && (y_pix-2 >= 0 && y_pix-2 < IMG_PIXEL_HEIGHT))    
@@ -202,8 +236,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix, y_pix-2);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix-2 >= 0 && x_pix-2 < IMG_PIXEL_WIDTH) && (y_pix-2 >= 0 && y_pix-2 < IMG_PIXEL_HEIGHT))    
@@ -211,8 +249,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix-2, y_pix-2);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix+2 >= 0 && x_pix+2 < IMG_PIXEL_WIDTH) && (y_pix >= 0 && y_pix < IMG_PIXEL_HEIGHT))    
@@ -220,8 +262,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix+2, y_pix);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix >= 0 && x_pix < IMG_PIXEL_WIDTH) && (y_pix+2 >= 0 && y_pix+2 < IMG_PIXEL_HEIGHT))    
@@ -229,8 +275,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix, y_pix+2);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix+2 >= 0 && x_pix+2 < IMG_PIXEL_WIDTH) && (y_pix+2 >= 0 && y_pix+2 < IMG_PIXEL_HEIGHT))    
@@ -238,8 +288,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix+2, y_pix+2);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix-2 >= 0 && x_pix-2 < IMG_PIXEL_WIDTH) && (y_pix+2 >= 0 && y_pix+2 < IMG_PIXEL_HEIGHT))    
@@ -247,8 +301,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix-2, y_pix+2);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix+2 >= 0 && x_pix+2 < IMG_PIXEL_WIDTH) && (y_pix-2 >= 0 && y_pix-2 < IMG_PIXEL_HEIGHT))    
@@ -256,22 +314,25 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix+2, y_pix-2);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
 
                             if (divisors)
                             {
-                                z /= (double) divisors;
+                                x /= (double) divisors;
                                 /* for edge cases */
-                                if (z > UPPER_VARIATION_THRESH * z0 || z < LOWER_VARIATION_THRESH * z0) z = z0;
+                                if (x > UPPER_VARIATION_THRESH * x0 || x < LOWER_VARIATION_THRESH * x0) x = x0;
                             }
 
                             if (std::isnan(x) || std::isnan(y) || std::isnan(z))
                             {
                                 x = 0.0; y = 0.0; z = 0.0;
-                                // continue;
                             }
 
                             try
@@ -354,7 +415,7 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                     for (uint32_t j = 0; j < 25; j++)
                     {
-                        double x = 0.0, y = 0.0, z = 0.0, prob = 0.0, x_pix = 0.0, y_pix = 0.0, z_pix = 0.0, z0 = 0.0;
+                        double x = 0.0, y = 0.0, z = 0.0, prob = 0.0, x_pix = 0.0, y_pix = 0.0, z_pix = 0.0, x0 = 0.0;
 
                         x_pix = list_msg->human_list[i].body_key_points_with_prob[j].x; y_pix = list_msg->human_list[i].body_key_points_with_prob[j].y; z_pix = list_msg->human_list[i].body_key_points_with_prob[j].z;
 
@@ -363,18 +424,23 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                             /* Get an average of neighboring points coordinates for more precise x, y, z */
                             // x --> width, y --> height
                             int divisors = 0;
-                            pcl::PointXYZ p;
+                            pcl::PointXYZRGBA p;
 
                             /* our point */
                             p = pPCL->at(x_pix, y_pix);
                             if (!std::isnan(p.x) && !std::isnan(p.y))
                             {
                                 x = p.x; y = p.y; z = p.z;
-                                z0 = z;
+                                x0 = x;
                                 divisors++;
+
+                                if (j == 4)
+                                    ROS_INFO("j = %d: p.x = %f, p.y = %f, p.z = %f", j, p.x, p.y, p.z);
+
+                                /* debugging pointcloud */
+                                if (j == 4)
+                                    pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                             }
-                            // else
-                            //     continue;
                             /* P: our point, *: one of our point's neighbors
                                 * * *
                                  ***
@@ -388,8 +454,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix-1, y_pix);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix >= 0 && x_pix < IMG_PIXEL_WIDTH) && (y_pix-1 >= 0 && y_pix-1 < IMG_PIXEL_HEIGHT))    
@@ -397,8 +467,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix, y_pix-1);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix-1 >= 0 && x_pix-1 < IMG_PIXEL_WIDTH) && (y_pix-1 >= 0 && y_pix-1 < IMG_PIXEL_HEIGHT))    
@@ -406,8 +480,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix-1, y_pix-1);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix+1 >= 0 && x_pix+1 < IMG_PIXEL_WIDTH) && (y_pix >= 0 && y_pix < IMG_PIXEL_HEIGHT))    
@@ -415,8 +493,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix+1, y_pix);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix >= 0 && x_pix < IMG_PIXEL_WIDTH) && (y_pix+1 >= 0 && y_pix+1 < IMG_PIXEL_HEIGHT))    
@@ -424,8 +506,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix, y_pix+1);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix+1 >= 0 && x_pix+1 < IMG_PIXEL_WIDTH) && (y_pix+1 >= 0 && y_pix+1 < IMG_PIXEL_HEIGHT))    
@@ -433,8 +519,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix+1, y_pix+1);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix-1 >= 0 && x_pix-1 < IMG_PIXEL_WIDTH) && (y_pix+1 >= 0 && y_pix+1 < IMG_PIXEL_HEIGHT))    
@@ -442,8 +532,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix-1, y_pix+1);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix+1 >= 0 && x_pix+1 < IMG_PIXEL_WIDTH) && (y_pix-1 >= 0 && y_pix-1 < IMG_PIXEL_HEIGHT))    
@@ -451,8 +545,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix+1, y_pix-1);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             /* some of our point's 2nd class neighbors */
@@ -461,8 +559,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix-2, y_pix);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix >= 0 && x_pix < IMG_PIXEL_WIDTH) && (y_pix-2 >= 0 && y_pix-2 < IMG_PIXEL_HEIGHT))    
@@ -470,8 +572,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix, y_pix-2);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix-2 >= 0 && x_pix-2 < IMG_PIXEL_WIDTH) && (y_pix-2 >= 0 && y_pix-2 < IMG_PIXEL_HEIGHT))    
@@ -479,8 +585,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix-2, y_pix-2);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix+2 >= 0 && x_pix+2 < IMG_PIXEL_WIDTH) && (y_pix >= 0 && y_pix < IMG_PIXEL_HEIGHT))    
@@ -488,8 +598,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix+2, y_pix);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix >= 0 && x_pix < IMG_PIXEL_WIDTH) && (y_pix+2 >= 0 && y_pix+2 < IMG_PIXEL_HEIGHT))    
@@ -497,8 +611,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix, y_pix+2);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix+2 >= 0 && x_pix+2 < IMG_PIXEL_WIDTH) && (y_pix+2 >= 0 && y_pix+2 < IMG_PIXEL_HEIGHT))    
@@ -506,8 +624,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix+2, y_pix+2);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix-2 >= 0 && x_pix-2 < IMG_PIXEL_WIDTH) && (y_pix+2 >= 0 && y_pix+2 < IMG_PIXEL_HEIGHT))    
@@ -515,8 +637,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix-2, y_pix+2);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
                             if ((x_pix+2 >= 0 && x_pix+2 < IMG_PIXEL_WIDTH) && (y_pix-2 >= 0 && y_pix-2 < IMG_PIXEL_HEIGHT))    
@@ -524,22 +650,25 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 p = pPCL->at(x_pix+2, y_pix-2);
                                 if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z))
                                 {
-                                    z += p.z;
+                                    x += p.x;
                                     divisors++;
+
+                                    /* debugging pointcloud */
+                                    if (j == 4)
+                                        pPCL->at(x_pix, y_pix).r = 255; pPCL->at(x_pix, y_pix).g = 255; pPCL->at(x_pix, y_pix).b = 0; pPCL->at(x_pix, y_pix).a = 255;
                                 }
                             }
 
                             if (divisors)
                             {
-                                z /= (double) divisors;
+                                x /= (double) divisors;
                                 /* for edge cases */
-                                if (z > UPPER_VARIATION_THRESH * z0 || z < LOWER_VARIATION_THRESH * z0) z = z0;
+                                if (x > UPPER_VARIATION_THRESH * x0 || x < LOWER_VARIATION_THRESH * x0) x = x0;
                             }
 
                             if (std::isnan(x) || std::isnan(y) || std::isnan(z))
                             {
                                 x = 0.0; y = 0.0; z = 0.0;
-                                // continue;
                             }
 
                             try
@@ -586,16 +715,16 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
         }
 
         /* for profiling */
-        // ROS_INFO("%s", strstream.str().c_str());
         std_msgs::String stringMsg;
         stringMsg.data = strstream.str();
         robotFrameCoordsPub.publish(stringMsg);
         if (list_msg->num_humans)
             humanReceiverPub.publish(humanMsg);
-        // ROS_WARN("----------------** %d total nan values in %d callback visits **----------------", totalNans, callbackVisits);
+
+        /* publish debugging's pointcloud */
+        pointcloudDebugPub.publish(pPCL);
 
         pclMsg = false;
-        // ROS_INFO("humanListCallback OUT");
     }
     else
     {
