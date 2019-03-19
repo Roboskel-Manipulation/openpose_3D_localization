@@ -25,7 +25,7 @@ include_directories(
   ${OpenPose_INCLUDE_DIRS} 
 )
 
-add_executable(openpose_ros_control_node src/openpose_ros_control_node.cpp src/functions.cpp src/utilities.cpp)
+add_executable(openpose_ros_control_node src/openpose_ros_control_node.cpp src/openpose_ros_control.cpp src/utilities.cpp)
 
 add_dependencies(openpose_ros_control_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
