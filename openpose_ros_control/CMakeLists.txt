@@ -9,12 +9,14 @@ find_package(catkin REQUIRED COMPONENTS
   openpose_ros_receiver_msgs
   moveit_ros_planning_interface
   moveit_msgs
+  geometry_msgs
+  std_msgs
 )
 find_package(/usr/local/lib/OpenPose/OpenPose REQUIRED)
 
 catkin_package(
    INCLUDE_DIRS include
-   CATKIN_DEPENDS roscpp openpose_ros_receiver_msgs moveit_ros_planning_interface moveit_msgs
+   CATKIN_DEPENDS roscpp openpose_ros_receiver_msgs moveit_ros_planning_interface moveit_msgs geometry_msgs std_msgs
 )
 
 include_directories( 
@@ -23,7 +25,7 @@ include_directories(
   ${OpenPose_INCLUDE_DIRS} 
 )
 
-add_executable(openpose_ros_control_node src/openpose_ros_control_node.cpp src/functions.cpp)
+add_executable(openpose_ros_control_node src/openpose_ros_control_node.cpp src/functions.cpp src/utilities.cpp)
 
 add_dependencies(openpose_ros_control_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 

@@ -580,6 +580,7 @@ if __name__ == "__main__":
         for i in range(part):
             # write in order of appearance Upper to Lower
             # print >> fp , body_25_body_parts_dict.get( int(body_25_body_parts_UL_order_of_appearance[i]) ) + "," + (",".join( str(e) for e in occurences_accross_frames_accross_scenarios[ int(body_25_body_parts_UL_order_of_appearance[i]) ] ))
+            # write in BODY_25 index order
             print >> fp , body_25_body_parts_dict.get(i) + "," + (",".join( str(e) for e in occurences_accross_frames_accross_scenarios[i] ))
 
     # report right wrist statistics accross frames

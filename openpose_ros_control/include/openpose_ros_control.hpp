@@ -4,6 +4,7 @@
 /* ROS headers */
 #include <ros/ros.h>
 #include <std_msgs/String.h>
+#include <geometry_msgs/Point.h>
 
 /* OpenPose ROS wrapper headers */
 #include <openpose_ros_receiver_msgs/OpenPoseReceiverHuman.h>
@@ -73,7 +74,8 @@ const std::map<unsigned int, unsigned int> POSE_BODY_25_BODY_PART_PAIRS
     {14, 21},
     {11, 22},
     {22, 23},
-    {11, 24}
+    {11, 24},
+    {0, 1}  // reverse also, may prove useful
 };
 
 /* Node class */
@@ -85,14 +87,18 @@ public:
     /* Callback functions */
     void robotFrameCoordsStrTopicCallback(const std_msgs::String::ConstPtr& msg);
     void robotFrameCoordsMsgTopicCallback(const openpose_ros_receiver_msgs::OpenPoseReceiverHuman::ConstPtr& msg);
+    void generatePrimitives(geometry_msgs::Point a, geometry_msgs::Point b, std::string idPrefix);  
 private:
     ros::NodeHandle nh_;
     std::string robot_frame_coords_str_topic_, robot_frame_coords_msg_topic_, image_frame_, robot_base_link_frame_;
     int queue_size_;
+    double primitive_radius_, min_avg_prob_;
     ros::Subscriber subRobotFrameCoordsStr_, subRobotFrameCoordsMsg_;
+    moveit::planning_interface::PlanningSceneInterface planning_scene_interface_;
 };
 
-/* Various functions */
+/* Utility functions */
+double distance(geometry_msgs::Point & a, geometry_msgs::Point & b);
 std::string getPoseBodyPartMappingBody25(unsigned int idx);
 unsigned int getPoseBodyPartPairMappingBody25(unsigned int idx);
 
