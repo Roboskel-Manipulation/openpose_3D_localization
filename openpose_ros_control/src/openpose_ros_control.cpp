@@ -32,6 +32,9 @@ void OpenPoseROSControl::robotFrameCoordsMsgTopicCallback(const openpose_ros_rec
     if (sumProb / msg->num_body_key_points_with_non_zero_prob < min_avg_prob_)
         return;
 
+    /* remove all othe collision obects in our planning scene */
+    planning_scene_interface_.removeCollisionObjects(planning_scene_interface_.getKnownObjectNames());
+
     for (uint8_t i = 0; i < 25; i++)
     {
         geometry_msgs::Point a;
@@ -76,19 +79,19 @@ void OpenPoseROSControl::robotFrameCoordsMsgTopicCallback(const openpose_ros_rec
 
                 /* if there can be a valid pair */
                 if (b.x && b.y && b.z)
-                    generatePrimitives(a, b, i+"_"+j);
+                    generatePrimitivesRec(a, b, i+"_"+j);
             }
         }
     }
 }
 
-void OpenPoseROSControl::generatePrimitives(geometry_msgs::Point a, geometry_msgs::Point b, std::string idPrefix)
+void OpenPoseROSControl::generatePrimitivesRec(geometry_msgs::Point a, geometry_msgs::Point b, std::string idPrefix)
 {
     /* the base of our recursion */
     if (distance(a, b) <= 2 * primitive_radius_)
         return;
 
-    /* find the midpoint of the line connecting points 1 & 2 */
+    /* find the midpoint of the line connecting points a & b */
     geometry_msgs::Point m;
     m.x = (a.x + b.x) / 2; m.y = (a.y + b.y) / 2; m.z = (a.z + b.z) / 2;
 
@@ -116,6 +119,12 @@ void OpenPoseROSControl::generatePrimitives(geometry_msgs::Point a, geometry_msg
     planning_scene_interface_.applyCollisionObject(collision_object);
 
     /* recursion branches */
-    generatePrimitives(a, m, idPrefix+"_L");   // leftmost half
-    generatePrimitives(m, b, idPrefix+"_R");   // rightmost half
+    generatePrimitivesRec(a, m, idPrefix+"_L");   // leftmost half
+    generatePrimitivesRec(m, b, idPrefix+"_R");   // rightmost half
+}
+
+void OpenPoseROSControl::generatePrimitivesIter(geometry_msgs::Point a, geometry_msgs::Point b, std::string idPrefix)
+{
+    // TODO
+    ;
 }

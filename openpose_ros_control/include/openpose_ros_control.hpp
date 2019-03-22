@@ -81,13 +81,6 @@ const std::map<unsigned int, unsigned int> POSE_BODY_25_BODY_PART_PAIRS
 /* Node class */
 class OpenPoseROSControl
 {
-public:
-    /* Node functions */
-    OpenPoseROSControl();
-    /* Callback functions */
-    void robotFrameCoordsStrTopicCallback(const std_msgs::String::ConstPtr& msg);
-    void robotFrameCoordsMsgTopicCallback(const openpose_ros_receiver_msgs::OpenPoseReceiverHuman::ConstPtr& msg);
-    void generatePrimitives(geometry_msgs::Point a, geometry_msgs::Point b, std::string idPrefix);  
 private:
     ros::NodeHandle nh_;
     std::string robot_frame_coords_str_topic_, robot_frame_coords_msg_topic_, image_frame_, robot_base_link_frame_;
@@ -95,6 +88,14 @@ private:
     double primitive_radius_, min_avg_prob_;
     ros::Subscriber subRobotFrameCoordsStr_, subRobotFrameCoordsMsg_;
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface_;
+public:
+    /* Node functions */
+    OpenPoseROSControl();
+    /* Callback functions */
+    void robotFrameCoordsStrTopicCallback(const std_msgs::String::ConstPtr& msg);
+    void robotFrameCoordsMsgTopicCallback(const openpose_ros_receiver_msgs::OpenPoseReceiverHuman::ConstPtr& msg);
+    void generatePrimitivesRec(geometry_msgs::Point a, geometry_msgs::Point b, std::string idPrefix);
+    void generatePrimitivesIter(geometry_msgs::Point a, geometry_msgs::Point b, std::string idPrefix);
 };
 
 /* Utility functions */

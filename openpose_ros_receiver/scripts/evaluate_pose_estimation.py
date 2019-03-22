@@ -184,14 +184,14 @@ if __name__ == "__main__":
                                ("B", [-0.15, -0.185, 0.09]),
                                ("C", [0.35, -0.35, 0.09]), ("C-right", [0.443, -0.35, 0.09]), ("C-up", [0.35, -0.35, 0.16]), ("C-front", [0.35, -0.257, 0.09]),
                                ("E", [0.417, -0.035, 0.09]), ("E-left", [0.324, -0.035, 0.09]), ("E-up", [0.417, -0.035, 0.16]), ("E-front", [0.417, 0.058, 0.09])
-                        ])
+                            ])
     right_wrist_ground_truth_dict = dict([ (0, [-0.35, -0.35, 0.09]), (1, [-0.257, -0.35, 0.09]), (2, [-0.35, -0.35, 0.16]), (3, [-0.35, -0.275, 0.09]), (4, [-0.35, -0.35, 0.09]),
                                            (5, [-0.35, -0.35, 0.09]), (6, [-0.35, -0.35, 0.09]), (7, [-0.35, -0.35, 0.09]), (8, [-0.35, -0.35, 0.16]), (9, [-0.35, -0.35, 0.09]),
                                            (10, [0.35, -0.35, 0.09]), (11, [0.443, -0.35, 0.09]), (12, [0.35, -0.35, 0.16]), (13, [0.35, -0.257, 0.09]), (14, [-0.15, -0.185, 0.09]),
                                            (15, [-0.15, -0.185, 0.09]), (16, [-0.15, -0.185, 0.09]), (17, [-0.15, -0.185, 0.09]), (18, [-0.15, -0.185, 0.09]), (19, [-0.15, -0.185, 0.09]),
                                            (20, [0.417, -0.035, 0.09]), (21, [0.417, -0.035, 0.09]), (22, [0.417, -0.035, 0.09]), (23, [0.417, -0.035, 0.09]), (24, [0.324, -0.035, 0.09]),
                                            (25, [0.417, -0.035, 0.16]), (26, [0.417, 0.058, 0.09])
-                                    ])
+                                        ])
 
     # File I/O specific variables
     scenarios_path = "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/SCENARIOS/"
@@ -200,7 +200,7 @@ if __name__ == "__main__":
     statistics_folder_path = scenarios_path + "evaluation_statistics/"
     csvs_folder_path = scenarios_path + "evaluation_csvs/"
 
-    # create our 4d report matrix, e.g. for 10 log frames at 10 scenarios: [Scenario][BodyPart][x/y/z/prob][t0,...,t9,mean,nobs,min,max,variance,skewness,kurtosis,std_dev] --> 10 * 25 * 4 * 0.18
+    # create our 4d report matrix, e.g. for 10 log frames at 10 scenarios: [Scenario][BodyPart][x/y/z][t0,...,t9,mean,nobs,min,max,variance,skewness,kurtosis,std_dev] --> 10 * 25 * 4 * 18
     scenarios, part, elem, val = 27, 25, 3, 48
     max_logs = 40
     stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 40, 40, 41, 42, 43, 44, 45, 46, 47
