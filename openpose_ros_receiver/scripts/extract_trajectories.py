@@ -28,6 +28,103 @@ def getKeysByValue(dictOfElements, valueToFind):
     return listOfKeys
 
 
+# Define a function for a lineplot
+def lineplot(data, path, x_label=None, y_label=None, title=None):
+    data.plot()
+    if x_label:
+        plt.xlabel(x_label, fontsize=8)
+    if y_label:
+        plt.ylabel(y_label, fontsize=8)
+    if title:
+        plt.title(title, fontsize=10)
+    plt.savefig(path)
+    plt.close()
+
+
+# Define a function for a histogram
+def histogram(data, path, x_label=None, y_label=None, title=None):
+    data.hist()
+    if x_label:
+        plt.xlabel(x_label, fontsize=8)
+    if y_label:
+        plt.ylabel(y_label, fontsize=8)
+    if title:
+        plt.title(title, fontsize=10)
+    plt.savefig(path)
+    plt.close()
+
+
+# Define a function for a density plot
+def density_plot(data, path, x_label=None, y_label=None, title=None):
+    data.plot(kind='kde')
+    if x_label:
+        plt.xlabel(x_label, fontsize=8)
+    if y_label:
+        plt.ylabel(y_label, fontsize=8)
+    if title:
+        plt.title(title, fontsize=10)
+    plt.savefig(path)
+    plt.close()
+
+
+# Define a function for a plot
+def plot(x_data, y_data, path, x_label=None, y_label=None, title=None):
+    plt.plot(x_data, y_data, linestyle='--', marker='o')
+    if x_label:
+        plt.xlabel(x_label, fontsize=8)
+    if y_label:
+        plt.ylabel(y_label, fontsize=8)
+    if title:
+        plt.title(title, fontsize=10)
+    plt.savefig(path)
+    plt.close()
+
+
+# Define a function for multiple plots
+def multiplot(x_data, y_data, path, data_names=None, x_label=None, y_label=None, title=None):
+    assert( len(x_data) == len(y_data) )
+    data = [ [x_data[i], y_data[i]] for i in range(len(x_data)) ]
+
+    if data_names:
+        fig, (ax, lax) = plt.subplots(ncols=2, gridspec_kw={"width_ratios":[6,1]})
+        i = 0
+        for d in data:
+            x, y = d[0], d[1]
+            ax.plot(x, y, label=data_names[i], linestyle='--', marker='o')
+            i += 1
+    else:
+        fig, ax = plt.subplots()
+        for d in data:
+            x, y = d[0], d[1]
+            ax.plot(x, y, linestyle='--', marker='o')
+    if x_label:
+        plt.xlabel(x_label, fontsize=8)
+    if y_label:
+        plt.ylabel(y_label, fontsize=8)
+    if title:
+        ax.set_title(title, fontsize=10)
+    if data_names:
+        h,l = ax.get_legend_handles_labels()
+        lax.legend(h, l, borderaxespad=0, prop={'size': 8})
+        lax.axis("off")
+        plt.tight_layout()
+    plt.savefig(path)
+    plt.close()
+
+
+# Define a function for a boxplot
+def boxplot(data, path, x_label=None, y_label=None, title=None):
+    data.boxplot()
+    if x_label:
+        plt.xlabel(x_label, fontsize=8)
+    if y_label:
+        plt.ylabel(y_label, fontsize=8)
+    if title:
+        plt.title(title, fontsize=10)
+    plt.savefig(path)
+    plt.close()
+
+
 # MAIN FUNCTION
 
 
@@ -40,6 +137,16 @@ if __name__ == "__main__":
                                      (20, "LSmallToe"), (21, "LHeel"), (22, "RBigToe"), (23, "RSmallToe"), (24, "RHeel"),
                                      (25, "Background")
                                     ])
+    body_25_body_part_pairs = [ [1, 8], [1, 2], [1, 5], [2, 3], [3, 4], [5, 6], [6, 7],
+                                [8, 9], [9, 10], [10, 11], [8, 12], [12, 13], [13, 14], [1, 0],
+                                [0, 15], [15, 17], [0, 16], [16, 18], [14, 19],
+                                [19, 20], [14, 21], [11, 22], [22, 23], [11, 24]
+                            ]
+    body_25_body_part_pairs_dict = dict([   (1, [0, 2, 5, 8]), (2, [3]), (3, [4]), (5, [6]), (6, [7]),
+                                            (8, [9, 12]), (9, [10]), (10, [11]), (12, [13]), (13, [14]),
+                                            (0, [15, 16]), (15, [17]), (16, [18]), (14, [19, 21]),
+                                            (19, [20]), (11, [22, 24]), (22, [23])
+                                        ])
 
     # OpenPose specific variables
     element_dict = dict([ (0, "x"), (1, "y")])
@@ -56,6 +163,8 @@ if __name__ == "__main__":
     trajectories_csvs_path = trajectories_path + trajectories_csvs_dir
     trajectories_plots_dir = "plots/"
     trajectories_plots_path = trajectories_path + trajectories_plots_dir
+    trajectories_plots_trajectories_dir = "trajectories/"
+    trajectories_plots_trajectories_path = trajectories_plots_path + trajectories_plots_trajectories_dir
     trajectories_plots_lines_dir = "lines/"
     trajectories_plots_lines_path = trajectories_plots_path + trajectories_plots_lines_dir
     trajectories_plots_histograms_dir = "histograms/"
@@ -85,6 +194,10 @@ if __name__ == "__main__":
     # create trajectories plots directory
     if not os.path.exists(trajectories_plots_path):
         os.makedirs(trajectories_plots_path)
+
+    # create trajectories plots trajectories directory
+    if not os.path.exists(trajectories_plots_trajectories_path):
+        os.makedirs(trajectories_plots_trajectories_path)
 
     # create trajectories plots lines directory
     if not os.path.exists(trajectories_plots_lines_path):
@@ -167,36 +280,78 @@ if __name__ == "__main__":
                 print >> fp , "t" + str(j) + "," + str(report_matrix[i][j][ getKeysByValue(element_dict, "y")[0] ])
 
 
-    # create timeseries figures
+    # set timeseries data specifications
     header_x, header_y = ['t', 'x'], ['t', 'y']
     dtypes_x, dtypes_y = {'t':'str', 'x':'float64'}, {'t':'str', 'y':'float64'}
+
+
+    # create timeseries figures
     all_series_x, all_series_y = DataFrame(), DataFrame()
     for i in range(part):
         series_x = pd.read_csv(trajectories_csvs_path + body_25_body_parts_dict.get(i) + "_x" + ".csv", names=header_x, dtype=dtypes_x, header=0)
         series_y = pd.read_csv(trajectories_csvs_path + body_25_body_parts_dict.get(i) + "_y" + ".csv", names=header_y, dtype=dtypes_y, header=0)
+
+        x_list, y_list = series_x['x'].values.tolist(), series_y['y'].values.tolist()
+        # print x_list, y_list
+
+        # timeseries plot trajectory
+        plot(
+            x_data=x_list,
+            y_data=y_list,
+            x_label="X Coord.",
+            y_label="Y Coord.",
+            title=body_25_body_parts_dict.get(i) + " trajectory plot",
+            path=trajectories_plots_trajectories_path + body_25_body_parts_dict.get(i) + "_trajectory" + ".png"
+        )
+
         # timeseries line plots
-        series_x.plot()
-        plt.savefig(trajectories_plots_lines_path + body_25_body_parts_dict.get(i) + "_x" + "_line" + ".png")
-        plt.close()
-        series_y.plot()
-        plt.savefig(trajectories_plots_lines_path + body_25_body_parts_dict.get(i) + "_y" + "_line" + ".png")
-        plt.close()
+        lineplot(
+            data=series_x,
+            x_label="Instance",
+            y_label="X coord.",
+            title=body_25_body_parts_dict.get(i) + " x coordinate line plot",
+            path=trajectories_plots_lines_path + body_25_body_parts_dict.get(i) + "_x" + "_line" + ".png"
+        )
+        lineplot(
+            data=series_y,
+            x_label="Instance",
+            y_label="Y coord.",
+            title=body_25_body_parts_dict.get(i) + " y coordinate line plot",
+            path=trajectories_plots_lines_path + body_25_body_parts_dict.get(i) + "_y" + "_line" + ".png"
+        )
+
         # timeseries histogram and density plots
         # histograms
-        series_x.hist()
-        plt.savefig(trajectories_plots_histograms_path + body_25_body_parts_dict.get(i) + "_x" + "_hist" + ".png")
-        plt.close()
-        series_y.hist()
-        plt.savefig(trajectories_plots_histograms_path + body_25_body_parts_dict.get(i) + "_y" + "_hist" + ".png")
-        plt.close()
+        histogram(
+            data=series_x,
+            x_label="X coord.",
+            y_label="Num. of occurences",
+            title=body_25_body_parts_dict.get(i) + " x coordinate histogram",
+            path=trajectories_plots_histograms_path + body_25_body_parts_dict.get(i) + "_x" + "_hist" + ".png"
+        )
+        histogram(
+            data=series_y,
+            x_label="Y coord.",
+            y_label="Num. of occurences",
+            title=body_25_body_parts_dict.get(i) + " y coordinate histogram",
+            path=trajectories_plots_histograms_path + body_25_body_parts_dict.get(i) + "_y" + "_hist" + ".png"
+        )
         # densities
         try:
-            series_x.plot(kind='kde')
-            plt.savefig(trajectories_plots_histograms_path + body_25_body_parts_dict.get(i) + "_x_dens" + ".png")
-            plt.close()
-            series_y.plot(kind='kde')
-            plt.savefig(trajectories_plots_histograms_path + body_25_body_parts_dict.get(i) + "_y_dens" + ".png")
-            plt.close()
+            density_plot(
+                data=series_x,
+                x_label="X coord.",
+                y_label="Density of values",
+                title=body_25_body_parts_dict.get(i) + " x coordinate density plot",
+                path=trajectories_plots_histograms_path + body_25_body_parts_dict.get(i) + "_x_dens" + ".png"
+            )
+            density_plot(
+                data=series_y,
+                x_label="Y coord.",
+                y_label="Density of values",
+                title=body_25_body_parts_dict.get(i) + " y coordinate density plot",
+                path=trajectories_plots_histograms_path + body_25_body_parts_dict.get(i) + "_y_dens" + ".png"
+            )
         except Exception as e:
             if e.__class__.__name__ == "LinAlgError":
                 # source: https://stats.stackexchange.com/questions/89754/statsmodels-error-in-kde-on-a-list-of-repeated-values
@@ -209,20 +364,73 @@ if __name__ == "__main__":
                 '''
                 continue
             raise e
+        
         # for timeseries boxplots
         all_series_x[ i ] = [ e[1] for e in series_x.values.tolist() ]
         all_series_y[ i ] = [ e[1] for e in series_y.values.tolist() ]
-        # debugging
-        print(series_x.head())
-        print(series_y.head())
+
+        # # debugging
+        # print(series_x.head())
+        # print(series_y.head())
+
+
+    # timeseries plot trajectories among pairs
+    for i in range(part):
+        series_x = pd.read_csv(trajectories_csvs_path + body_25_body_parts_dict.get(i) + "_x" + ".csv", names=header_x, dtype=dtypes_x, header=0)
+        series_y = pd.read_csv(trajectories_csvs_path + body_25_body_parts_dict.get(i) + "_y" + ".csv", names=header_y, dtype=dtypes_y, header=0)
+
+        x_list, y_list = series_x['x'].values.tolist(), series_y['y'].values.tolist()
+
+        x_values, y_values = [], []
+        x_values.append(x_list)
+        y_values.append(y_list)
+
+        # if keypoint with ID i has pairs
+        if i in body_25_body_part_pairs_dict.keys():
+            keypoint_names = []
+            keypoint_names.append(body_25_body_parts_dict.get(i))
+
+            paired_keypoints = body_25_body_part_pairs_dict.get(i)
+            # print body_25_body_parts_dict.get(i) + " pairs with: " + ", ".join([ body_25_body_parts_dict.get(kp) for kp in paired_keypoints ])
+
+            # for every paired keypoint with ID j
+            for j in paired_keypoints:
+                series_x = pd.read_csv(trajectories_csvs_path + body_25_body_parts_dict.get(j) + "_x" + ".csv", names=header_x, dtype=dtypes_x, header=0)
+                series_y = pd.read_csv(trajectories_csvs_path + body_25_body_parts_dict.get(j) + "_y" + ".csv", names=header_y, dtype=dtypes_y, header=0)
+
+                x_list, y_list = series_x['x'].values.tolist(), series_y['y'].values.tolist()
+                x_values.append(x_list)
+                y_values.append(y_list)
+                
+                keypoint_names.append(body_25_body_parts_dict.get(j))
+            
+                multiplot(
+                    x_data=x_values,
+                    y_data=y_values,
+                    data_names=keypoint_names,
+                    x_label="X Coord.",
+                    y_label="Y Coord.",
+                    title=body_25_body_parts_dict.get(j) + " paired with: " + ", ".join([ body_25_body_parts_dict.get(kp) for kp in paired_keypoints ]) + " trajectory plots",
+                    path=trajectories_plots_trajectories_path + body_25_body_parts_dict.get(i) + "_&_" + "_".join([ body_25_body_parts_dict.get(kp) for kp in paired_keypoints ]) +"_trajectories" + ".png"
+                )
+
 
     # timeseries boxplots
-    print all_series_x, all_series_y
-    all_series_x.boxplot()
-    plt.savefig(trajectories_plots_boxplots_path + "all_keypoints_x" + "_boxplot" + ".png")
-    plt.close()
-    all_series_y.boxplot()
-    plt.savefig(trajectories_plots_boxplots_path + "all_keypoints_y" + "_boxplot" + ".png")
-    plt.close()
+    # print all_series_x, all_series_y
+    boxplot(
+        data=all_series_x,
+        x_label="Keypoint ID",
+        y_label="X coord. value",
+        title="All keypoints x coordinate boxplot",
+        path=trajectories_plots_boxplots_path + "all_keypoints_x" + "_boxplot" + ".png"
+    )
+    boxplot(
+        data=all_series_y,
+        x_label="Keypoint ID",
+        y_label="Y coord. value",
+        title="All keypoints y coordinate boxplot",
+        path=trajectories_plots_boxplots_path + "all_keypoints_y" + "_boxplot" + ".png"
+    )
+
 
     print "SUCCESS!"

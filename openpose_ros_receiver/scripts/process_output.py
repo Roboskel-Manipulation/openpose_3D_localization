@@ -456,15 +456,6 @@ if __name__ == "__main__":
     # File I/O specific variables
     output_path = "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/"
     ''''''
-    # output_subfolder = "take6/"
-    # raw_output_file_prefix = "raw Thu Jan 24 12:10:"   # to go from 12:10:00 to 11:10:39 (40 files -- 40 log frames)
-    # tfed_output_file_prefix = "tfed Thu Jan 24 12:10:"
-    ''''''
-    # output_subfolder = "take9/"
-    # op_output_file_prefix = "OP Fri Jan 25 12:41:"
-    # raw_output_file_prefix = "raw Fri Jan 25 12:41:"
-    # tfed_output_file_prefix = "tfed Fri Jan 25 12:4"
-    ''''''
     output_subfolder = "take46QueueSize100/"
     op_output_file_prefix = "OP Thu Feb 14 15:16:"
     raw_output_file_prefix = "raw Thu Feb 14 15:16:"
