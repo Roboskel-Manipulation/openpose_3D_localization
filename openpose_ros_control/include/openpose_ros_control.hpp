@@ -16,67 +16,8 @@
 
 /* Global Variables */
 
-/* OpenPose BODY_25 Body Parts Mapping */
-const std::map<unsigned int, std::string> POSE_BODY_25_BODY_PARTS
-{
-    {0,  "Nose"},
-    {1,  "Neck"},
-    {2,  "RShoulder"},
-    {3,  "RElbow"},
-    {4,  "RWrist"},
-    {5,  "LShoulder"},
-    {6,  "LElbow"},
-    {7,  "LWrist"},
-    {8,  "MidHip"},
-    {9,  "RHip"},
-    {10, "RKnee"},
-    {11, "RAnkle"},
-    {12, "LHip"},
-    {13, "LKnee"},
-    {14, "LAnkle"},
-    {15, "REye"},
-    {16, "LEye"},
-    {17, "REar"},
-    {18, "LEar"},
-    {19, "LBigToe"},
-    {20, "LSmallToe"},
-    {21, "LHeel"},
-    {22, "RBigToe"},
-    {23, "RSmallToe"},
-    {24, "RHeel"},
-    {25, "Background"}
-};
-/* OpenPose BODY_25 Body Part Pairs Mapping */
-const std::map<unsigned int, unsigned int> POSE_BODY_25_BODY_PART_PAIRS
-{
-    {1, 8},
-    {1, 2},
-    {1, 5},
-    {2, 3},
-    {3, 4},
-    {5, 6},
-    {6, 7},
-    {8, 9},
-    {9, 10},
-    {10, 11},
-    {8, 12},
-    {12, 13},
-    {13, 14},
-    {1, 0},
-    {0, 15},
-    {15, 17},
-    {0, 16},
-    {16, 18},
-    {2, 17},
-    {5, 18},
-    {14, 19},
-    {19, 20},
-    {14, 21},
-    {11, 22},
-    {22, 23},
-    {11, 24},
-    {0, 1}  // reverse also, may prove useful
-};
+/* BODY_25 Pose Output Format header */
+#include "body_25_pose_output_format.hpp"
 
 /* Node class */
 class OpenPoseROSControl
@@ -84,18 +25,29 @@ class OpenPoseROSControl
 private:
     ros::NodeHandle nh_;
     std::string robot_frame_coords_str_topic_, robot_frame_coords_msg_topic_, image_frame_, robot_base_link_frame_;
-    int queue_size_;
-    double primitive_radius_, min_avg_prob_;
+    int queue_size_, human_body_keypoints_;
+    double primitive_radius_, basic_limb_safety_radius_, min_avg_prob_;
     ros::Subscriber subRobotFrameCoordsStr_, subRobotFrameCoordsMsg_;
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface_;
 public:
     /* Node functions */
+    /* Class constructor -- ROS node initializer */
     OpenPoseROSControl();
     /* Callback functions */
+    /* Human body keypoint coordinates in the robot's coordinate frams as strings */
     void robotFrameCoordsStrTopicCallback(const std_msgs::String::ConstPtr& msg);
+    /* Human body keypoint coordinates in the robot's coordinate frams as regular messages */
     void robotFrameCoordsMsgTopicCallback(const openpose_ros_receiver_msgs::OpenPoseReceiverHuman::ConstPtr& msg);
-    void generatePrimitivesRec(geometry_msgs::Point a, geometry_msgs::Point b, std::string idPrefix);
-    void generatePrimitivesIter(geometry_msgs::Point a, geometry_msgs::Point b, std::string idPrefix);
+    /* Generate geometric primitives around every detected human body keypoint */
+    void generateBasicPrimitives(const openpose_ros_receiver_msgs::OpenPoseReceiverHuman::ConstPtr& msg);
+    /* Generate geometric primitives around every detected human body keypoint, while also tryig to tackle the absence of the non-detected keypoints */
+    /* work in progress... (TODO) */
+    void generateBasicPrimitivesPro(const openpose_ros_receiver_msgs::OpenPoseReceiverHuman::ConstPtr& msg);
+    /* Generate geometric primitives around between every detected human body keypoints pair recursively */    
+    void generateIntermediatePrimitivesRec(geometry_msgs::Point a, geometry_msgs::Point b, std::string idPrefix);
+    /* Generate geometric primitives around between every detected human body keypoints pair iteratively */
+    /* work in progress... (TODO) */
+    void generateIntermediatePrimitivesIter(geometry_msgs::Point a, geometry_msgs::Point b, std::string idPrefix);
 };
 
 /* Utility functions */

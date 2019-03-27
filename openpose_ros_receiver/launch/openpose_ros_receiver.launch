@@ -75,4 +75,10 @@
     <rosparam command="load" file="$(find openpose_ros_receiver)/config/config.yaml"/>
   </node> -->
 
+
+  <!-- Launch openpose_ros_control node -->
+  <node pkg="openpose_ros_control" type="openpose_ros_control_node" name="openpose_ros_control_node" output="screen">
+    <rosparam command="load" file="$(find openpose_ros_control)/config/config.yaml"/>
+  </node>
+
 </launch>

@@ -100,8 +100,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 x0 = x;
                                 divisors++;
 
-                                if (j == 4)
-                                    ROS_INFO("j = %d: x_pix = %f, y_pix = %f --> p.x = %f, p.y = %f, p.z = %f", j, x_pix, y_pix, p.x, p.y, p.z);
+                                // if (j == 4)
+                                //     ROS_INFO("j = %d: x_pix = %f, y_pix = %f --> p.x = %f, p.y = %f, p.z = %f", j, x_pix, y_pix, p.x, p.y, p.z);
 
                                 /* debugging pointcloud */
                                 if (j == 4)
@@ -456,8 +456,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 x0 = x;
                                 divisors++;
 
-                                if (j == 4)
-                                    ROS_INFO("j = %d: x_pix = %f, y_pix = %f --> p.x = %f, p.y = %f, p.z = %f", j, x_pix, y_pix, p.x, p.y, p.z);
+                                // if (j == 4)
+                                //     ROS_INFO("j = %d: x_pix = %f, y_pix = %f --> p.x = %f, p.y = %f, p.z = %f", j, x_pix, y_pix, p.x, p.y, p.z);
 
                                 /* debugging pointcloud */
                                 if (j == 4)

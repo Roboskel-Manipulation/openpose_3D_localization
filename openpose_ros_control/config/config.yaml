@@ -3,5 +3,7 @@ robot_frame_coords_msg_topic: "/openpose_ros_receiver/robot_frame_coords_msg"
 queue_size: 1
 image_frame: "/zed_left_camera_frame"
 base_link_frame: "/base_link"
-primitive_radius: 0.05
+primitive_radius: 0.075
+basic_limb_safety_radius: 0.35
 min_avg_prob: 0.25
+human_body_keypoints: 25

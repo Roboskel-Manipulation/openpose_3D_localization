@@ -53,7 +53,7 @@ extern bool pclMsg, humanListMsg;
 extern ros::Publisher robotFrameCoordsPub, humanReceiverPub, pointcloudDebugPub;
 extern pcl::PointCloud<pcl::PointXYZRGBA>::Ptr pPCL;
 
-/* OpenPose BODY_25 Body Parts Mapping */
+/* OpenPose BODY_25 Body Parts Index-to-Name Mapping */
 const std::map<unsigned int, std::string> POSE_BODY_25_BODY_PARTS
 {
     {0,  "Nose"},
