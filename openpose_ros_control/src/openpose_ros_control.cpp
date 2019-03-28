@@ -9,7 +9,11 @@ OpenPoseROSControl::OpenPoseROSControl()
     nh_.param("openpose_ros_control_node/queue_size", queue_size_, 2);
     nh_.param("openpose_ros_control_node/human_body_keypoints", human_body_keypoints_, 25);
     nh_.param("openpose_ros_control_node/primitive_radius", primitive_radius_, 0.05);
+    default_primitive_radius_ = primitive_radius_;
     nh_.param("openpose_ros_control_node/basic_limb_safety_radius", basic_limb_safety_radius_, 0.35);
+    default_basic_limb_safety_radius_ = basic_limb_safety_radius_;
+    nh_.param("openpose_ros_control_node/primitive_radius_adaptation_limit", primitive_radius_adaptation_limit_, 0.25);
+    nh_.param("openpose_ros_control_node/basic_limb_safety_radius_adaptation_limit", basic_limb_safety_radius_adaptation_limit_, 1.25);
     nh_.param("openpose_ros_control_node/min_avg_prob", min_avg_prob_, 0.25);
     nh_.param("openpose_ros_control/image_frame", image_frame_, std::string("/zed_left_camera_frame"));
     nh_.param("openpose_ros_control/base_link_frame", robot_base_link_frame_, std::string("/base_link"));
@@ -37,6 +41,8 @@ void OpenPoseROSControl::robotFrameCoordsMsgTopicCallback(const openpose_ros_rec
     if (sumProb / msg->num_body_key_points_with_non_zero_prob < min_avg_prob_)
         return;
 
+    // adaptPrimitiveGenerationParameters(msg);
+
     // generateBasicPrimitives(msg);
     generateBasicPrimitivesPro(msg);
 }
@@ -53,7 +59,7 @@ void OpenPoseROSControl::generateBasicPrimitives(const openpose_ros_receiver_msg
         a.x = msg->body_key_points_with_prob[i].x; a.y = msg->body_key_points_with_prob[i].y; a.z = msg->body_key_points_with_prob[i].z;
 
         // /* for debugging */
-        // ROS_WARN("%s: (x, y, z) = (%f, %f, %f), prob = %f", getPoseBodyPartMappingBody25(i).c_str(), a.x, a.y, a.z, msg->body_key_points_with_prob[i].prob);
+        // ROS_WARN("%s: (x, y, z) = (%f, %f, %f), prob = %f", getPoseBodyPartIndexMappingBody25(i).c_str(), a.x, a.y, a.z, msg->body_key_points_with_prob[i].prob);
 
         /* if there is a valid keypoint (remember in the robot frame (0,0,0) is the base_link of our robot... no way we have a human body keypoint in there) */
         if (a.x && a.y && a.z)
@@ -124,7 +130,6 @@ void OpenPoseROSControl::generateBasicPrimitives(const openpose_ros_receiver_msg
 }
 
 /* Generate geometric primitives around every detected human body keypoint, while also tryig to tackle the absence of the non-detected keypoints */
-/* work in progress... (TODO) */
 void OpenPoseROSControl::generateBasicPrimitivesPro(const openpose_ros_receiver_msgs::OpenPoseReceiverHuman::ConstPtr& msg)
 {
     /* remove all other collision obects in our planning scene */
@@ -204,11 +209,31 @@ void OpenPoseROSControl::generateBasicPrimitivesPro(const openpose_ros_receiver_
                     /* check if the non-detected pair keypoint B is an upper body keypoint */
                     if (std::find(POSE_BODY_25_UPPER_BODY_PARTS_IDX.begin(), POSE_BODY_25_UPPER_BODY_PARTS_IDX.end(), i) != POSE_BODY_25_UPPER_BODY_PARTS_IDX.end())
                     {
-                        /* for debugging */
-                        ROS_WARN("kp %s not detected", getPoseBodyPartMappingBody25(j).c_str());
+                        // /* for debugging */
+                        // ROS_WARN("kp %s not detected", getPoseBodyPartIndexMappingBody25(j).c_str());
                         
-                        /* TODO: Make an assumption about keypoint B's position using a relatively big sphere */
-                        
+                        /* Make an assumption about keypoint B's position using a relatively big sphere around keypoint A's position */
+                        /* Define a collision object ROS message */
+                        moveit_msgs::CollisionObject collision_object;
+                        collision_object.header.frame_id = "base_link";
+                        collision_object.id = j+"_assumption";
+                        /* Define a sphere which will be added to the world */
+                        shape_msgs::SolidPrimitive primitive;
+                        primitive.type = primitive.SPHERE;
+                        primitive.dimensions.resize(2);
+                        /* Setting the radius of the sphere. */
+                        primitive.dimensions[0] = basic_limb_safety_radius_;
+                        /* Define a pose for the sphere (specified relative to frame_id) */
+                        geometry_msgs::Pose sphere_pose;
+                        /* Setting the position of the sphere */
+                        sphere_pose.position.x = a.x;
+                        sphere_pose.position.y = a.y;
+                        sphere_pose.position.z = a.z;
+                        /* Add the sphere as collision object */
+                        collision_object.primitives.push_back(primitive);
+                        collision_object.primitive_poses.push_back(sphere_pose);
+                        collision_object.operation = collision_object.ADD;
+                        planning_scene_interface_.applyCollisionObject(collision_object);
                     }
                     else
                         continue;
@@ -220,8 +245,8 @@ void OpenPoseROSControl::generateBasicPrimitivesPro(const openpose_ros_receiver_
             /* check if the non-detected keypoint A is an upper body keypoint */
             if (std::find(POSE_BODY_25_UPPER_BODY_PARTS_IDX.begin(), POSE_BODY_25_UPPER_BODY_PARTS_IDX.end(), i) != POSE_BODY_25_UPPER_BODY_PARTS_IDX.end())
             {
-                /* for debugging */
-                ROS_WARN("kp %s not detected", getPoseBodyPartMappingBody25(i).c_str());
+                // /* for debugging */
+                // ROS_WARN("kp %s not detected", getPoseBodyPartIndexMappingBody25(i).c_str());
                 
                 /* check if keypoint A is paired with another keypoint */
                 if (getPoseBodyPartPairMappingBody25(i))
@@ -234,20 +259,20 @@ void OpenPoseROSControl::generateBasicPrimitivesPro(const openpose_ros_receiver_
                     /* if there can be a valid pair (if the pair exists) */
                     if (b.x && b.y && b.z)
                     {
-                        /* for debugging */
-                        ROS_INFO("kp %s (pair of kp %s) detected", getPoseBodyPartMappingBody25(j).c_str(), getPoseBodyPartMappingBody25(i).c_str());
+                        // /* for debugging */
+                        // ROS_INFO("kp %s (pair of kp %s) detected", getPoseBodyPartIndexMappingBody25(j).c_str(), getPoseBodyPartIndexMappingBody25(i).c_str());
 
-                        /* Add keypoint B's primitive */
+                        /* Add keypoint B's primitive, while also making an assumption about keypoint A's position using a relatively big sphere around keypoint B's position */
                         /* Define a collision object ROS message */
                         moveit_msgs::CollisionObject collision_object;
                         collision_object.header.frame_id = "base_link";
-                        collision_object.id = j;
+                        collision_object.id = i+"_assumption";
                         /* Define a sphere which will be added to the world */
                         shape_msgs::SolidPrimitive primitive;
                         primitive.type = primitive.SPHERE;
                         primitive.dimensions.resize(2);
                         /* Setting the radius of the sphere. */
-                        primitive.dimensions[0] = primitive_radius_;
+                        primitive.dimensions[0] = basic_limb_safety_radius_;
                         /* Define a pose for the sphere (specified relative to frame_id) */
                         geometry_msgs::Pose sphere_pose;
                         /* Setting the position of the sphere */
@@ -259,22 +284,89 @@ void OpenPoseROSControl::generateBasicPrimitivesPro(const openpose_ros_receiver_
                         collision_object.primitive_poses.push_back(sphere_pose);
                         collision_object.operation = collision_object.ADD;
                         planning_scene_interface_.applyCollisionObject(collision_object);
-                        
-                        /* TODO: Make an assumption about keypoint A's position using a relatively big sphere */
-
-                        /* Generate the intermediate keypoints of the A-B pair */
-                        generateIntermediatePrimitivesRec(a, b, i+"_"+j);
                     }
                     else
                     {
                         /* check if the non-detected pair keypoint B is an upper body keypoint */
                         if (std::find(POSE_BODY_25_UPPER_BODY_PARTS_IDX.begin(), POSE_BODY_25_UPPER_BODY_PARTS_IDX.end(), i) != POSE_BODY_25_UPPER_BODY_PARTS_IDX.end())
                         {
-                            /* for debugging */
-                            ROS_WARN("kp %s (pair of kp %s) not detected", getPoseBodyPartMappingBody25(j).c_str(), getPoseBodyPartMappingBody25(i).c_str());
+                            // /* for debugging */
+                            // ROS_WARN("kp %s (pair of kp %s) not detected", getPoseBodyPartIndexMappingBody25(j).c_str(), getPoseBodyPartIndexMappingBody25(i).c_str());
                             
-                            /* TODO: Make an assumption about A-B pair's position using a relatively big sphere */
+                            /* Check if one of the non-detected pair's keypoints has a predecessor-keypoint */
+                            /* A pair's "predecessor" is the keypoint through which one of the pair's keypoints is immediately connected with the rest of the human body */
+                            /* First, check for the keypoint A, the keypoint which is closer to the body's core */
+                            if (POSE_BODY_25_UPPER_BODY_PART_PAIRS_PREDECESSORS.find(i) != POSE_BODY_25_UPPER_BODY_PART_PAIRS_PREDECESSORS.end())
+                            {
+                                int k = getPoseBodyPartPredecessorMappingBody25(i);
 
+                                geometry_msgs::Point c;
+                                c.x = msg->body_key_points_with_prob[k].x; c.y = msg->body_key_points_with_prob[k].y; c.z = msg->body_key_points_with_prob[k].z;
+
+                                /* if there can be a valid predecessor (if the predecessor exists) */
+                                if (c.x && c.y && c.z)
+                                {
+                                    /* Make an assumption about A-B pair's position using a relatively big sphere around the pair's predecessor position */
+                                    /* Define a collision object ROS message */
+                                    moveit_msgs::CollisionObject collision_object;
+                                    collision_object.header.frame_id = "base_link";
+                                    collision_object.id = std::to_string(i)+"-"+std::to_string(j)+"_pair_assumption";
+                                    /* Define a sphere which will be added to the world */
+                                    shape_msgs::SolidPrimitive primitive;
+                                    primitive.type = primitive.SPHERE;
+                                    primitive.dimensions.resize(2);
+                                    /* Setting the radius of the sphere. */
+                                    primitive.dimensions[0] = 2*basic_limb_safety_radius_;
+                                    /* Define a pose for the sphere (specified relative to frame_id) */
+                                    geometry_msgs::Pose sphere_pose;
+                                    /* Setting the position of the sphere */
+                                    sphere_pose.position.x = c.x;
+                                    sphere_pose.position.y = c.y;
+                                    sphere_pose.position.z = c.z;
+                                    /* Add the sphere as collision object */
+                                    collision_object.primitives.push_back(primitive);
+                                    collision_object.primitive_poses.push_back(sphere_pose);
+                                    collision_object.operation = collision_object.ADD;
+                                    planning_scene_interface_.applyCollisionObject(collision_object);
+                                }
+                            }
+                            /* Second, if needed, check for the keypoint B */
+                            else if (POSE_BODY_25_UPPER_BODY_PART_PAIRS_PREDECESSORS.find(j) != POSE_BODY_25_UPPER_BODY_PART_PAIRS_PREDECESSORS.end())
+                            {
+                                int k = getPoseBodyPartPredecessorMappingBody25(j);
+
+                                geometry_msgs::Point c;
+                                c.x = msg->body_key_points_with_prob[k].x; c.y = msg->body_key_points_with_prob[k].y; c.z = msg->body_key_points_with_prob[k].z;
+
+                                /* if there can be a valid predecessor (if the predecessor exists) */
+                                if (c.x && c.y && c.z)
+                                {
+                                    /* Make an assumption about A-B pair's position using a relatively big sphere around the pair's predecessor position */
+                                    /* Define a collision object ROS message */
+                                    moveit_msgs::CollisionObject collision_object;
+                                    collision_object.header.frame_id = "base_link";
+                                    collision_object.id = std::to_string(i)+"-"+std::to_string(j)+"_pair_assumption";
+                                    /* Define a sphere which will be added to the world */
+                                    shape_msgs::SolidPrimitive primitive;
+                                    primitive.type = primitive.SPHERE;
+                                    primitive.dimensions.resize(2);
+                                    /* Setting the radius of the sphere. */
+                                    primitive.dimensions[0] = 2*basic_limb_safety_radius_;
+                                    /* Define a pose for the sphere (specified relative to frame_id) */
+                                    geometry_msgs::Pose sphere_pose;
+                                    /* Setting the position of the sphere */
+                                    sphere_pose.position.x = c.x;
+                                    sphere_pose.position.y = c.y;
+                                    sphere_pose.position.z = c.z;
+                                    /* Add the sphere as collision object */
+                                    collision_object.primitives.push_back(primitive);
+                                    collision_object.primitive_poses.push_back(sphere_pose);
+                                    collision_object.operation = collision_object.ADD;
+                                    planning_scene_interface_.applyCollisionObject(collision_object);
+                                }
+                            }
+                            else
+                                continue;
                         }
                         else
                             continue;
@@ -375,4 +467,85 @@ void OpenPoseROSControl::generateIntermediatePrimitivesIter(geometry_msgs::Point
         segment++;
         numerator -= 2;
     }
+}
+
+/* Adapt the geometric primitive generation parameters e.g. radiuses to be suitable for a given human body message */
+/* work in progress... (TODO) */
+void OpenPoseROSControl::adaptPrimitiveGenerationParameters(const openpose_ros_receiver_msgs::OpenPoseReceiverHuman::ConstPtr& msg)
+{
+    /* ideally:
+        * primitive_radius = abs( d(LHip, RHip) - d(LShoulder, RShoulder) )
+        * basic_limb_safety_radius = max( max( d(LShoulder, LElbow), d(RShoulder, RElbow) ), max( d(LElbow, LWrist), d(RElbow, RWrist) ) ) */
+    /* for better performance we need to minimize the accesses to our maps */
+    geometry_msgs::Point LShoulder, RShoulder, LElbow, RElbow, LWrist, RWrist, LHip, RHip;
+    bool hasLShoulder = false, hasRShoulder = false, hasLElbow = false, hasRElbow = false, hasLWrist = false, hasRWrist = false, hasLHip = false, hasRHip = false;
+    uint8_t LShoulder_idx, RShoulder_idx, LElbow_idx, RElbow_idx, LWrist_idx, RWrist_idx, LHip_idx, RHip_idx;
+
+    LShoulder_idx = getPoseBodyPartNameMappingBody25("LShoulder"); RShoulder_idx = getPoseBodyPartNameMappingBody25("RShoulder");
+    LElbow_idx = getPoseBodyPartNameMappingBody25("LElbow"); RElbow_idx = getPoseBodyPartNameMappingBody25("RElbow");
+    LWrist_idx = getPoseBodyPartNameMappingBody25("LWrist"); RWrist_idx = getPoseBodyPartNameMappingBody25("RWrist");
+    LHip_idx = getPoseBodyPartNameMappingBody25("LHip"); RHip_idx = getPoseBodyPartNameMappingBody25("RHip");
+
+    LShoulder.x = msg->body_key_points_with_prob[LShoulder_idx].x; LShoulder.y = msg->body_key_points_with_prob[LShoulder_idx].y; LShoulder.z = msg->body_key_points_with_prob[LShoulder_idx].z;
+    RShoulder.x = msg->body_key_points_with_prob[RShoulder_idx].x; RShoulder.y = msg->body_key_points_with_prob[RShoulder_idx].y; RShoulder.z = msg->body_key_points_with_prob[RShoulder_idx].z;
+    LElbow.x = msg->body_key_points_with_prob[LElbow_idx].x; LElbow.y = msg->body_key_points_with_prob[LElbow_idx].y; LElbow.z = msg->body_key_points_with_prob[LElbow_idx].z;
+    RElbow.x = msg->body_key_points_with_prob[RElbow_idx].x; RElbow.y = msg->body_key_points_with_prob[RElbow_idx].y; RElbow.z = msg->body_key_points_with_prob[RElbow_idx].z;
+    LWrist.x = msg->body_key_points_with_prob[LWrist_idx].x; LWrist.y = msg->body_key_points_with_prob[LWrist_idx].y; LWrist.z = msg->body_key_points_with_prob[LWrist_idx].z;
+    RWrist.x = msg->body_key_points_with_prob[RWrist_idx].x; RWrist.y = msg->body_key_points_with_prob[RWrist_idx].y; RWrist.z = msg->body_key_points_with_prob[RWrist_idx].z;
+    LHip.x = msg->body_key_points_with_prob[LHip_idx].x; LHip.y = msg->body_key_points_with_prob[LHip_idx].y; LHip.z = msg->body_key_points_with_prob[LHip_idx].z;
+    RHip.x = msg->body_key_points_with_prob[RHip_idx].x; RHip.y = msg->body_key_points_with_prob[RHip_idx].y; RHip.z = msg->body_key_points_with_prob[RHip_idx].z;
+
+    /* find which keypoints exist in the human body message at hand */
+    if (LShoulder.x && LShoulder.y && LShoulder.z)
+        hasLShoulder = true;
+    if (RShoulder.x && RShoulder.y && RShoulder.z)
+        hasRShoulder = true;
+    if (LElbow.x && LElbow.y && LElbow.z)
+        hasLElbow = true;
+    if (RElbow.x && RElbow.y && RElbow.z)
+        hasRElbow = true;
+    if (LWrist.x && LWrist.y && LWrist.z)
+        hasLWrist = true;
+    if (RWrist.x && RWrist.y && RWrist.z)
+        hasRWrist = true;
+    if (LHip.x && LHip.y && LHip.z)
+        hasLHip = true;
+    if (RHip.x && RHip.y && RHip.z)
+        hasRHip = true;
+
+    /* adapt primitive radius parameter */
+    if (hasLHip && hasRHip && hasLShoulder && hasRShoulder)
+        primitive_radius_ = std::abs( distance(LHip, RHip) - distance(LShoulder, RShoulder) );
+    else
+        primitive_radius_ = default_primitive_radius_;
+
+    if (primitive_radius_ > primitive_radius_adaptation_limit_)
+        primitive_radius_ = default_primitive_radius_;
+
+    /* adapt basic limb safety radius parameter */
+    if (hasLShoulder && hasLElbow && hasLWrist && hasRShoulder && hasRElbow && hasRWrist)
+        basic_limb_safety_radius_ = std::max( std::max( distance(LShoulder, LElbow), distance(RShoulder, RElbow) ), std::max( distance(LElbow, LWrist), distance(RElbow, RWrist) ) );
+    else if (hasLElbow && hasLWrist && hasRShoulder && hasRElbow && hasRWrist)
+        basic_limb_safety_radius_ = std::max( distance(RShoulder, RElbow), std::max( distance(LElbow, LWrist), distance(RElbow, RWrist) ) );
+    else if (hasLShoulder && hasLElbow && hasLWrist && hasRElbow && hasRWrist)
+        basic_limb_safety_radius_ = std::max( distance(LShoulder, LElbow), std::max( distance(LElbow, LWrist), distance(RElbow, RWrist) ) );
+    else if (hasLShoulder && hasLElbow && hasLWrist && hasRShoulder && hasRElbow)
+        basic_limb_safety_radius_ = std::max( std::max( distance(LShoulder, LElbow), distance(RShoulder, RElbow) ), distance(LElbow, LWrist) );
+    else if (hasLShoulder && hasLElbow && hasRShoulder && hasRElbow && hasRWrist)
+        basic_limb_safety_radius_ = std::max( std::max( distance(LShoulder, LElbow), distance(RShoulder, RElbow) ), distance(RElbow, RWrist) );
+    else if (hasLShoulder && hasLElbow && hasLWrist)
+        basic_limb_safety_radius_ = std::max( distance(LShoulder, LElbow), distance(LElbow, LWrist) );
+    else if (hasLShoulder && hasLElbow && hasRElbow && hasRWrist)
+        basic_limb_safety_radius_ = std::max( distance(LShoulder, LElbow), distance(RElbow, RWrist) );
+    else if (hasLElbow && hasLWrist && hasRShoulder && hasRElbow)
+        basic_limb_safety_radius_ = std::max( distance(RShoulder, RElbow), distance(LElbow, LWrist) );
+    else if (hasRShoulder && hasRElbow && hasRWrist)
+        basic_limb_safety_radius_ = std::max( distance(RShoulder, RElbow), distance(RElbow, RWrist) );
+    else
+        basic_limb_safety_radius_ = default_basic_limb_safety_radius_;
+
+    if (basic_limb_safety_radius_ > basic_limb_safety_radius_adaptation_limit_)
+        basic_limb_safety_radius_ = default_basic_limb_safety_radius_;
+
+    ROS_INFO("primitive_radius: %f, basic_limb_safety_radius: %f", primitive_radius_, basic_limb_safety_radius_);
 }

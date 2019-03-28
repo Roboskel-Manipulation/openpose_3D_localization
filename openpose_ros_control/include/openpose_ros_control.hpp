@@ -26,7 +26,10 @@ private:
     ros::NodeHandle nh_;
     std::string robot_frame_coords_str_topic_, robot_frame_coords_msg_topic_, image_frame_, robot_base_link_frame_;
     int queue_size_, human_body_keypoints_;
-    double primitive_radius_, basic_limb_safety_radius_, min_avg_prob_;
+    double  primitive_radius_, basic_limb_safety_radius_,
+            default_primitive_radius_, default_basic_limb_safety_radius_,
+            primitive_radius_adaptation_limit_, basic_limb_safety_radius_adaptation_limit_,
+            min_avg_prob_;
     ros::Subscriber subRobotFrameCoordsStr_, subRobotFrameCoordsMsg_;
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface_;
 public:
@@ -41,18 +44,22 @@ public:
     /* Generate geometric primitives around every detected human body keypoint */
     void generateBasicPrimitives(const openpose_ros_receiver_msgs::OpenPoseReceiverHuman::ConstPtr& msg);
     /* Generate geometric primitives around every detected human body keypoint, while also tryig to tackle the absence of the non-detected keypoints */
-    /* work in progress... (TODO) */
     void generateBasicPrimitivesPro(const openpose_ros_receiver_msgs::OpenPoseReceiverHuman::ConstPtr& msg);
     /* Generate geometric primitives around between every detected human body keypoints pair recursively */    
     void generateIntermediatePrimitivesRec(geometry_msgs::Point a, geometry_msgs::Point b, std::string idPrefix);
     /* Generate geometric primitives around between every detected human body keypoints pair iteratively */
     /* work in progress... (TODO) */
     void generateIntermediatePrimitivesIter(geometry_msgs::Point a, geometry_msgs::Point b, std::string idPrefix);
+    /* Adapt the geometric primitive generation parameters e.g. radiuses to be suitable for a given human body message */
+    /* work in progress... (TODO) */
+    void adaptPrimitiveGenerationParameters(const openpose_ros_receiver_msgs::OpenPoseReceiverHuman::ConstPtr& msg);
 };
 
 /* Utility functions */
 double distance(geometry_msgs::Point & a, geometry_msgs::Point & b);
-std::string getPoseBodyPartMappingBody25(unsigned int idx);
+std::string getPoseBodyPartIndexMappingBody25(unsigned int idx);
+unsigned int getPoseBodyPartNameMappingBody25(std::string name);
 unsigned int getPoseBodyPartPairMappingBody25(unsigned int idx);
+unsigned int getPoseBodyPartPredecessorMappingBody25(unsigned int idx);
 
 #endif
