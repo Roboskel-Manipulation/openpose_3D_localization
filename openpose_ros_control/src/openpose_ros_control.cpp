@@ -41,10 +41,17 @@ void OpenPoseROSControl::robotFrameCoordsMsgTopicCallback(const openpose_ros_rec
     if (sumProb / msg->num_body_key_points_with_non_zero_prob < min_avg_prob_)
         return;
 
+    // double beginSec = ros::Time::now().toSec();
     // adaptPrimitiveGenerationParameters(msg);
+    // double endSec = ros::Time::now().toSec();
+    // ROS_INFO("adaptPrimitiveGenerationParameters duration: %f", endSec - beginSec);
 
     // generateBasicPrimitives(msg);
+
+    // beginSec = ros::Time::now().toSec();
     generateBasicPrimitivesPro(msg);
+    // endSec = ros::Time::now().toSec();
+    // ROS_INFO("generateBasicPrimitivesPro duration: %f", endSec - beginSec);
 }
 
 /* Generate geometric primitives around every detected human body keypoint */
@@ -55,6 +62,15 @@ void OpenPoseROSControl::generateBasicPrimitives(const openpose_ros_receiver_msg
 
     for (uint8_t i = 0; i < human_body_keypoints_; i++)
     {
+        /* no need to deal with, knees, ankles, heels, toes and background in our application */
+        if (i == 10 || i == 13)     // knees (11, 12) and ankles (13, 14)
+        {
+            i++;
+            continue;
+        }
+        if (i > 18)                 // heels, toes and background
+            break;
+
         geometry_msgs::Point a;
         a.x = msg->body_key_points_with_prob[i].x; a.y = msg->body_key_points_with_prob[i].y; a.z = msg->body_key_points_with_prob[i].z;
 
@@ -138,6 +154,15 @@ void OpenPoseROSControl::generateBasicPrimitivesPro(const openpose_ros_receiver_
     /* for every possible keypoint */
     for (uint8_t i = 0; i < human_body_keypoints_; i++)
     {
+        /* no need to deal with, knees, ankles, heels, toes and background in our application */
+        if (i == 10 || i == 13)     // knees (11, 12) and ankles (13, 14)
+        {
+            i++;
+            continue;
+        }
+        if (i > 18)                 // heels, toes and background
+            break;
+
         geometry_msgs::Point a;
         a.x = msg->body_key_points_with_prob[i].x; a.y = msg->body_key_points_with_prob[i].y; a.z = msg->body_key_points_with_prob[i].z;
 
@@ -154,7 +179,7 @@ void OpenPoseROSControl::generateBasicPrimitivesPro(const openpose_ros_receiver_
             primitive.type = primitive.SPHERE;
             primitive.dimensions.resize(2);
             /* Setting the radius of the sphere. */
-            primitive.dimensions[0] = primitive_radius_;
+            primitive.dimensions[0] = ( i == 4 || i == 7 ? 2*primitive_radius_ : primitive_radius_ ); // wrists need a bigger sphere to cover the hand
             /* Define a pose for the sphere (specified relative to frame_id) */
             geometry_msgs::Pose sphere_pose;
             /* Setting the position of the sphere */
@@ -188,7 +213,7 @@ void OpenPoseROSControl::generateBasicPrimitivesPro(const openpose_ros_receiver_
                     primitive.type = primitive.SPHERE;
                     primitive.dimensions.resize(2);
                     /* Setting the radius of the sphere. */
-                    primitive.dimensions[0] = primitive_radius_;
+                    primitive.dimensions[0] = ( j == 4 || j == 7 ? 2*primitive_radius_ : primitive_radius_ ); // wrists need a bigger sphere to cover the hand
                     /* Define a pose for the sphere (specified relative to frame_id) */
                     geometry_msgs::Pose sphere_pose;
                     /* Setting the position of the sphere */
@@ -202,7 +227,46 @@ void OpenPoseROSControl::generateBasicPrimitivesPro(const openpose_ros_receiver_
                     planning_scene_interface_.applyCollisionObject(collision_object);
 
                     /* Generate the intermediate keypoints of the A-B pair */
-                    generateIntermediatePrimitivesRec(a, b, i+"_"+j);
+                    /* we moved the checking of the base condition of our recursion here in order to avoid unnecessary function calls */
+                    if (distance(a, b) > 2 * primitive_radius_)
+                    {
+                        if ( (i == 1 && j == 8) || (i == 8 && j == 1))
+                        {
+                            /* find the middle of the torso */
+                            geometry_msgs::Point m;
+                            m.x = (a.x + b.x) / 2; m.y = (a.y + b.y) / 2; m.z = (a.z + b.z) / 2;
+
+                            /* create a sphere in space in the position of the midpoint */
+                            /* Define a collision object ROS message */
+                            moveit_msgs::CollisionObject collision_object;
+                            collision_object.header.frame_id = "base_link";
+                            collision_object.id = i+"_"+j;
+                            /* Define a sphere which will be added to the world */
+                            shape_msgs::SolidPrimitive primitive;
+                            primitive.type = primitive.SPHERE;
+                            primitive.dimensions.resize(2);
+                            /* Setting the radius of the sphere. */
+                            primitive.dimensions[0] = basic_limb_safety_radius_;
+                            /* Define a pose for the sphere (specified relative to frame_id) */
+                            geometry_msgs::Pose sphere_pose;
+                            /* Setting the position of the sphere */
+                            sphere_pose.position.x = m.x;
+                            sphere_pose.position.y = m.y;
+                            sphere_pose.position.z = m.z;
+                            /* Add the sphere as collision object */
+                            collision_object.primitives.push_back(primitive);
+                            collision_object.primitive_poses.push_back(sphere_pose);
+                            collision_object.operation = collision_object.ADD;
+                            planning_scene_interface_.applyCollisionObject(collision_object);
+                        }
+                        else
+                        {
+                            // double beginSec = ros::Time::now().toSec();
+                            generateIntermediatePrimitivesRec(a, b, i+"_"+j);
+                            // double endSec = ros::Time::now().toSec();
+                            // ROS_INFO("generateIntermediatePrimitivesRec duration: %f", endSec - beginSec);
+                        }
+                    }
                 }
                 else
                 {
@@ -382,9 +446,9 @@ void OpenPoseROSControl::generateBasicPrimitivesPro(const openpose_ros_receiver_
 /* Generate geometric primitives around between every detected human body keypoints pair recursively */
 void OpenPoseROSControl::generateIntermediatePrimitivesRec(geometry_msgs::Point a, geometry_msgs::Point b, std::string idPrefix)
 {
-    /* the base of our recursion */
-    if (distance(a, b) <= 2 * primitive_radius_)
-        return;
+    // /* the base of our recursion */
+    // if (distance(a, b) <= 2 * primitive_radius_)
+    //     return;
 
     /* find the midpoint of the line connecting points a & b */
     geometry_msgs::Point m;
@@ -414,8 +478,11 @@ void OpenPoseROSControl::generateIntermediatePrimitivesRec(geometry_msgs::Point 
     planning_scene_interface_.applyCollisionObject(collision_object);
 
     /* recursion branches */
-    generateIntermediatePrimitivesRec(a, m, idPrefix+"_L");   // leftmost half
-    generateIntermediatePrimitivesRec(m, b, idPrefix+"_R");   // rightmost half
+    /* we moved the checking of the base condition of our recursion here in order to avoid unnecessary function calls */
+    if (distance(a, m) > 2 * primitive_radius_)
+        generateIntermediatePrimitivesRec(a, m, idPrefix+"_L");   // leftmost half
+    if (distance(m, b) > 2 * primitive_radius_)
+        generateIntermediatePrimitivesRec(m, b, idPrefix+"_R");   // rightmost half
 }
 
 /* Generate geometric primitives around between every detected human body keypoints pair iteratively */
@@ -474,17 +541,20 @@ void OpenPoseROSControl::generateIntermediatePrimitivesIter(geometry_msgs::Point
 void OpenPoseROSControl::adaptPrimitiveGenerationParameters(const openpose_ros_receiver_msgs::OpenPoseReceiverHuman::ConstPtr& msg)
 {
     /* ideally:
-        * primitive_radius = abs( d(LHip, RHip) - d(LShoulder, RShoulder) )
+        * primitive_radius = abs( d(LHip, RHip) - d(LShoulder, RShoulder) ) / 2
         * basic_limb_safety_radius = max( max( d(LShoulder, LElbow), d(RShoulder, RElbow) ), max( d(LElbow, LWrist), d(RElbow, RWrist) ) ) */
     /* for better performance we need to minimize the accesses to our maps */
     geometry_msgs::Point LShoulder, RShoulder, LElbow, RElbow, LWrist, RWrist, LHip, RHip;
     bool hasLShoulder = false, hasRShoulder = false, hasLElbow = false, hasRElbow = false, hasLWrist = false, hasRWrist = false, hasLHip = false, hasRHip = false;
     uint8_t LShoulder_idx, RShoulder_idx, LElbow_idx, RElbow_idx, LWrist_idx, RWrist_idx, LHip_idx, RHip_idx;
 
-    LShoulder_idx = getPoseBodyPartNameMappingBody25("LShoulder"); RShoulder_idx = getPoseBodyPartNameMappingBody25("RShoulder");
-    LElbow_idx = getPoseBodyPartNameMappingBody25("LElbow"); RElbow_idx = getPoseBodyPartNameMappingBody25("RElbow");
-    LWrist_idx = getPoseBodyPartNameMappingBody25("LWrist"); RWrist_idx = getPoseBodyPartNameMappingBody25("RWrist");
-    LHip_idx = getPoseBodyPartNameMappingBody25("LHip"); RHip_idx = getPoseBodyPartNameMappingBody25("RHip");
+    // LShoulder_idx = getPoseBodyPartNameMappingBody25("LShoulder"); RShoulder_idx = getPoseBodyPartNameMappingBody25("RShoulder");
+    // LElbow_idx = getPoseBodyPartNameMappingBody25("LElbow"); RElbow_idx = getPoseBodyPartNameMappingBody25("RElbow");
+    // LWrist_idx = getPoseBodyPartNameMappingBody25("LWrist"); RWrist_idx = getPoseBodyPartNameMappingBody25("RWrist");
+    // LHip_idx = getPoseBodyPartNameMappingBody25("LHip"); RHip_idx = getPoseBodyPartNameMappingBody25("RHip");
+    /* better for performance this way: */
+    LShoulder_idx = 5; LElbow_idx = 6; LWrist_idx = 7; LHip_idx = 12;
+    RShoulder_idx = 2; RElbow_idx = 3; RWrist_idx = 4; RHip_idx = 9;
 
     LShoulder.x = msg->body_key_points_with_prob[LShoulder_idx].x; LShoulder.y = msg->body_key_points_with_prob[LShoulder_idx].y; LShoulder.z = msg->body_key_points_with_prob[LShoulder_idx].z;
     RShoulder.x = msg->body_key_points_with_prob[RShoulder_idx].x; RShoulder.y = msg->body_key_points_with_prob[RShoulder_idx].y; RShoulder.z = msg->body_key_points_with_prob[RShoulder_idx].z;
@@ -515,7 +585,7 @@ void OpenPoseROSControl::adaptPrimitiveGenerationParameters(const openpose_ros_r
 
     /* adapt primitive radius parameter */
     if (hasLHip && hasRHip && hasLShoulder && hasRShoulder)
-        primitive_radius_ = std::abs( distance(LHip, RHip) - distance(LShoulder, RShoulder) );
+        primitive_radius_ = std::abs( distance(LHip, RHip) - distance(LShoulder, RShoulder) ) / 2;
     else
         primitive_radius_ = default_primitive_radius_;
 
@@ -547,5 +617,5 @@ void OpenPoseROSControl::adaptPrimitiveGenerationParameters(const openpose_ros_r
     if (basic_limb_safety_radius_ > basic_limb_safety_radius_adaptation_limit_)
         basic_limb_safety_radius_ = default_basic_limb_safety_radius_;
 
-    ROS_INFO("primitive_radius: %f, basic_limb_safety_radius: %f", primitive_radius_, basic_limb_safety_radius_);
+    // ROS_INFO("primitive_radius: %f, basic_limb_safety_radius: %f", primitive_radius_, basic_limb_safety_radius_);
 }
