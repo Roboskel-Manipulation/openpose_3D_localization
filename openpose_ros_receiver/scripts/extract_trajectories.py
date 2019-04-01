@@ -216,6 +216,8 @@ if __name__ == "__main__":
         os.makedirs(trajectories_plots_autocorrelation_path)
 
     # create CSVs
+    fp = open(trajectories_csvs_path + "all_keypoints_timeseries" + ".csv", 'w')
+    fp.close()
     for _, value in body_25_body_parts_dict.items():
         fp = open(trajectories_csvs_path + value + "_x" + ".csv", 'w')
         fp.close()
@@ -278,6 +280,14 @@ if __name__ == "__main__":
             print >> fp , "t,y"
             for j in range(val):
                 print >> fp , "t" + str(j) + "," + str(report_matrix[i][j][ getKeysByValue(element_dict, "y")[0] ])
+
+
+    # all keypoints timeseries
+    with open(trajectories_csvs_path + "all_keypoints_timeseries" + ".csv", 'a') as fp:
+        for i in range(part):
+            print >> fp, body_25_body_parts_dict.get(i)
+            print >> fp, "x:" + ",".join( [ str(report_matrix[i][j][ getKeysByValue(element_dict, "x")[0] ]) for j in range(val) ] )
+            print >> fp, "y:" + ",".join( [ str(report_matrix[i][j][ getKeysByValue(element_dict, "y")[0] ]) for j in range(val) ] )
 
 
     # set timeseries data specifications

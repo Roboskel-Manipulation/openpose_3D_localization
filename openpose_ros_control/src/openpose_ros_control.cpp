@@ -8,11 +8,11 @@ OpenPoseROSControl::OpenPoseROSControl()
     nh_.param("openpose_ros_control_node/robot_frame_coords_msg_topic", robot_frame_coords_msg_topic_, std::string("/openpose_ros_receiver/robot_frame_coords_msg"));
     nh_.param("openpose_ros_control_node/queue_size", queue_size_, 2);
     nh_.param("openpose_ros_control_node/human_body_keypoints", human_body_keypoints_, 25);
-    nh_.param("openpose_ros_control_node/primitive_radius", primitive_radius_, 0.05);
-    default_primitive_radius_ = primitive_radius_;
+    nh_.param("openpose_ros_control_node/geometric_primitive_radius", geometric_primitive_radius_, 0.05);
+    default_geometric_primitive_radius_ = geometric_primitive_radius_;
     nh_.param("openpose_ros_control_node/basic_limb_safety_radius", basic_limb_safety_radius_, 0.35);
     default_basic_limb_safety_radius_ = basic_limb_safety_radius_;
-    nh_.param("openpose_ros_control_node/primitive_radius_adaptation_limit", primitive_radius_adaptation_limit_, 0.25);
+    nh_.param("openpose_ros_control_node/geometric_primitive_radius_adaptation_limit", geometric_primitive_radius_adaptation_limit_, 0.25);
     nh_.param("openpose_ros_control_node/basic_limb_safety_radius_adaptation_limit", basic_limb_safety_radius_adaptation_limit_, 1.25);
     nh_.param("openpose_ros_control_node/min_avg_prob", min_avg_prob_, 0.25);
     nh_.param("openpose_ros_control/image_frame", image_frame_, std::string("/zed_left_camera_frame"));
@@ -42,20 +42,20 @@ void OpenPoseROSControl::robotFrameCoordsMsgTopicCallback(const openpose_ros_rec
         return;
 
     // double beginSec = ros::Time::now().toSec();
-    // adaptPrimitiveGenerationParameters(msg);
+    // adaptGeometricPrimitiveGenerationParameters(msg);
     // double endSec = ros::Time::now().toSec();
-    // ROS_INFO("adaptPrimitiveGenerationParameters duration: %f", endSec - beginSec);
+    // ROS_INFO("adaptGeometricPrimitiveGenerationParameters duration: %f", endSec - beginSec);
 
-    // generateBasicPrimitives(msg);
+    // generateBasicGeometricPrimitives(msg);
 
     // beginSec = ros::Time::now().toSec();
-    generateBasicPrimitivesPro(msg);
+    generateBasicGeometricPrimitivesPro(msg);
     // endSec = ros::Time::now().toSec();
-    // ROS_INFO("generateBasicPrimitivesPro duration: %f", endSec - beginSec);
+    // ROS_INFO("generateBasicGeometricPrimitivesPro duration: %f", endSec - beginSec);
 }
 
 /* Generate geometric primitives around every detected human body keypoint */
-void OpenPoseROSControl::generateBasicPrimitives(const openpose_ros_receiver_msgs::OpenPoseReceiverHuman::ConstPtr& msg)
+void OpenPoseROSControl::generateBasicGeometricPrimitives(const openpose_ros_receiver_msgs::OpenPoseReceiverHuman::ConstPtr& msg)
 {
     /* remove all other collision obects in our planning scene */
     planning_scene_interface_.removeCollisionObjects(planning_scene_interface_.getKnownObjectNames());
@@ -90,7 +90,7 @@ void OpenPoseROSControl::generateBasicPrimitives(const openpose_ros_receiver_msg
             primitive.type = primitive.SPHERE;
             primitive.dimensions.resize(2);
             /* Setting the radius of the sphere. */
-            primitive.dimensions[0] = primitive_radius_;
+            primitive.dimensions[0] = geometric_primitive_radius_;
             /* Define a pose for the sphere (specified relative to frame_id) */
             geometry_msgs::Pose sphere_pose;
             /* Setting the position of the sphere */
@@ -124,7 +124,7 @@ void OpenPoseROSControl::generateBasicPrimitives(const openpose_ros_receiver_msg
                     primitive.type = primitive.SPHERE;
                     primitive.dimensions.resize(2);
                     /* Setting the radius of the sphere. */
-                    primitive.dimensions[0] = primitive_radius_;
+                    primitive.dimensions[0] = geometric_primitive_radius_;
                     /* Define a pose for the sphere (specified relative to frame_id) */
                     geometry_msgs::Pose sphere_pose;
                     /* Setting the position of the sphere */
@@ -138,7 +138,7 @@ void OpenPoseROSControl::generateBasicPrimitives(const openpose_ros_receiver_msg
                     planning_scene_interface_.applyCollisionObject(collision_object);
 
                     /* Generate the intermediate keypoints of the A-B pair */
-                    generateIntermediatePrimitivesRec(a, b, i+"_"+j);
+                    generateIntermediateGeometricPrimitivesRec(a, b, i+"_"+j);
                 }
             }
         }
@@ -146,7 +146,7 @@ void OpenPoseROSControl::generateBasicPrimitives(const openpose_ros_receiver_msg
 }
 
 /* Generate geometric primitives around every detected human body keypoint, while also tryig to tackle the absence of the non-detected keypoints */
-void OpenPoseROSControl::generateBasicPrimitivesPro(const openpose_ros_receiver_msgs::OpenPoseReceiverHuman::ConstPtr& msg)
+void OpenPoseROSControl::generateBasicGeometricPrimitivesPro(const openpose_ros_receiver_msgs::OpenPoseReceiverHuman::ConstPtr& msg)
 {
     /* remove all other collision obects in our planning scene */
     planning_scene_interface_.removeCollisionObjects(planning_scene_interface_.getKnownObjectNames());
@@ -169,7 +169,7 @@ void OpenPoseROSControl::generateBasicPrimitivesPro(const openpose_ros_receiver_
         /* if there is a valid keypoint (remember in the robot frame (0,0,0) is the base_link of our robot... no way we have a human body keypoint in there) */
         if (a.x && a.y && a.z)
         {
-            /* Add keypoint A's primitive */
+            /* Add keypoint A's geometric primitive */
             /* Define a collision object ROS message */
             moveit_msgs::CollisionObject collision_object;
             collision_object.header.frame_id = "base_link";
@@ -179,7 +179,7 @@ void OpenPoseROSControl::generateBasicPrimitivesPro(const openpose_ros_receiver_
             primitive.type = primitive.SPHERE;
             primitive.dimensions.resize(2);
             /* Setting the radius of the sphere. */
-            primitive.dimensions[0] = ( i == 4 || i == 7 ? 2*primitive_radius_ : primitive_radius_ ); // wrists need a bigger sphere to cover the hand
+            primitive.dimensions[0] = ( i == 4 || i == 7 ? 2*geometric_primitive_radius_ : geometric_primitive_radius_ ); // wrists need a bigger sphere to cover the hand
             /* Define a pose for the sphere (specified relative to frame_id) */
             geometry_msgs::Pose sphere_pose;
             /* Setting the position of the sphere */
@@ -203,7 +203,7 @@ void OpenPoseROSControl::generateBasicPrimitivesPro(const openpose_ros_receiver_
                 /* if there can be a valid pair (if the pair exists) */
                 if (b.x && b.y && b.z)
                 {
-                    /* Add keypoint B's primitive */
+                    /* Add keypoint B's geometric primitive */
                     /* Define a collision object ROS message */
                     moveit_msgs::CollisionObject collision_object;
                     collision_object.header.frame_id = "base_link";
@@ -213,7 +213,7 @@ void OpenPoseROSControl::generateBasicPrimitivesPro(const openpose_ros_receiver_
                     primitive.type = primitive.SPHERE;
                     primitive.dimensions.resize(2);
                     /* Setting the radius of the sphere. */
-                    primitive.dimensions[0] = ( j == 4 || j == 7 ? 2*primitive_radius_ : primitive_radius_ ); // wrists need a bigger sphere to cover the hand
+                    primitive.dimensions[0] = ( j == 4 || j == 7 ? 2*geometric_primitive_radius_ : geometric_primitive_radius_ ); // wrists need a bigger sphere to cover the hand
                     /* Define a pose for the sphere (specified relative to frame_id) */
                     geometry_msgs::Pose sphere_pose;
                     /* Setting the position of the sphere */
@@ -228,7 +228,7 @@ void OpenPoseROSControl::generateBasicPrimitivesPro(const openpose_ros_receiver_
 
                     /* Generate the intermediate keypoints of the A-B pair */
                     /* we moved the checking of the base condition of our recursion here in order to avoid unnecessary function calls */
-                    if (distance(a, b) > 2 * primitive_radius_)
+                    if (distance(a, b) > 2 * geometric_primitive_radius_)
                     {
                         if ( (i == 1 && j == 8) || (i == 8 && j == 1))
                         {
@@ -262,9 +262,9 @@ void OpenPoseROSControl::generateBasicPrimitivesPro(const openpose_ros_receiver_
                         else
                         {
                             // double beginSec = ros::Time::now().toSec();
-                            generateIntermediatePrimitivesRec(a, b, i+"_"+j);
+                            generateIntermediateGeometricPrimitivesRec(a, b, i+"_"+j);
                             // double endSec = ros::Time::now().toSec();
-                            // ROS_INFO("generateIntermediatePrimitivesRec duration: %f", endSec - beginSec);
+                            // ROS_INFO("generateIntermediateGeometricPrimitivesRec duration: %f", endSec - beginSec);
                         }
                     }
                 }
@@ -326,7 +326,7 @@ void OpenPoseROSControl::generateBasicPrimitivesPro(const openpose_ros_receiver_
                         // /* for debugging */
                         // ROS_INFO("kp %s (pair of kp %s) detected", getPoseBodyPartIndexMappingBody25(j).c_str(), getPoseBodyPartIndexMappingBody25(i).c_str());
 
-                        /* Add keypoint B's primitive, while also making an assumption about keypoint A's position using a relatively big sphere around keypoint B's position */
+                        /* Add keypoint B's geometric primitive, while also making an assumption about keypoint A's position using a relatively big sphere around keypoint B's position */
                         /* Define a collision object ROS message */
                         moveit_msgs::CollisionObject collision_object;
                         collision_object.header.frame_id = "base_link";
@@ -444,10 +444,10 @@ void OpenPoseROSControl::generateBasicPrimitivesPro(const openpose_ros_receiver_
 }
 
 /* Generate geometric primitives around between every detected human body keypoints pair recursively */
-void OpenPoseROSControl::generateIntermediatePrimitivesRec(geometry_msgs::Point a, geometry_msgs::Point b, std::string idPrefix)
+void OpenPoseROSControl::generateIntermediateGeometricPrimitivesRec(geometry_msgs::Point a, geometry_msgs::Point b, std::string idPrefix)
 {
     // /* the base of our recursion */
-    // if (distance(a, b) <= 2 * primitive_radius_)
+    // if (distance(a, b) <= 2 * geometric_primitive_radius_)
     //     return;
 
     /* find the midpoint of the line connecting points a & b */
@@ -464,7 +464,7 @@ void OpenPoseROSControl::generateIntermediatePrimitivesRec(geometry_msgs::Point 
     primitive.type = primitive.SPHERE;
     primitive.dimensions.resize(2);
     /* Setting the radius of the sphere. */
-    primitive.dimensions[0] = primitive_radius_;
+    primitive.dimensions[0] = geometric_primitive_radius_;
     /* Define a pose for the sphere (specified relative to frame_id) */
     geometry_msgs::Pose sphere_pose;
     /* Setting the position of the sphere */
@@ -479,30 +479,30 @@ void OpenPoseROSControl::generateIntermediatePrimitivesRec(geometry_msgs::Point 
 
     /* recursion branches */
     /* we moved the checking of the base condition of our recursion here in order to avoid unnecessary function calls */
-    if (distance(a, m) > 2 * primitive_radius_)
-        generateIntermediatePrimitivesRec(a, m, idPrefix+"_L");   // leftmost half
-    if (distance(m, b) > 2 * primitive_radius_)
-        generateIntermediatePrimitivesRec(m, b, idPrefix+"_R");   // rightmost half
+    if (distance(a, m) > 2 * geometric_primitive_radius_)
+        generateIntermediateGeometricPrimitivesRec(a, m, idPrefix+"_L");   // leftmost half
+    if (distance(m, b) > 2 * geometric_primitive_radius_)
+        generateIntermediateGeometricPrimitivesRec(m, b, idPrefix+"_R");   // rightmost half
 }
 
 /* Generate geometric primitives around between every detected human body keypoints pair iteratively */
 /* work in progress... (TODO) */
-void OpenPoseROSControl::generateIntermediatePrimitivesIter(geometry_msgs::Point a, geometry_msgs::Point b, std::string idPrefix)
+void OpenPoseROSControl::generateIntermediateGeometricPrimitivesIter(geometry_msgs::Point a, geometry_msgs::Point b, std::string idPrefix)
 {
-    /* check if there is enough space for another primitive */
-    if (distance(a, b) <= 2 * primitive_radius_)
+    /* check if there is enough space for another geometric primitive */
+    if (distance(a, b) <= 2 * geometric_primitive_radius_)
         return;
 
     /* find the distance d between points A & B */
     double d = distance(a, b);
     geometry_msgs::Point n;
-    int segment = 0, numerator = d / primitive_radius_ - 1, denominator = d / primitive_radius_;
+    int segment = 0, numerator = d / geometric_primitive_radius_ - 1, denominator = d / geometric_primitive_radius_;
 
     /* starting from B, iteratively, take portions of the line between A & B */
     while (numerator > 0)
     {
         // /* for debugging */
-        // ROS_INFO("distance: %f, primitive_radius_: %f, segment: %d, numerator: %d, denominator: %d", d, primitive_radius_, segment, numerator, denominator);
+        // ROS_INFO("distance: %f, geometric_primitive_radius_: %f, segment: %d, numerator: %d, denominator: %d", d, geometric_primitive_radius_, segment, numerator, denominator);
         // ROS_INFO("a.x = %f, b.x = %f -- a.y = %f, b.y = %f -- a.z = %f, b.z = %f", a.x, b.x, a.y, b.y, a.z, b.z);
         // ROS_INFO("n.x = %f, n.y = %f, n.z = %f", n.x, n.y, n.z);
 
@@ -518,7 +518,7 @@ void OpenPoseROSControl::generateIntermediatePrimitivesIter(geometry_msgs::Point
         primitive.type = primitive.SPHERE;
         primitive.dimensions.resize(2);
         /* Setting the radius of the sphere. */
-        primitive.dimensions[0] = primitive_radius_;
+        primitive.dimensions[0] = geometric_primitive_radius_;
         /* Define a pose for the sphere (specified relative to frame_id) */
         geometry_msgs::Pose sphere_pose;
         /* Setting the position of the sphere */
@@ -538,10 +538,10 @@ void OpenPoseROSControl::generateIntermediatePrimitivesIter(geometry_msgs::Point
 
 /* Adapt the geometric primitive generation parameters e.g. radiuses to be suitable for a given human body message */
 /* work in progress... (TODO) */
-void OpenPoseROSControl::adaptPrimitiveGenerationParameters(const openpose_ros_receiver_msgs::OpenPoseReceiverHuman::ConstPtr& msg)
+void OpenPoseROSControl::adaptGeometricPrimitiveGenerationParameters(const openpose_ros_receiver_msgs::OpenPoseReceiverHuman::ConstPtr& msg)
 {
     /* ideally:
-        * primitive_radius = abs( d(LHip, RHip) - d(LShoulder, RShoulder) ) / 2
+        * geometric_primitive_radius = abs( d(LHip, RHip) - d(LShoulder, RShoulder) ) / 2
         * basic_limb_safety_radius = max( max( d(LShoulder, LElbow), d(RShoulder, RElbow) ), max( d(LElbow, LWrist), d(RElbow, RWrist) ) ) */
     /* for better performance we need to minimize the accesses to our maps */
     geometry_msgs::Point LShoulder, RShoulder, LElbow, RElbow, LWrist, RWrist, LHip, RHip;
@@ -585,12 +585,12 @@ void OpenPoseROSControl::adaptPrimitiveGenerationParameters(const openpose_ros_r
 
     /* adapt primitive radius parameter */
     if (hasLHip && hasRHip && hasLShoulder && hasRShoulder)
-        primitive_radius_ = std::abs( distance(LHip, RHip) - distance(LShoulder, RShoulder) ) / 2;
+        geometric_primitive_radius_ = std::abs( distance(LHip, RHip) - distance(LShoulder, RShoulder) ) / 2;
     else
-        primitive_radius_ = default_primitive_radius_;
+        geometric_primitive_radius_ = default_geometric_primitive_radius_;
 
-    if (primitive_radius_ > primitive_radius_adaptation_limit_)
-        primitive_radius_ = default_primitive_radius_;
+    if (geometric_primitive_radius_ > geometric_primitive_radius_adaptation_limit_)
+        geometric_primitive_radius_ = default_geometric_primitive_radius_;
 
     /* adapt basic limb safety radius parameter */
     if (hasLShoulder && hasLElbow && hasLWrist && hasRShoulder && hasRElbow && hasRWrist)
@@ -617,5 +617,5 @@ void OpenPoseROSControl::adaptPrimitiveGenerationParameters(const openpose_ros_r
     if (basic_limb_safety_radius_ > basic_limb_safety_radius_adaptation_limit_)
         basic_limb_safety_radius_ = default_basic_limb_safety_radius_;
 
-    // ROS_INFO("primitive_radius: %f, basic_limb_safety_radius: %f", primitive_radius_, basic_limb_safety_radius_);
+    // ROS_INFO("geometric_primitive_radius: %f, basic_limb_safety_radius: %f", geometric_primitive_radius_, basic_limb_safety_radius_);
 }
