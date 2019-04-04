@@ -2,18 +2,16 @@
 
 using namespace openpose_ros;
 
-OpenPoseROSIO::OpenPoseROSIO(OpenPose &openPose): nh_("/openpose_ros_node"), it_(nh_)
+OpenPoseROSIO::OpenPoseROSIO(OpenPose &openPose): nh_("openpose_ros_node"), it_(nh_)
 {
     #ifdef PROFILING
     ros::Time begin_config = ros::Time::now();
     #endif
 
     // Subscribe to input video feed and publish human lists as output
-    std::string image_topic;
-    std::string output_topic;
-    std::string depth_topic;
+    std::string image_topic, output_topic, depth_topic;
 
-    nh_.param("image_topic", image_topic, std::string("/usb_cam/image_raw"));
+    nh_.param("image_topic", image_topic, std::string("/zed/left/image_raw_color"));
     nh_.param("output_topic", output_topic, std::string("/openpose_ros/human_list"));
     nh_.param("depth_topic", depth_topic, std::string("/zed/depth/depth_registered"));
     nh_.param("display_output", display_output_flag_, true);
@@ -23,8 +21,8 @@ OpenPoseROSIO::OpenPoseROSIO(OpenPose &openPose): nh_("/openpose_ros_node"), it_
     nh_.param("original_video_file_name", original_video_file_name_, std::string(""));
     nh_.param("openpose_video_file_name", openpose_video_file_name_, std::string(""));
     nh_.param("video_fps", video_fps_, 10);
-    nh_.param("depth_queue_size", depth_queue_size_, 10);
-    nh_.param("human_list_queue_size", human_list_queue_size_, 10);
+    nh_.param("depth_queue_size", depth_queue_size_, 1);
+    nh_.param("human_list_queue_size", human_list_queue_size_, 1);
 
     #ifdef PROFILING
     ros::Time end_config = ros::Time::now();
@@ -33,7 +31,7 @@ OpenPoseROSIO::OpenPoseROSIO(OpenPose &openPose): nh_("/openpose_ros_node"), it_
     ros::Time begin_init = ros::Time::now();
     #endif
 
-    depth_sub_ = nh_.subscribe("/zed/depth/depth_registered", depth_queue_size_, &OpenPoseROSIO::storeDepth, this);
+    depth_sub_ = nh_.subscribe(depth_topic, depth_queue_size_, &OpenPoseROSIO::storeDepth, this);
     image_sub_ = it_.subscribe(image_topic, 1, &OpenPoseROSIO::processImage, this);
     openpose_human_list_pub_ = nh_.advertise<openpose_ros_msgs::OpenPoseHumanList>(output_topic, human_list_queue_size_);
     cv_img_ptr_ = nullptr;

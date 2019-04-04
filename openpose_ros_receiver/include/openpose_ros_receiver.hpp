@@ -48,8 +48,8 @@
 #define LOWER_VARIATION_THRESH 0.85         // how much different is the avg neighborhood value allowed to be in contrast to the point value --> float
 
 /* Global Variables */
-extern bool tfSubtree, logging;
-extern bool pclMsg, humanListMsg;
+extern bool tfSubtree, logging, pclMsg, humanListMsg;
+extern std::string image_frame;
 extern ros::Publisher robotFrameCoordsPub, humanReceiverPub, pointcloudDebugPub;
 extern pcl::PointCloud<pcl::PointXYZRGBA>::Ptr pPCL;
 

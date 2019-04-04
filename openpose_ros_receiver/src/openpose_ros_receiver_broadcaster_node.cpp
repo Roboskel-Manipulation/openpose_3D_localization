@@ -12,6 +12,7 @@ int main (int argc, char** argv)
     nh.param("openpose_ros_receiver_broadcaster_node/human_list_topic", human_list_topic, std::string("/openpose_ros/human_list"));
     nh.param("openpose_ros_receiver_broadcaster_node/pointcloud_topic", pointcloud_topic, std::string("/zed/point_cloud/cloud_registered"));
     nh.param("openpose_ros_receiver_broadcaster_node/pointcloud_topic_debug", pointcloud_topic_debug, std::string("/zed/point_cloud/cloud_registered_debug"));
+    nh.param("openpose_ros_receiver_broadcaster_node/image_frame", image_frame, std::string("/zed_left_camera_frame"));
     nh.param("openpose_ros_receiver_broadcaster_node/robot_frame_coords_str_topic", robot_frame_coords_str_topic, std::string("/openpose_ros_receiver/robot_frame_coords_str"));
     nh.param("openpose_ros_receiver_broadcaster_node/robot_frame_coords_msg_topic", robot_frame_coords_msg_topic, std::string("/openpose_ros_receiver/robot_frame_coords_msg"));
     nh.param("openpose_ros_receiver_broadcaster_node/queue_size", queue_size, 2);

@@ -8,20 +8,28 @@
   <!-- UNCOMMENT for ROSbag reproduction -->
 
 
-  <!-- 1: Launch ZED wrapper node -->
-  <!-- 2: Launch ZED camera wrapper -->
+  <!-- Launch camera ROS-wrapper node -->
+  <!-- Stereolabs ZED -->
   <arg name="svo_file"                default="" />
 
   <include file="$(find zed_wrapper)/launch/zed.launch">
     <arg name="camera_model"        value="0" />
     <arg name="svo_file"            value="$(arg svo_file)" />
   </include>
-  <!-- COMMENT for ROSbag reproduction -->
+
+  <!-- ASUS Xtion -->
+  <!-- <include file="$(find manos_vision)/launch/asus_xtion.launch"/> -->
+
+  <!-- Orbbec Astra Pro -->
+  <!-- <include file="$(find manos_vision)/launch/orbbec_astra.launch"/> -->
+
+  <!-- COMMENT camera ROS-wrapper module for ROSbag reproduction -->
+  <!-- also, COMMENT if you want to use a different camera -->
 
 
   <!-- Launch openpose_ros -->
   <node pkg="openpose_ros" type="openpose_ros_node" name="openpose_ros_node" output="screen">
-    <rosparam command="load" file="$(find openpose_ros)/config/config.yaml"/>
+    <rosparam command="load" file="$(find openpose_ros)/config/openpose_ros.yaml"/>
   </node>
 
 
@@ -33,6 +41,7 @@
 
 
   <!-- Launch AR marker calibration node -->
+  <!-- Stereolabs ZED -->
   <arg name="camera" default="camera" />
 
   <node pkg="tf" type="static_transform_publisher" name="dummy_tf_publisher"
@@ -61,24 +70,85 @@
   <node pkg="tf_based_on_ar_marker" type="tf_based_on_ar_marker.py" respawn="false" name="tf_based_on_ar_marker" output="screen">
     <rosparam file="$(find manos_vision)/config/connect_trees.yaml" command="load" />
   </node>
-  <!-- COMMENT for ROSbag reproduction -->
+
+  <!-- ASUS Xtion -->
+  <!-- <arg name="camera" default="camera" />
+
+  <node pkg="tf" type="static_transform_publisher" name="dummy_tf_publisher"
+        args="0 0 0 0 0 0 /dummy_link /camera_link 100" />
+
+  <node pkg="tf" type="static_transform_publisher" name="static_marker_link_publisher"
+        args="-0.406 0.406 0 0 0 0 /base_link /ar_marker_link 100" />
+
+  <arg name="marker_size" default="14.4" />
+  <arg name="max_new_marker_error" default="0.08" />
+  <arg name="max_track_error" default="0.2" />
+  <arg name="cam_image_topic" default="/camera/rgb/image_raw" />
+  <arg name="cam_info_topic" default="/camera/rgb/camera_info" />
+  <arg name="output_frame" default="/camera_link" />
+
+  <node name="ar_track_alvar" pkg="ar_track_alvar" type="individualMarkersNoKinect" respawn="false" output="screen">
+    <param name="marker_size"           type="double" value="$(arg marker_size)" />
+    <param name="max_new_marker_error"  type="double" value="$(arg max_new_marker_error)" />
+    <param name="max_track_error"       type="double" value="$(arg max_track_error)" />
+    <param name="output_frame"          type="string" value="$(arg output_frame)" />
+
+    <remap from="camera_image"  to="$(arg cam_image_topic)" />
+    <remap from="camera_info"   to="$(arg cam_info_topic)" />
+  </node>
+
+  <node pkg="tf_based_on_ar_marker" type="tf_based_on_ar_marker.py" respawn="false" name="tf_based_on_ar_marker" output="screen">
+    <rosparam file="$(find manos_vision)/config/connect_trees2.yaml" command="load" />
+  </node> -->
+  
+  <!-- Orbbec Astra Pro -->
+  <!-- <arg name="camera" default="camera" />
+
+  <node pkg="tf" type="static_transform_publisher" name="dummy_tf_publisher"
+        args="0 0 0 0 0 0 /dummy_link /camera_link 100" />
+
+  <node pkg="tf" type="static_transform_publisher" name="static_marker_link_publisher"
+        args="-0.406 0.406 0 0 0 0 /base_link /ar_marker_link 100" />
+
+  <arg name="marker_size" default="14.4" />
+  <arg name="max_new_marker_error" default="0.08" />
+  <arg name="max_track_error" default="0.2" />
+  <arg name="cam_image_topic" default="/camera/rgb/image_raw" />
+  <arg name="cam_info_topic" default="/camera/rgb/camera_info" />
+  <arg name="output_frame" default="/camera_link" />
+
+  <node name="ar_track_alvar" pkg="ar_track_alvar" type="individualMarkersNoKinect" respawn="false" output="screen">
+    <param name="marker_size"           type="double" value="$(arg marker_size)" />
+    <param name="max_new_marker_error"  type="double" value="$(arg max_new_marker_error)" />
+    <param name="max_track_error"       type="double" value="$(arg max_track_error)" />
+    <param name="output_frame"          type="string" value="$(arg output_frame)" />
+
+    <remap from="camera_image"  to="$(arg cam_image_topic)" />
+    <remap from="camera_info"   to="$(arg cam_info_topic)" />
+  </node>
+
+  <node pkg="tf_based_on_ar_marker" type="tf_based_on_ar_marker.py" respawn="false" name="tf_based_on_ar_marker" output="screen">
+    <rosparam file="$(find manos_vision)/config/connect_trees2.yaml" command="load" />
+  </node> -->
+
+  <!-- COMMENT AR marker calibration module for ROSbag reproduction -->
 
 
   <!-- Launch openpose_ros_receiver_broadcaster node -->
   <node pkg="openpose_ros_receiver" type="openpose_ros_receiver_broadcaster_node" name="openpose_ros_receiver_broadcaster_node" output="screen">
-    <rosparam command="load" file="$(find openpose_ros_receiver)/config/config.yaml"/>
+    <rosparam command="load" file="$(find openpose_ros_receiver)/config/openpose_ros_receiver.yaml"/>
   </node>
 
 
   <!-- Launch openpose_ros_receiver_listener node -->
   <!-- <node pkg="openpose_ros_receiver" type="openpose_ros_receiver_listener_node" name="openpose_ros_receiver_listener_node" output="screen">
-    <rosparam command="load" file="$(find openpose_ros_receiver)/config/config.yaml"/>
+    <rosparam command="load" file="$(find openpose_ros_receiver)/config/openpose_ros_receiver.yaml"/>
   </node> -->
 
 
   <!-- Launch openpose_ros_control node -->
   <node pkg="openpose_ros_control" type="openpose_ros_control_node" name="openpose_ros_control_node" output="screen">
-    <rosparam command="load" file="$(find openpose_ros_control)/config/config.yaml"/>
+    <rosparam command="load" file="$(find openpose_ros_control)/config/openpose_ros_control.yaml"/>
   </node>
 
 </launch>
