@@ -1,8 +1,0 @@
-<launch>
-
-    <!-- Launch openpose_ros_receiver_broadcaster node -->
-    <node pkg="openpose_ros_receiver" type="openpose_ros_receiver_broadcaster_node" name="openpose_ros_receiver_broadcaster_node" output="screen">
-        <rosparam command="load" file="$(find openpose_ros_receiver)/config/openpose_ros_receiver.yaml"/>
-    </node>
-
-</launch>
