@@ -39,7 +39,11 @@ void OpenPoseROSControl::robotFrameCoordsMsgTopicCallback(const openpose_ros_rec
     for (uint8_t i = 0; i < human_body_keypoints_; i++)
         sumProb += msg->body_key_points_with_prob[i].prob;
     if (sumProb / msg->num_body_key_points_with_non_zero_prob < min_avg_prob_)
+    {
+        /* for now, since we have set number_people_max = 1, remove all other collision obects in our planning scene */
+        planning_scene_interface_.removeCollisionObjects(planning_scene_interface_.getKnownObjectNames());
         return;
+    }
 
     // double beginSec = ros::Time::now().toSec();
     // adaptGeometricPrimitiveGenerationParameters(msg);
