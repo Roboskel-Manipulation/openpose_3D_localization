@@ -1,7 +1,7 @@
 robot_frame_coords_str_topic: "/openpose_ros_receiver/robot_frame_coords_str"
 robot_frame_coords_msg_topic: "/openpose_ros_receiver/robot_frame_coords_msg"
 queue_size: 1
-image_frame: "/zed_left_camera_frame" # Asus Xtion & Orbbec Astra Pro: "/camera_link" # Stereolabs ZED: "/zed_left_camera_frame"
+image_sensor_frame: "/zed_left_camera_frame" # Asus Xtion & Orbbec Astra Pro: "/camera_rgb_optical_frame" # Stereolabs ZED: "/zed_left_camera_frame"
 base_link_frame: "/base_link"
 geometric_primitive_radius: 0.075
 basic_limb_safety_radius: 0.175

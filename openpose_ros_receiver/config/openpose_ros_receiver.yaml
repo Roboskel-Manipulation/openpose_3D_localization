@@ -1,7 +1,7 @@
 human_list_topic: "/openpose_ros/human_list"
 pointcloud_topic: "/zed/point_cloud/cloud_registered" # Asus Xtion & Orbbec Astra Pro: "/camera/depth_registered/points" # Stereolabs ZED: "/zed/point_cloud/cloud_registered"
 pointcloud_topic_debug: "/zed/point_cloud/cloud_registered_debug" # Asus Xtion & Orbbec Astra Pro: "/camera/depth_registered/points_debug" # Stereolabs ZED: "/zed/point_cloud/cloud_registered_debug"
-image_frame: "/zed_left_camera_frame" # Asus Xtion & Orbbec Astra Pro: "/camera_link" # Stereolabs ZED: "/zed_left_camera_frame"
+image_sensor_frame: "/zed_left_camera_frame" # Asus Xtion & Orbbec Astra Pro: "/camera_rgb_optical_frame" # Stereolabs ZED: "/zed_left_camera_frame"
 robot_frame_coords_str_topic: "/openpose_ros_receiver/robot_frame_coords_str"
 robot_frame_coords_msg_topic: "/openpose_ros_receiver/robot_frame_coords_msg"
 queue_size: 1

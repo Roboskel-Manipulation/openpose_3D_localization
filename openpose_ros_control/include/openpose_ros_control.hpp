@@ -24,7 +24,7 @@ class OpenPoseROSControl
 {
 private:
     ros::NodeHandle nh_;
-    std::string robot_frame_coords_str_topic_, robot_frame_coords_msg_topic_, image_frame_, robot_base_link_frame_;
+    std::string robot_frame_coords_str_topic_, robot_frame_coords_msg_topic_, image_sensor_frame_, robot_base_link_frame_;
     int queue_size_, human_body_keypoints_;
     double  geometric_primitive_radius_, basic_limb_safety_radius_,
             default_geometric_primitive_radius_, default_basic_limb_safety_radius_,

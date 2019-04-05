@@ -15,7 +15,7 @@ OpenPoseROSControl::OpenPoseROSControl()
     nh_.param("openpose_ros_control_node/geometric_primitive_radius_adaptation_limit", geometric_primitive_radius_adaptation_limit_, 0.25);
     nh_.param("openpose_ros_control_node/basic_limb_safety_radius_adaptation_limit", basic_limb_safety_radius_adaptation_limit_, 1.25);
     nh_.param("openpose_ros_control_node/min_avg_prob", min_avg_prob_, 0.25);
-    nh_.param("openpose_ros_control/image_frame", image_frame_, std::string("/zed_left_camera_frame"));
+    nh_.param("openpose_ros_control/image_sensor_frame", image_sensor_frame_, std::string("/zed_left_camera_frame"));
     nh_.param("openpose_ros_control/base_link_frame", robot_base_link_frame_, std::string("/base_link"));
 
     /* Subscribe to robot frame coordinates topics */

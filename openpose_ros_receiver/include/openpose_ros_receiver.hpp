@@ -49,7 +49,7 @@
 
 /* Global Variables */
 extern bool tfSubtree, logging, pclMsg, humanListMsg;
-extern std::string image_frame;
+extern std::string image_sensor_frame;
 extern ros::Publisher robotFrameCoordsPub, humanReceiverPub, pointcloudDebugPub;
 extern pcl::PointCloud<pcl::PointXYZRGBA>::Ptr pPCL;
 

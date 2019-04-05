@@ -1,5 +1,4 @@
-image_topic: "/zed/left/image_raw_color"  # Asus Xtion & Orbbec Astra Pro: "/camera/rgb/image_raw" # Stereolabs ZED: "/zed/left/image_raw_color" # Standard USB webcam: "/usb_cam/image_raw"
-output_topic: "/openpose_ros/human_list"
+image_topic: "/zed/left/image_raw_color"  # Asus Xtion & Orbbec Astra Pro: "/camera/rgb/image_raw" # Stereolabs ZED: "/zed/left/image_raw_color"
 depth_topic: "/zed/depth/depth_registered" # Asus Xtion & Orbbec Astra Pro: "/camera/depth/image" # Stereolabs ZED: "/zed/depth/depth_registered"
 display_output: true
 print_keypoints: false

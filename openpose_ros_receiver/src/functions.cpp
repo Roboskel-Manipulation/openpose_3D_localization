@@ -2,7 +2,7 @@
 
 /* Global Variables */
 bool tfSubtree, logging, pclMsg, humanListMsg;
-std::string image_frame;
+std::string image_sensor_frame;
 ros::Publisher robotFrameCoordsPub, humanReceiverPub, pointcloudDebugPub;
 pcl::PointCloud<pcl::PointXYZRGBA>::Ptr pPCL;
 
@@ -47,8 +47,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                 try
                 {
                     /* take the TF subtree that we want for the transformations */
-                    tfListener.waitForTransform("base_link", image_frame, ros::Time(0), ros::Duration(TF_WAIT));
-                    tfListener.lookupTransform("base_link", image_frame, ros::Time(0), baseLinkTransform);
+                    tfListener.waitForTransform("base_link", image_sensor_frame, ros::Time(0), ros::Duration(TF_WAIT));
+                    tfListener.lookupTransform("base_link", image_sensor_frame, ros::Time(0), baseLinkTransform);
 
                     tfSubtree = true;
                 }
@@ -361,7 +361,7 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 localTransform.setOrigin( tf::Vector3(x, y, z) );
                                 tf::Quaternion localQuat(0, 0, 0, 1);
                                 localTransform.setRotation(localQuat);
-                                tfListener.setTransform( tf::StampedTransform(localTransform, ros::Time::now(), image_frame, getPoseBodyPartMappingBody25(j)) );
+                                tfListener.setTransform( tf::StampedTransform(localTransform, ros::Time::now(), image_sensor_frame, getPoseBodyPartMappingBody25(j)) );
 
                                 /* LOOKUP LOCAL TRANSFORM */
                                 tfListener.waitForTransform("base_link", getPoseBodyPartMappingBody25(j), ros::Time(0), ros::Duration(TF_WAIT));
@@ -416,8 +416,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                 try
                 {
                     /* take the TF subtree that we want for the transformations */
-                    tfListener.waitForTransform("base_link", image_frame, ros::Time(0), ros::Duration(TF_WAIT));
-                    tfListener.lookupTransform("base_link", image_frame, ros::Time(0), baseLinkTransform);
+                    tfListener.waitForTransform("base_link", image_sensor_frame, ros::Time(0), ros::Duration(TF_WAIT));
+                    tfListener.lookupTransform("base_link", image_sensor_frame, ros::Time(0), baseLinkTransform);
 
                     tfSubtree = true;
                 }
@@ -717,7 +717,7 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                 localTransform.setOrigin( tf::Vector3(x, y, z) );
                                 tf::Quaternion localQuat(0, 0, 0, 1);
                                 localTransform.setRotation(localQuat);
-                                tfListener.setTransform( tf::StampedTransform(localTransform, ros::Time::now(), image_frame, getPoseBodyPartMappingBody25(j)) );
+                                tfListener.setTransform( tf::StampedTransform(localTransform, ros::Time::now(), image_sensor_frame, getPoseBodyPartMappingBody25(j)) );
 
                                 /* LOOKUP LOCAL TRANSFORM */
                                 tfListener.waitForTransform("base_link", getPoseBodyPartMappingBody25(j), ros::Time(0), ros::Duration(TF_WAIT));
