@@ -1,38 +1,38 @@
-#include "openpose_ros_control.hpp"
+#include "openpose_ros_avoid.hpp"
 
 /* Class constructor -- ROS node initializer */
-OpenPoseROSControl::OpenPoseROSControl()
+OpenPoseROSAvoid::OpenPoseROSAvoid()
 {
     /* Initialize node variables */
-    nh_.param("openpose_ros_control_node/robot_frame_coords_str_topic", robot_frame_coords_str_topic_, std::string("/openpose_ros_receiver/robot_frame_coords_str"));
-    nh_.param("openpose_ros_control_node/robot_frame_coords_msg_topic", robot_frame_coords_msg_topic_, std::string("/openpose_ros_receiver/robot_frame_coords_msg"));
-    nh_.param("openpose_ros_control_node/queue_size", queue_size_, 2);
-    nh_.param("openpose_ros_control_node/human_body_keypoints", human_body_keypoints_, 25);
-    nh_.param("openpose_ros_control_node/geometric_primitive_radius", geometric_primitive_radius_, 0.05);
+    nh_.param("openpose_ros_avoid_node/robot_frame_coords_str_topic", robot_frame_coords_str_topic_, std::string("/openpose_ros_receiver/robot_frame_coords_str"));
+    nh_.param("openpose_ros_avoid_node/robot_frame_coords_msg_topic", robot_frame_coords_msg_topic_, std::string("/openpose_ros_receiver/robot_frame_coords_msg"));
+    nh_.param("openpose_ros_avoid_node/queue_size", queue_size_, 2);
+    nh_.param("openpose_ros_avoid_node/human_body_keypoints", human_body_keypoints_, 25);
+    nh_.param("openpose_ros_avoid_node/geometric_primitive_radius", geometric_primitive_radius_, 0.05);
     default_geometric_primitive_radius_ = geometric_primitive_radius_;
-    nh_.param("openpose_ros_control_node/basic_limb_safety_radius", basic_limb_safety_radius_, 0.35);
+    nh_.param("openpose_ros_avoid_node/basic_limb_safety_radius", basic_limb_safety_radius_, 0.35);
     default_basic_limb_safety_radius_ = basic_limb_safety_radius_;
-    nh_.param("openpose_ros_control_node/geometric_primitive_radius_adaptation_limit", geometric_primitive_radius_adaptation_limit_, 0.25);
-    nh_.param("openpose_ros_control_node/basic_limb_safety_radius_adaptation_limit", basic_limb_safety_radius_adaptation_limit_, 1.25);
-    nh_.param("openpose_ros_control_node/min_avg_prob", min_avg_prob_, 0.25);
-    nh_.param("openpose_ros_control_node/image_sensor_frame", image_sensor_frame_, std::string("/zed_left_camera_frame"));
-    nh_.param("openpose_ros_control_node/base_link_frame", robot_base_link_frame_, std::string("/base_link"));
+    nh_.param("openpose_ros_avoid_node/geometric_primitive_radius_adaptation_limit", geometric_primitive_radius_adaptation_limit_, 0.25);
+    nh_.param("openpose_ros_avoid_node/basic_limb_safety_radius_adaptation_limit", basic_limb_safety_radius_adaptation_limit_, 1.25);
+    nh_.param("openpose_ros_avoid_node/min_avg_prob", min_avg_prob_, 0.25);
+    nh_.param("openpose_ros_avoid_node/image_sensor_frame", image_sensor_frame_, std::string("/zed_left_camera_frame"));
+    nh_.param("openpose_ros_avoid_node/base_link_frame", robot_base_link_frame_, std::string("/base_link"));
 
     /* Subscribe to robot frame coordinates topics */
-    // subRobotFrameCoordsStr_ = nh_.subscribe(robot_frame_coords_str_topic_, queue_size_, &OpenPoseROSControl::robotFrameCoordsStrTopicCallback, this);
-    subRobotFrameCoordsMsg_ = nh_.subscribe(robot_frame_coords_msg_topic_, queue_size_, &OpenPoseROSControl::robotFrameCoordsMsgTopicCallback, this);
+    // subRobotFrameCoordsStr_ = nh_.subscribe(robot_frame_coords_str_topic_, queue_size_, &OpenPoseROSAvoid::robotFrameCoordsStrTopicCallback, this);
+    subRobotFrameCoordsMsg_ = nh_.subscribe(robot_frame_coords_msg_topic_, queue_size_, &OpenPoseROSAvoid::robotFrameCoordsMsgTopicCallback, this);
 
     ros::spin();
 }
 
 /* Human body keypoint coordinates in the robot's coordinate frams as strings */
-void OpenPoseROSControl::robotFrameCoordsStrTopicCallback(const std_msgs::String::ConstPtr& msg)
+void OpenPoseROSAvoid::robotFrameCoordsStrTopicCallback(const std_msgs::String::ConstPtr& msg)
 {
     ROS_INFO("%s", msg->data.c_str());
 }
 
 /* Human body keypoint coordinates in the robot's coordinate frams as regular messages */
-void OpenPoseROSControl::robotFrameCoordsMsgTopicCallback(const openpose_ros_receiver_msgs::OpenPoseReceiverHuman::ConstPtr& msg)
+void OpenPoseROSAvoid::robotFrameCoordsMsgTopicCallback(const openpose_ros_receiver_msgs::OpenPoseReceiverHuman::ConstPtr& msg)
 {
     /* if a body doesn't have a minimum average probability, then it is possibly a false positive */
     double sumProb = 0.0;
@@ -59,7 +59,7 @@ void OpenPoseROSControl::robotFrameCoordsMsgTopicCallback(const openpose_ros_rec
 }
 
 /* Generate geometric primitives around every detected human body keypoint */
-void OpenPoseROSControl::generateBasicGeometricPrimitives(const openpose_ros_receiver_msgs::OpenPoseReceiverHuman::ConstPtr& msg)
+void OpenPoseROSAvoid::generateBasicGeometricPrimitives(const openpose_ros_receiver_msgs::OpenPoseReceiverHuman::ConstPtr& msg)
 {
     /* remove all other collision obects in our planning scene */
     planning_scene_interface_.removeCollisionObjects(planning_scene_interface_.getKnownObjectNames());
@@ -150,7 +150,7 @@ void OpenPoseROSControl::generateBasicGeometricPrimitives(const openpose_ros_rec
 }
 
 /* Generate geometric primitives around every detected human body keypoint, while also tryig to tackle the absence of the non-detected keypoints */
-void OpenPoseROSControl::generateBasicGeometricPrimitivesPro(const openpose_ros_receiver_msgs::OpenPoseReceiverHuman::ConstPtr& msg)
+void OpenPoseROSAvoid::generateBasicGeometricPrimitivesPro(const openpose_ros_receiver_msgs::OpenPoseReceiverHuman::ConstPtr& msg)
 {
     /* remove all other collision obects in our planning scene */
     planning_scene_interface_.removeCollisionObjects(planning_scene_interface_.getKnownObjectNames());
@@ -448,7 +448,7 @@ void OpenPoseROSControl::generateBasicGeometricPrimitivesPro(const openpose_ros_
 }
 
 /* Generate geometric primitives around between every detected human body keypoints pair recursively */
-void OpenPoseROSControl::generateIntermediateGeometricPrimitivesRec(geometry_msgs::Point a, geometry_msgs::Point b, std::string idPrefix)
+void OpenPoseROSAvoid::generateIntermediateGeometricPrimitivesRec(geometry_msgs::Point a, geometry_msgs::Point b, std::string idPrefix)
 {
     // /* the base of our recursion */
     // if (distance(a, b) <= 2 * geometric_primitive_radius_)
@@ -491,7 +491,7 @@ void OpenPoseROSControl::generateIntermediateGeometricPrimitivesRec(geometry_msg
 
 /* Generate geometric primitives around between every detected human body keypoints pair iteratively */
 /* work in progress... (TODO) */
-void OpenPoseROSControl::generateIntermediateGeometricPrimitivesIter(geometry_msgs::Point a, geometry_msgs::Point b, std::string idPrefix)
+void OpenPoseROSAvoid::generateIntermediateGeometricPrimitivesIter(geometry_msgs::Point a, geometry_msgs::Point b, std::string idPrefix)
 {
     /* check if there is enough space for another geometric primitive */
     if (distance(a, b) <= 2 * geometric_primitive_radius_)
@@ -542,7 +542,7 @@ void OpenPoseROSControl::generateIntermediateGeometricPrimitivesIter(geometry_ms
 
 /* Adapt the geometric primitive generation parameters e.g. radiuses to be suitable for a given human body message */
 /* work in progress... (TODO) */
-void OpenPoseROSControl::adaptGeometricPrimitiveGenerationParameters(const openpose_ros_receiver_msgs::OpenPoseReceiverHuman::ConstPtr& msg)
+void OpenPoseROSAvoid::adaptGeometricPrimitiveGenerationParameters(const openpose_ros_receiver_msgs::OpenPoseReceiverHuman::ConstPtr& msg)
 {
     /* ideally:
         * geometric_primitive_radius = abs( d(LHip, RHip) - d(LShoulder, RShoulder) ) / 2

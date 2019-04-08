@@ -1,5 +1,5 @@
-#ifndef _OPENPOSE_ROS_CONTROL_H_
-#define _OPENPOSE_ROS_CONTROL_H_
+#ifndef _OPENPOSE_ROS_AVOID_H_
+#define _OPENPOSE_ROS_AVOID_H_
 
 /* ROS headers */
 #include <ros/ros.h>
@@ -20,7 +20,7 @@
 #include "body_25_pose_output_format.hpp"
 
 /* Node class */
-class OpenPoseROSControl
+class OpenPoseROSAvoid
 {
 private:
     ros::NodeHandle nh_;
@@ -35,7 +35,7 @@ private:
 public:
     /* Node functions */
     /* Class constructor -- ROS node initializer */
-    OpenPoseROSControl();
+    OpenPoseROSAvoid();
     /* Callback functions */
     /* Human body keypoint coordinates in the robot's coordinate frams as strings */
     void robotFrameCoordsStrTopicCallback(const std_msgs::String::ConstPtr& msg);

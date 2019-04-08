@@ -116,9 +116,9 @@
   </node> -->
 
 
-  <!-- Launch openpose_ros_control node -->
-  <node pkg="openpose_ros_control" type="openpose_ros_control_node" name="openpose_ros_control_node" output="screen">
-    <rosparam command="load" file="$(find openpose_ros_control)/config/openpose_ros_control.yaml"/>
+  <!-- Launch openpose_ros_avoid node -->
+  <node pkg="openpose_ros_avoid" type="openpose_ros_avoid_node" name="openpose_ros_avoid_node" output="screen">
+    <rosparam command="load" file="$(find openpose_ros_avoid)/config/openpose_ros_avoid.yaml"/>
   </node>
 
 </launch>

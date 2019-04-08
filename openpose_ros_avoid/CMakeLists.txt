@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(openpose_ros_control)
+project(openpose_ros_avoid)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
@@ -25,11 +25,11 @@ include_directories(
   ${OpenPose_INCLUDE_DIRS} 
 )
 
-add_executable(openpose_ros_control_node src/openpose_ros_control_node.cpp src/openpose_ros_control.cpp src/utilities.cpp)
+add_executable(openpose_ros_avoid_node src/openpose_ros_avoid_node.cpp src/openpose_ros_avoid.cpp src/utilities.cpp)
 
-add_dependencies(openpose_ros_control_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(openpose_ros_avoid_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-target_link_libraries(openpose_ros_control_node
+target_link_libraries(openpose_ros_avoid_node
   ${catkin_LIBRARIES}
   ${OpenPose_LIBS} 
 )

@@ -1,1 +1,0 @@
-# openpose_ros_control
