@@ -10,7 +10,7 @@ This software is a product of on-going research and has been developed and teste
 
 * **zed-ros-wrapper**: https://github.com/stereolabs/zed-ros-wrapper
 * **manos_description**: https://github.com/Roboskel-Manipulation/manos
-* **manos_vision**: https://github.com/Roboskel-Manipulation/manos_vision
+* **manos_vision**: https://github.com/yorgosk/manos_vision
 
 ## Run
 
