@@ -454,12 +454,18 @@ if __name__ == "__main__":
     element_dict = dict([ (0, "x"), (1, "y"), (2, "z"), (3, "certainty") ])
 
     # File I/O specific variables
-    output_path = "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/"
+    # output_path = "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/"
+    output_path = "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/SCENARIOS/ZED_HD720/logs/"
     ''''''
-    output_subfolder = "take46QueueSize100/"
-    op_output_file_prefix = "OP Thu Feb 14 15:16:"
-    raw_output_file_prefix = "raw Thu Feb 14 15:16:"
-    tfed_output_file_prefix = "tfed Thu Feb 14 15:16:"
+    # output_subfolder = "take46QueueSize100/"
+    # op_output_file_prefix = "OP Thu Feb 14 15:16:"
+    # raw_output_file_prefix = "raw Thu Feb 14 15:16:"
+    # tfed_output_file_prefix = "tfed Thu Feb 14 15:16:"
+    ''''''
+    output_subfolder = "A-FV-ST-V-C-up/"
+    op_output_file_prefix = "OP Wed Apr 10 12:1"
+    raw_output_file_prefix = "raw Wed Apr 10 12:1"
+    tfed_output_file_prefix = "tfed Wed Apr 10 12:1"
     ''''''
 
     output_folder_path = output_path + output_subfolder
@@ -483,26 +489,24 @@ if __name__ == "__main__":
 
     # create our 3d report matrix, e.g. for 10 log frames: [BodyPart][x/y/z/prob][t0,...,t9,mean,nobs,min,max,variance,skewness,kurtosis,std_dev] --> 25 * 4 * 18
     ''''''
-    # part, elem, val = 25, 4, 18
-    # max_logs = 10
-    # stat_analysis_idx, mean_idx, nobs_idx, min_idx, max_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 10, 10, 11, 12, 13, 14, 15, 16, 17
-    # report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
+    max_logs = 10
+    part, elem, val = 25, 4, 18
+    stat_analysis_idx, mean_idx, nobs_idx, min_idx, max_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 10, 10, 11, 12, 13, 14, 15, 16, 17
     ''''''
-    part, elem, val = 25, 4, 23
-    max_logs = 15
-    stat_analysis_idx, mean_idx, nobs_idx, min_idx, max_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 15, 15, 16, 17, 18, 19, 20, 21, 22
-    report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
+    # max_logs = 15
+    # part, elem, val = 25, 4, 23
+    # stat_analysis_idx, mean_idx, nobs_idx, min_idx, max_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 15, 15, 16, 17, 18, 19, 20, 21, 22
     ''''''
-    # part, elem, val = 25, 4, 48
     # max_logs = 40
+    # part, elem, val = 25, 4, 48
     # stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 40, 40, 41, 42, 43, 44, 45, 46, 47
-    # report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
     ''''''
-    # part, elem, val = 25, 4, 68
     # max_logs = 60
+    # part, elem, val = 25, 4, 68
     # stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 60, 60, 61, 62, 63, 64, 65, 66, 67
-    # report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
     ''''''
+
+    report_matrix = [ [ [ np.nan for k in range(val) ] for j in range(elem) ] for i in range(part) ]
 
     # create CSVs directory
     if not os.path.exists(csv_folder_path):

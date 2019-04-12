@@ -66,10 +66,10 @@ void OpenPoseROSAvoid::generateBasicGeometricPrimitives(const openpose_ros_recei
 
     for (uint8_t i = 0; i < human_body_keypoints_; i++)
     {
-        /* no need to deal with, knees, ankles, heels, toes and background in our application */
-        if (i == 10 || i == 13)     // knees (11, 12) and ankles (13, 14)
+        /* no need to deal with left & right hips, knees, ankles, heels, toes and background in our application */
+        if (i == 9)
         {
-            i++;
+            i += 5;
             continue;
         }
         if (i > 18)                 // heels, toes and background
@@ -158,10 +158,10 @@ void OpenPoseROSAvoid::generateBasicGeometricPrimitivesPro(const openpose_ros_re
     /* for every possible keypoint */
     for (uint8_t i = 0; i < human_body_keypoints_; i++)
     {
-        /* no need to deal with, knees, ankles, heels, toes and background in our application */
-        if (i == 10 || i == 13)     // knees (11, 12) and ankles (13, 14)
+        /* no need to deal with left & right hips, knees, ankles, heels, toes and background in our application */
+        if (i == 9)
         {
-            i++;
+            i += 5;
             continue;
         }
         if (i > 18)                 // heels, toes and background

@@ -201,9 +201,20 @@ if __name__ == "__main__":
     csvs_folder_path = scenarios_path + "evaluation_csvs/"
 
     # create our 4d report matrix, e.g. for 10 log frames at 10 scenarios: [Scenario][BodyPart][x/y/z][t0,...,t9,mean,nobs,min,max,variance,skewness,kurtosis,std_dev] --> 10 * 25 * 4 * 18
-    scenarios, part, elem, val = 27, 25, 3, 48
+    ''''''
+    # max_logs = 10
+    # scenarios, part, elem, val = 27, 25, 3, 18
+    # stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 10, 10, 11, 12, 13, 14, 15, 16, 17
+    ''''''
+    # max_logs = 15
+    # scenarios, part, elem, val = 27, 25, 3, 23
+    # stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 15, 15, 16, 17, 18, 19, 20, 21, 22
+    ''''''
     max_logs = 40
+    scenarios, part, elem, val = 27, 25, 3, 48
     stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 40, 40, 41, 42, 43, 44, 45, 46, 47
+    ''''''
+    
     right_wrist_idx = getKeysByValue(body_25_body_parts_dict, "RWrist")[0]
     report_matrix = [ [ [ [ np.nan for l in range(val) ] for k in range(elem) ] for j in range(part) ] for i in range(scenarios) ]
 
