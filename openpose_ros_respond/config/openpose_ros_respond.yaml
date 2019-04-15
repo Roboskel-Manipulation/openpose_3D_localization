@@ -1,3 +1,4 @@
 robot_frame_coords_str_topic: "/openpose_ros_receiver/robot_frame_coords_str"
 robot_frame_coords_msg_topic: "/openpose_ros_receiver/robot_frame_coords_msg"
 queue_size: 1
+human_body_keypoints: 25
