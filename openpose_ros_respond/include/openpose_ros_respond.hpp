@@ -29,6 +29,8 @@ public:
     /* Class constructors */
     HumanLimbGesture();
     HumanLimbGesture(const geometry_msgs::Point bodyPositionInSpace, const std::vector<geometry_msgs::Point> limbPositionInSpace);
+    /* Print limb gesture description */
+    void print();
 };
 
 /* Node class */
@@ -38,6 +40,7 @@ private:
     ros::NodeHandle nh_;
     std::string robot_frame_coords_str_topic_, robot_frame_coords_msg_topic_;
     int queue_size_, human_body_keypoints_;
+    double deviation_margin_;
     ros::Subscriber subRobotFrameCoordsStr_, subRobotFrameCoordsMsg_;
 public:
     /* Node functions */
@@ -49,7 +52,7 @@ public:
     /* Human body keypoint coordinates in the robot's coordinate frams as regular messages */
     void robotFrameCoordsMsgTopicCallback(const openpose_ros_receiver_msgs::OpenPoseReceiverHuman::ConstPtr& msg);
     /* Approximate a human body limb's gesture as a series of points */
-    HumanLimbGesture ApproximateLimbGesture(const openpose_ros_receiver_msgs::OpenPoseReceiverHuman::ConstPtr& msg);
+    HumanLimbGesture ApproximateLimbGesture(const openpose_ros_receiver_msgs::OpenPoseReceiverHuman::ConstPtr& msg, const std::vector<geometry_msgs::Point>& limb);
     /* Associate the human body's position in space with a single keypoint */
     geometry_msgs::Point BodyPositionInSpace(const openpose_ros_receiver_msgs::OpenPoseReceiverHuman::ConstPtr& msg);
     /* Approximate a human body limb's position in space with a series of keypoints */
