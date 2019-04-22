@@ -171,6 +171,7 @@ if __name__ == "__main__":
     element_dict = dict([ (0, "x"), (1, "y"), (2, "z")])
 
     # Scenarios specific variables
+    ''''''
     scenarios_dict = dict([ (0, "A-FV-ST-V-C"), (1, "A-FV-ST-V-C-right"), (2, "A-FV-ST-V-C-up"), (3, "A-FV-ST-V-C-front"), (4, "A-FV-ST-H-C"),
                             (5, "A-FV-ST-H-O"), (6, "A-FV-ST-V-O"), (7, "A-FV-MT-V-C"), (8, "A-FV-CT-V-C-up"), (9, "A-SV-ST-H-C"),
                             (10, "C-FV-ST-V-C"), (11, "C-FV-ST-V-C-right"), (12, "C-FV-ST-V-C-up"), (13, "C-FV-ST-V-C-front"), (14, "B-FV-ST-H-C"),
@@ -178,6 +179,15 @@ if __name__ == "__main__":
                             (20, "E-FV-ST-H-C"), (21, "E-FV-ST-H-O"), (22, "E-SV-ST-H-C"), (23, "E-SV-ST-V-C"), (24, "E-SV-ST-H-C-left"),
                             (25, "E-SV-ST-H-C-up"), (26, "E-SV-ST-H-C-front")
                         ])
+    ''''''
+    # scenarios_dict = dict([ (0, "A-FV-ST-V-C"), (1, "A-FV-ST-V-C-right"), (2, "A-FV-ST-V-C-up"), (3, "A-FV-ST-V-C-front"), (4, "A-FV-ST-H-C"),
+    #                         (5, "A-FV-ST-H-O"), (6, "A-FV-ST-V-O"), (7, "A-FV-MT-V-C"), (8, "A-FV-CT-V-C-up"), (9, "A-SV-ST-H-C"),
+    #                         (10, "C-FV-ST-V-C"), (11, "C-FV-ST-V-C-right"), (12, "C-FV-ST-V-C-up"), (13, "C-FV-ST-V-C-front"), (14, "B-FV-ST-H-C"),
+    #                         (15, "B-FV-ST-H-O"), (16, "B-FV-ST-V-O"), (17, "B-FV-MT-V-C"), (18, "B-FV-CT-V-C"), (19, "B-SV-ST-C"),
+    #                         (20, "E-FV-ST-H-C"), (21, "E-FV-ST-H-O"), (22, "E-SV-ST-H-C"), (23, "E-SV-ST-V-C"), (24, "E-SV-ST-H-C-left"),
+    #                         (25, "E-SV-ST-H-C-up"), (26, "E-SV-ST-H-C-front"), (27, "A-FV-ST-V-C_ASTRA_VGA"), (28, "A-FV-ST-V-C_XTION_VGA"), (29, "A-FV-ST-V-C_ZED_HD720")
+    #                     ])
+    ''''''
     complementary_scenarios_c_o_pairs = [ ["A-FV-ST-H-C", "A-FV-ST-H-O"], ["B-FV-ST-H-C", "B-FV-ST-H-O"], ["E-FV-ST-H-C", "E-FV-ST-H-O"] ]
     cube_dimensions_dict = dict([ ("l", 0.093), ("w", 0.093), ("h", 0.07) ])
     ground_truth_dict = dict([ ("A", [-0.35, -0.35, 0.09]), ("A-right", [-0.257, -0.35, 0.09]), ("A-up", [-0.35, -0.35, 0.16]), ("A-front", [-0.35, -0.275, 0.09]),
@@ -185,6 +195,7 @@ if __name__ == "__main__":
                                ("C", [0.35, -0.35, 0.09]), ("C-right", [0.443, -0.35, 0.09]), ("C-up", [0.35, -0.35, 0.16]), ("C-front", [0.35, -0.257, 0.09]),
                                ("E", [0.417, -0.035, 0.09]), ("E-left", [0.324, -0.035, 0.09]), ("E-up", [0.417, -0.035, 0.16]), ("E-front", [0.417, 0.058, 0.09])
                             ])
+    ''''''
     right_wrist_ground_truth_dict = dict([ (0, [-0.35, -0.35, 0.09]), (1, [-0.257, -0.35, 0.09]), (2, [-0.35, -0.35, 0.16]), (3, [-0.35, -0.275, 0.09]), (4, [-0.35, -0.35, 0.09]),
                                            (5, [-0.35, -0.35, 0.09]), (6, [-0.35, -0.35, 0.09]), (7, [-0.35, -0.35, 0.09]), (8, [-0.35, -0.35, 0.16]), (9, [-0.35, -0.35, 0.09]),
                                            (10, [0.35, -0.35, 0.09]), (11, [0.443, -0.35, 0.09]), (12, [0.35, -0.35, 0.16]), (13, [0.35, -0.257, 0.09]), (14, [-0.15, -0.185, 0.09]),
@@ -192,14 +203,27 @@ if __name__ == "__main__":
                                            (20, [0.417, -0.035, 0.09]), (21, [0.417, -0.035, 0.09]), (22, [0.417, -0.035, 0.09]), (23, [0.417, -0.035, 0.09]), (24, [0.324, -0.035, 0.09]),
                                            (25, [0.417, -0.035, 0.16]), (26, [0.417, 0.058, 0.09])
                                         ])
+    ''''''
+    # right_wrist_ground_truth_dict = dict([ (0, [-0.35, -0.35, 0.09]), (1, [-0.257, -0.35, 0.09]), (2, [-0.35, -0.35, 0.16]), (3, [-0.35, -0.275, 0.09]), (4, [-0.35, -0.35, 0.09]),
+    #                                        (5, [-0.35, -0.35, 0.09]), (6, [-0.35, -0.35, 0.09]), (7, [-0.35, -0.35, 0.09]), (8, [-0.35, -0.35, 0.16]), (9, [-0.35, -0.35, 0.09]),
+    #                                        (10, [0.35, -0.35, 0.09]), (11, [0.443, -0.35, 0.09]), (12, [0.35, -0.35, 0.16]), (13, [0.35, -0.257, 0.09]), (14, [-0.15, -0.185, 0.09]),
+    #                                        (15, [-0.15, -0.185, 0.09]), (16, [-0.15, -0.185, 0.09]), (17, [-0.15, -0.185, 0.09]), (18, [-0.15, -0.185, 0.09]), (19, [-0.15, -0.185, 0.09]),
+    #                                        (20, [0.417, -0.035, 0.09]), (21, [0.417, -0.035, 0.09]), (22, [0.417, -0.035, 0.09]), (23, [0.417, -0.035, 0.09]), (24, [0.324, -0.035, 0.09]),
+    #                                        (25, [0.417, -0.035, 0.16]), (26, [0.417, 0.058, 0.09]), (27, [-0.35, -0.35, 0.09]), (28, [-0.35, -0.35, 0.09]), (29, [-0.35, -0.35, 0.09])
+    #                                     ])
+    ''''''
 
     # File I/O specific variables
-    scenarios_path = "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/SCENARIOS/"
+    ''''''
+    scenarios_path = "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/SCENARIOS/ZED_VGA/"
+    ''''''
+    # scenarios_path = "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/SCENARIOS_expanded/"
+    ''''''
     scenarios_logs_path = scenarios_path + "logs/"
     plots_folder_path = scenarios_path + "evaluation_plots/"
     statistics_folder_path = scenarios_path + "evaluation_statistics/"
     csvs_folder_path = scenarios_path + "evaluation_csvs/"
-
+    
     # create our 4d report matrix, e.g. for 10 log frames at 10 scenarios: [Scenario][BodyPart][x/y/z][t0,...,t9,mean,nobs,min,max,variance,skewness,kurtosis,std_dev] --> 10 * 25 * 4 * 18
     ''''''
     # max_logs = 10
@@ -214,7 +238,11 @@ if __name__ == "__main__":
     scenarios, part, elem, val = 27, 25, 3, 48
     stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 40, 40, 41, 42, 43, 44, 45, 46, 47
     ''''''
-    
+    # max_logs = 10
+    # scenarios, part, elem, val = 30, 25, 3, 18
+    # stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 10, 10, 11, 12, 13, 14, 15, 16, 17
+    ''''''
+
     right_wrist_idx = getKeysByValue(body_25_body_parts_dict, "RWrist")[0]
     report_matrix = [ [ [ [ np.nan for l in range(val) ] for k in range(elem) ] for j in range(part) ] for i in range(scenarios) ]
 
@@ -248,6 +276,12 @@ if __name__ == "__main__":
     fp = open(statistics_folder_path + "evaluation_statistics.csv", 'w')
     fp.close()
     fp = open(statistics_folder_path + "right_wrist_statistics.csv", 'w')
+    fp.close()
+    fp = open(statistics_folder_path + "all_right_wrist_x.csv", 'w')
+    fp.close()
+    fp = open(statistics_folder_path + "all_right_wrist_y.csv", 'w')
+    fp.close()
+    fp = open(statistics_folder_path + "all_right_wrist_z.csv", 'w')
     fp.close()
 
     # access the files of the folders of the logs directory
@@ -304,7 +338,7 @@ if __name__ == "__main__":
             raise e
 
     # do statistical analysis
-    occurences_accross_frames_accross_scenarios = [ [ 0 for j in range(scenarios) ] for i in range(part) ]
+    occurrences_accross_frames_accross_scenarios = [ [ 0 for j in range(scenarios) ] for i in range(part) ]
 
     for i in range(scenarios):
         for j in range(part):
@@ -325,8 +359,8 @@ if __name__ == "__main__":
                 report_matrix[i][j][k][kurtosis_idx] = description.kurtosis
                 report_matrix[i][j][k][std_dev_idx] = np.std(np.array(report_matrix[i][j][k][0:stat_analysis_idx])[~np.isnan(report_matrix[i][j][k][0:stat_analysis_idx])])
 
-            # Count occurences accross log frames accross scenarios
-            occurences_accross_frames_accross_scenarios[j][i] = (~np.isnan(report_matrix[i][j][ getKeysByValue(element_dict, "x")[0] ][0:stat_analysis_idx])).sum(0)
+            # Count occurrences accross log frames accross scenarios
+            occurrences_accross_frames_accross_scenarios[j][i] = (~np.isnan(report_matrix[i][j][ getKeysByValue(element_dict, "x")[0] ][0:stat_analysis_idx])).sum(0)
 
 
     # right wrist coords accross scenarios, with ground truth and mean value ( range(max_logs+2) )
@@ -373,7 +407,8 @@ if __name__ == "__main__":
 
 
     # summary of right wrist statistics accross scenarios
-    right_wrist_stats = []
+    right_wrist_stats, all_right_wrist_x, all_right_wrist_y, all_right_wrist_z = [], [], [], []
+
     for i in range(scenarios):
         right_wrist_stats.append([
             right_wrist_ground_truth_dict.get(i)[0], right_wrist_ground_truth_dict.get(i)[1], right_wrist_ground_truth_dict.get(i)[2],
@@ -381,6 +416,50 @@ if __name__ == "__main__":
             report_matrix[i][right_wrist_idx][ getKeysByValue(element_dict, "x")[0] ][std_dev_idx], report_matrix[i][right_wrist_idx][ getKeysByValue(element_dict, "y")[0] ][std_dev_idx], report_matrix[i][right_wrist_idx][ getKeysByValue(element_dict, "z")[0] ][std_dev_idx],
             (right_wrist_ground_truth_dict.get(i)[0] - report_matrix[i][right_wrist_idx][ getKeysByValue(element_dict, "x")[0] ][mean_idx]), (right_wrist_ground_truth_dict.get(i)[1] - report_matrix[i][right_wrist_idx][ getKeysByValue(element_dict, "y")[0] ][mean_idx]), (right_wrist_ground_truth_dict.get(i)[2] - report_matrix[i][right_wrist_idx][ getKeysByValue(element_dict, "z")[0] ][mean_idx])
         ])
+
+    right_wrist_occurrences = 0
+
+    # [Scenario][BodyPart][x/y/z][t0,...,t9,mean,nobs,min,max,variance,skewness,kurtosis,std_dev]
+    for i in range(scenarios):
+        if np.nan not in right_wrist_stats[i]:
+            scenario_right_wrist_x, scenario_right_wrist_y, scenario_right_wrist_z = [], [], []
+
+            for j in range(max_logs):
+                x = report_matrix[i][ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][ getKeysByValue(element_dict, "x")[0] ][j]
+                y = report_matrix[i][ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][ getKeysByValue(element_dict, "y")[0] ][j]
+                z = report_matrix[i][ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][ getKeysByValue(element_dict, "z")[0] ][j]
+
+                if x is not np.nan:
+                    scenario_right_wrist_x.append(x)
+                else:
+                    scenario_right_wrist_x.append(0.0)
+                if y is not np.nan:
+                    scenario_right_wrist_y.append(y)
+                else:
+                    scenario_right_wrist_y.append(0.0)
+                if z is not np.nan:
+                    scenario_right_wrist_z.append(z)
+                else:
+                    scenario_right_wrist_z.append(0.0)
+
+            all_right_wrist_x.append(scenario_right_wrist_x)
+            all_right_wrist_y.append(scenario_right_wrist_y)
+            all_right_wrist_z.append(scenario_right_wrist_z)
+
+            right_wrist_occurrences += 1
+    
+    rotated_all_right_wrist_x, rotated_all_right_wrist_y, rotated_all_right_wrist_z = [], [], []
+
+    for i in range(max_logs):
+        xs, ys, zs = [], [], []
+        for j in range(right_wrist_occurrences):
+            xs.append( all_right_wrist_x[j][i] )
+            ys.append( all_right_wrist_y[j][i] )
+            zs.append( all_right_wrist_z[j][i] )
+
+        rotated_all_right_wrist_x.append(xs)
+        rotated_all_right_wrist_y.append(ys)
+        rotated_all_right_wrist_z.append(zs)
     
 
     # complementary scenarios coordinates boxplot comparison
@@ -584,15 +663,15 @@ if __name__ == "__main__":
                 for k in range(elem):
                     print >> fp , element_dict.get(k) + "," + (",".join( str(e) for e in report_matrix[i][j][k] ))
 
-    # report occurences accross frames
+    # report occurrences accross frames
     with open(statistics_folder_path + "evaluation_statistics.csv", 'w') as fp:
-        print >> fp , "Occurences accross " + str(max_logs) + " log frames"
+        print >> fp , "Occurrences accross " + str(max_logs) + " log frames"
         print >> fp, "Keypoint" + "," + (",".join( str(e) for e in scenarios_dict.values() ))
         for i in range(part):
             # write in order of appearance Upper to Lower
-            # print >> fp , body_25_body_parts_dict.get( int(body_25_body_parts_UL_order_of_appearance[i]) ) + "," + (",".join( str(e) for e in occurences_accross_frames_accross_scenarios[ int(body_25_body_parts_UL_order_of_appearance[i]) ] ))
+            # print >> fp , body_25_body_parts_dict.get( int(body_25_body_parts_UL_order_of_appearance[i]) ) + "," + (",".join( str(e) for e in occurrences_accross_frames_accross_scenarios[ int(body_25_body_parts_UL_order_of_appearance[i]) ] ))
             # write in BODY_25 index order
-            print >> fp , body_25_body_parts_dict.get(i) + "," + (",".join( str(e) for e in occurences_accross_frames_accross_scenarios[i] ))
+            print >> fp , body_25_body_parts_dict.get(i) + "," + (",".join( str(e) for e in occurrences_accross_frames_accross_scenarios[i] ))
 
     # report right wrist statistics accross frames
     with open(statistics_folder_path + "right_wrist_statistics.csv", 'w') as fp:
@@ -601,5 +680,27 @@ if __name__ == "__main__":
             if np.nan not in right_wrist_stats[i]:
                 print >> fp , scenarios_dict.get(i) + "," + (",".join( str(e) for e in right_wrist_stats[i] ))
 
+
+    # report all right wrist x coordinates accross frames
+    with open(statistics_folder_path + "all_right_wrist_x.csv", 'w') as fp:
+        print >> fp, ",".join( '"'+str( occurrences_accross_frames_accross_scenarios[ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][i] )+"@"+scenarios_dict.get(i)+'"' for i in range(scenarios) if np.nan not in right_wrist_stats[i] )
+        # print >> fp, ",".join( str( occurrences_accross_frames_accross_scenarios[ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][i] ) for i in range(scenarios) if np.nan not in right_wrist_stats[i] )
+        for i in range(max_logs):
+            print >> fp, ",".join( str(e) for e in rotated_all_right_wrist_x[i] )
+    
+    # report all right wrist y coordinates accross frames
+    with open(statistics_folder_path + "all_right_wrist_y.csv", 'w') as fp:
+        print >> fp, ",".join( '"'+str( occurrences_accross_frames_accross_scenarios[ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][i] )+"@"+scenarios_dict.get(i)+'"' for i in range(scenarios) if np.nan not in right_wrist_stats[i] )
+        # print >> fp, ",".join( str( occurrences_accross_frames_accross_scenarios[ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][i] ) for i in range(scenarios) if np.nan not in right_wrist_stats[i] )
+        for i in range(max_logs):
+            print >> fp, ",".join( str(e) for e in rotated_all_right_wrist_y[i] )
+    
+    # report all right wrist x coordinates accross frames
+    with open(statistics_folder_path + "all_right_wrist_z.csv", 'w') as fp:
+        print >> fp, ",".join( '"'+str( occurrences_accross_frames_accross_scenarios[ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][i] )+"@"+scenarios_dict.get(i)+'"' for i in range(scenarios) if np.nan not in right_wrist_stats[i] )
+        # print >> fp, ",".join( str( occurrences_accross_frames_accross_scenarios[ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][i] ) for i in range(scenarios) if np.nan not in right_wrist_stats[i] )
+        for i in range(max_logs):
+            print >> fp, ",".join( str(e) for e in rotated_all_right_wrist_z[i] )
+        
 
     print "SUCCESS!"

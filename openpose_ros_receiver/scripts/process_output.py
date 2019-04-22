@@ -144,13 +144,15 @@ def scatterplot3D(x, y, z, directory, x_label=None, y_label=None, z_label=None, 
     # number of index to markers
     i = 0
     for x_i, y_i, z_i in zip(np.array(x)[~np.isnan(np.array(x))], np.array(y)[~np.isnan(np.array(y))], np.array(z)[~np.isnan(np.array(z))]):
-        ax.text(x_i, y_i, z_i, str(i), fontsize=8)
+        ax.text(x_i, y_i, z_i, str(i), fontsize=12)
         i = i+1
     if x_label:
         ax.set_xlabel(x_label, fontsize=8)
     if y_label:
         ax.set_ylabel(y_label, fontsize=8)
     if z_label:
+        if "pix" in z_label:
+            z_label = "Z_depth_image"
         ax.set_zlabel(z_label, fontsize=8)
     if title:
         ax.set_title(title, fontsize=10)
@@ -162,6 +164,8 @@ def scatterplot3D(x, y, z, directory, x_label=None, y_label=None, z_label=None, 
         if z_lim_min != z_lim_max:
             ax.set_zlim3d(z_lim_min, z_lim_max)
     plt.savefig(directory+title+".png")
+    if "LWrist" in title:
+        plt.show(fig)
     plt.close(fig)
 
 

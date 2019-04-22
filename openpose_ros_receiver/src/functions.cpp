@@ -36,7 +36,8 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
         if (logging)
         {
             /* log skeletons to file */
-            std::ofstream tfedFile;
+            std::ofstream tfedFile/*, opFile*/;
+            // std::stringstream opstream;
             int writen = 0;
 
             static tf::TransformListener tfListener;
@@ -70,9 +71,12 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                         char* dt = ctime(&now);
                         strstream << "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/tfed " << dt << ".txt";
                         tfedFile.open(strstream.str(), std::ofstream::out);
+                        // opstream << "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/OP " << dt << ".txt";
+                        // opFile.open(opstream.str(), std::ofstream::out);
                     }
 
                     tfedFile << "Body " << i << " keypoints:" << std::endl;
+                    // opFile << "Body " << i << " keypoints:" << std::endl;
 
                     /* broadcast transform locally */
                     static tf::Transform localTransform;
@@ -381,6 +385,7 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                     }
                                     tfedFile << "kp " << getPoseBodyPartMappingBody25(j) << ": x=" << baseLinkTransform.getOrigin().x() << " y=" << baseLinkTransform.getOrigin().y()
                                             << " z=" << baseLinkTransform.getOrigin().z() << std::endl;
+                                    // opFile << "kp " << getPoseBodyPartMappingBody25(j) << ": x=" << x_pix << " y=" << y_pix << " z=" << z_pix << std::endl;
                                     strstream << "kp " << getPoseBodyPartMappingBody25(j) << ": x=" << baseLinkTransform.getOrigin().x() << " y=" << baseLinkTransform.getOrigin().y()
                                             << " z=" << baseLinkTransform.getOrigin().z() << std::endl;
                                     
@@ -399,12 +404,14 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                     }
 
                     tfedFile << std::endl << std::endl;
+                    // opFile << std::endl << std::endl;
 
                     writen++;
                 }
             }
             
             tfedFile.close();
+            // opFile.close();
         }
         else
         {
