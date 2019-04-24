@@ -152,7 +152,7 @@ if __name__ == "__main__":
     element_dict = dict([ (0, "x"), (1, "y")])
 
     # File I/O specific variables
-    json_dir = "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/SCENARIOS/json/samples/"
+    json_dir = "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/SCENARIOS/ZED_VGA/json/samples/"
     folder_name = "sample1"
     json_path = json_dir + folder_name
     trajectories_dir = "trajectories/"

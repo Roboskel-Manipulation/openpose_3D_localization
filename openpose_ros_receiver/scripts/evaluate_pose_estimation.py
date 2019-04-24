@@ -541,24 +541,24 @@ if __name__ == "__main__":
         )
 
 
-    # # more boxplots
+    # more boxplots
     # # [Scenario][BodyPart][x/y/z][t0,...,t9,mean,nobs,min,max,variance,skewness,kurtosis,std_dev]
     # boxplot(
-    #     data=[ report_matrix[0][ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][ getKeysByValue(element_dict, "x")[0] ], report_matrix[1][ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][ getKeysByValue(element_dict, "x")[0] ], report_matrix[2][ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][ getKeysByValue(element_dict, "x")[0] ] ],
+    #     data=[ report_matrix[0][ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][ getKeysByValue(element_dict, "x")[0] ][:max_logs-1], report_matrix[1][ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][ getKeysByValue(element_dict, "x")[0] ][:max_logs-1], report_matrix[2][ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][ getKeysByValue(element_dict, "x")[0] ] ][:max_logs-1],
     #         directory=plots_folder_path,
     #         data_label="Right Wrist X coordinates",
     #         title="Right Wrist X coordinates for ASTRA PRO, XTION, ZED_HD720",
     #         x_tick_labels=[ "X_astra_pro", "X_xtion", "X_zed_hd720" ]
     # )
     # boxplot(
-    #     data=[ report_matrix[0][ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][ getKeysByValue(element_dict, "y")[0] ], report_matrix[1][ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][ getKeysByValue(element_dict, "y")[0] ], report_matrix[2][ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][ getKeysByValue(element_dict, "y")[0] ] ],
+    #     data=[ report_matrix[0][ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][ getKeysByValue(element_dict, "y")[0] ][:max_logs-1], report_matrix[1][ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][ getKeysByValue(element_dict, "y")[0] ][:max_logs-1], report_matrix[2][ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][ getKeysByValue(element_dict, "y")[0] ] ][:max_logs-1],
     #         directory=plots_folder_path,
     #         data_label="Right Wrist Y coordinates",
     #         title="Right Wrist Y coordinates for ASTRA PRO, XTION, ZED_HD720",
     #         x_tick_labels=[ "Y_astra_pro", "Y_xtion", "Y_zed_hd720" ]
     # )
     # boxplot(
-    #     data=[ report_matrix[0][ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][ getKeysByValue(element_dict, "z")[0] ], report_matrix[1][ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][ getKeysByValue(element_dict, "z")[0] ], report_matrix[2][ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][ getKeysByValue(element_dict, "z")[0] ] ],
+    #     data=[ report_matrix[0][ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][ getKeysByValue(element_dict, "z")[0] ][:max_logs-1], report_matrix[1][ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][ getKeysByValue(element_dict, "z")[0] ][:max_logs-1], report_matrix[2][ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][ getKeysByValue(element_dict, "z")[0] ] ][:max_logs-1],
     #         directory=plots_folder_path,
     #         data_label="Right Wrist Z coordinates",
     #         title="Right Wrist Z coordinates for ASTRA PRO, XTION, ZED_HD720",

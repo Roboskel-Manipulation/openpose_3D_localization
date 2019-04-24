@@ -38,3 +38,7 @@ The original package has been upgraded in order to support OpenPose 1.5.0 and ha
 source catkin_workspace/devel/setup.bash
 roslaunch openpose_ros openpose_ros.launch
 ```
+
+### Time measurements
+
+Go to *./include/openpose_ros_io.hpp* and uncomment ```#define PROFILING```
