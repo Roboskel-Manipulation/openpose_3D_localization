@@ -125,7 +125,7 @@ std::vector<geometry_msgs::Point> OpenPoseROSRespond::LimbPositionInSpace(const 
 
     std::vector<geometry_msgs::Point> pointsVec;
 
-    for (int i = 1; i < limb.size(); i++)
+    for (unsigned int i = 1; i < limb.size(); i++)
     {
         geometry_msgs::Point tempPoint;
 

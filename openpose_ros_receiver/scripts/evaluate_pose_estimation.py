@@ -188,7 +188,14 @@ if __name__ == "__main__":
     #                         (25, "E-SV-ST-H-C-up"), (26, "E-SV-ST-H-C-front"), (27, "A-FV-ST-V-C_ASTRA_VGA"), (28, "A-FV-ST-V-C_XTION_VGA"), (29, "A-FV-ST-V-C_ZED_HD720")
     #                     ])
     ''''''
+    # scenarios_dict = dict([ (0, "A-FV-ST-V-C_ASTRA_VGA"), (1, "A-FV-ST-V-C_XTION_VGA"), (2, "A-FV-ST-V-C_ZED_HD720") ])
+    ''''''
+
     complementary_scenarios_c_o_pairs = [ ["A-FV-ST-H-C", "A-FV-ST-H-O"], ["B-FV-ST-H-C", "B-FV-ST-H-O"], ["E-FV-ST-H-C", "E-FV-ST-H-O"] ]
+    ''''''
+    # complementary_scenarios_c_o_pairs = []
+    # group_of_scenarios = ["A-FV-ST-V-C_ASTRA_VGA", "A-FV-ST-V-C_XTION_VGA", "A-FV-ST-V-C_ZED_HD720"]
+    ''''''
     cube_dimensions_dict = dict([ ("l", 0.093), ("w", 0.093), ("h", 0.07) ])
     ground_truth_dict = dict([ ("A", [-0.35, -0.35, 0.09]), ("A-right", [-0.257, -0.35, 0.09]), ("A-up", [-0.35, -0.35, 0.16]), ("A-front", [-0.35, -0.275, 0.09]),
                                ("B", [-0.15, -0.185, 0.09]),
@@ -212,12 +219,16 @@ if __name__ == "__main__":
     #                                        (25, [0.417, -0.035, 0.16]), (26, [0.417, 0.058, 0.09]), (27, [-0.35, -0.35, 0.09]), (28, [-0.35, -0.35, 0.09]), (29, [-0.35, -0.35, 0.09])
     #                                     ])
     ''''''
+    # right_wrist_ground_truth_dict = dict([ (0, [-0.35, -0.35, 0.09]), (1, [-0.35, -0.35, 0.09]), (2, [-0.35, -0.35, 0.09]) ])
+    ''''''
 
     # File I/O specific variables
     ''''''
     scenarios_path = "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/SCENARIOS/ZED_VGA/"
     ''''''
     # scenarios_path = "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/SCENARIOS_expanded/"
+    ''''''
+    # scenarios_path = "/home/gkamaras/catkin_ws/src/openpose_ros/openpose_ros_receiver/output/SCENARIOS_ASTRA_XTION_ZEDHD720/"
     ''''''
     scenarios_logs_path = scenarios_path + "logs/"
     plots_folder_path = scenarios_path + "evaluation_plots/"
@@ -240,6 +251,10 @@ if __name__ == "__main__":
     ''''''
     # max_logs = 10
     # scenarios, part, elem, val = 30, 25, 3, 18
+    # stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 10, 10, 11, 12, 13, 14, 15, 16, 17
+    ''''''
+    # max_logs = 10
+    # scenarios, part, elem, val = 3, 25, 3, 18
     # stat_analysis_idx, nobs_idx, min_idx, max_idx, mean_idx, variance_idx, skewness_idx, kurtosis_idx, std_dev_idx = 10, 10, 11, 12, 13, 14, 15, 16, 17
     ''''''
 
@@ -526,6 +541,31 @@ if __name__ == "__main__":
         )
 
 
+    # # more boxplots
+    # # [Scenario][BodyPart][x/y/z][t0,...,t9,mean,nobs,min,max,variance,skewness,kurtosis,std_dev]
+    # boxplot(
+    #     data=[ report_matrix[0][ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][ getKeysByValue(element_dict, "x")[0] ], report_matrix[1][ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][ getKeysByValue(element_dict, "x")[0] ], report_matrix[2][ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][ getKeysByValue(element_dict, "x")[0] ] ],
+    #         directory=plots_folder_path,
+    #         data_label="Right Wrist X coordinates",
+    #         title="Right Wrist X coordinates for ASTRA PRO, XTION, ZED_HD720",
+    #         x_tick_labels=[ "X_astra_pro", "X_xtion", "X_zed_hd720" ]
+    # )
+    # boxplot(
+    #     data=[ report_matrix[0][ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][ getKeysByValue(element_dict, "y")[0] ], report_matrix[1][ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][ getKeysByValue(element_dict, "y")[0] ], report_matrix[2][ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][ getKeysByValue(element_dict, "y")[0] ] ],
+    #         directory=plots_folder_path,
+    #         data_label="Right Wrist Y coordinates",
+    #         title="Right Wrist Y coordinates for ASTRA PRO, XTION, ZED_HD720",
+    #         x_tick_labels=[ "Y_astra_pro", "Y_xtion", "Y_zed_hd720" ]
+    # )
+    # boxplot(
+    #     data=[ report_matrix[0][ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][ getKeysByValue(element_dict, "z")[0] ], report_matrix[1][ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][ getKeysByValue(element_dict, "z")[0] ], report_matrix[2][ getKeysByValue(body_25_body_parts_dict, "RWrist")[0] ][ getKeysByValue(element_dict, "z")[0] ] ],
+    #         directory=plots_folder_path,
+    #         data_label="Right Wrist Z coordinates",
+    #         title="Right Wrist Z coordinates for ASTRA PRO, XTION, ZED_HD720",
+    #         x_tick_labels=[ "Z_astra_pro", "Z_xtion", "Z_zed_hd720" ]
+    # )
+
+
     # repeat with median normalization
     # complementary scenarios coordinates boxplot comparison
     # for each pair of complementary scenarios:
@@ -589,7 +629,7 @@ if __name__ == "__main__":
             optimize_lims=True
         )
 
-    
+
     # repeat with ground truth normalization
     # complementary scenarios coordinates boxplot comparison
     # for each pair of complementary scenarios:

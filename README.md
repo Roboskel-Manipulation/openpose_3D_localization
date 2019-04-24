@@ -2,6 +2,8 @@
 
 A collection of ROS catkin package that utilize the OpenPose library from https://github.com/CMU-Perceptual-Computing-Lab/openpose in order to detect human presence near a robotic arm workspace and provide the robot's motion planner with the input which is necessary to guarantee safe Human-Robot Collaboration.
 
+![alt text](./doc/img/TheCompleteHumanBodyAsAnObstacleSoftwarePipeline.png?raw=true)
+
 ## Contents
 
 * **openpose_ros**: The core functionality of the OpenPose ROS wrapper. Take a stream of images and in each image perform human pose recognition, using a human pose model (COCO_18, BODY_25). Describe each detected human with a skeleton made up of certain detected keypoints.
