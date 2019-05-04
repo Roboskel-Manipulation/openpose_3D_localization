@@ -1,6 +1,6 @@
 # OpenPose ROS wrapper for Human-Robot Collaboration
 
-A collection of ROS catkin package that utilize the OpenPose library from https://github.com/CMU-Perceptual-Computing-Lab/openpose in order to detect human presence near a robotic arm workspace and provide the robot's motion planner with the input which is necessary to guarantee safe Human-Robot Collaboration.
+A collection of ROS catkin packages that utilize the OpenPose library from https://github.com/CMU-Perceptual-Computing-Lab/openpose in order to detect human presence near a robotic arm workspace and provide the robot's motion planner with the input which is necessary to guarantee safe Human-Robot Collaboration.
 
 ![alt text](./doc/img/TheCompleteHumanBodyAsAnObstacleSoftwarePipeline.png?raw=true)
 
