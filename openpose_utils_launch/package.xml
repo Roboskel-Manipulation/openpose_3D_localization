@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>openpose_utils_launch</name>
+  <version>0.0.1</version>
+  <description>Collection of launch files, for the openpose_utils repository</description>
+
+  <maintainer email="gstavrinos@iit.demokritos.gr">George Stavrinos</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>openpose_ros</exec_depend>
+  <exec_depend>manos_vision</exec_depend>
+  <exec_depend>ar_track_alvar</exec_depend>
+  <exec_depend>openpose_ros_avoid</exec_depend>
+  <exec_depend>openpose_ros_respond</exec_depend>
+  <exec_depend>openpose_ros_receiver</exec_depend>
+  <exec_depend>tf_based_on_ar_marker</exec_depend>
+
+</package>
