@@ -2,8 +2,13 @@
 
 A collection of ROS catkin packages that utilize the OpenPose library from https://github.com/CMU-Perceptual-Computing-Lab/openpose in order to detect human presence near a robotic arm workspace and provide the robot's motion planner with the input which is necessary to guarantee safe Human-Robot Collaboration.
 
-This repo depends on this openpose ROS wrapper:
-https://github.com/firephinx/openpose_ros
+This repo depends on:
+
+* https://github.com/firephinx/openpose_ros
+* https://github.com/ros-perception/ar_track_alvar
+* https://github.com/Roboskel-Manipulation/manos_vision
+* https://github.com/gstavrinos/tf_based_on_ar_marker
+
 
 ## Contents
 
