@@ -1,0 +1,16 @@
+# string (topic name)
+human_list_topic: "/openpose_ros/human_list"
+# string (topic name)
+pointcloud_topic: "/zed/zed_node/point_cloud/cloud_registered"
+# string (topic name)
+pointcloud_topic_debug: "/zed/zed_node/point_cloud/cloud_registered_debug"
+# string (frame name)
+image_sensor_frame: "/zed_camera_center"
+# string (topic name)
+robot_frame_coords_str_topic: "/openpose_ros_receiver/robot_frame_coords_str"
+# string (topic name)
+robot_frame_coords_msg_topic: "/openpose_ros_receiver/robot_frame_coords_msg"
+# integer (number of positions)
+queue_size: 1
+# boolean
+logging: false

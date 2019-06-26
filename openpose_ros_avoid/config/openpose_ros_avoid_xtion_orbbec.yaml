@@ -1,0 +1,22 @@
+# string (topic name)
+robot_frame_coords_str_topic: "/openpose_ros_receiver/robot_frame_coords_str"
+# string (topic name)
+robot_frame_coords_msg_topic: "/openpose_ros_receiver/robot_frame_coords_msg"
+# integer (number of positions)
+queue_size: 1
+# string (topic name)
+image_sensor_frame: "/camera_rgb_optical_frame"
+# string (frame name)
+base_link_frame: "/base_link"
+# double (meters)
+geometric_primitive_radius: 0.075
+# double (meters)
+basic_limb_safety_radius: 0.175
+# double (meters)
+geometric_primitive_radius_adaptation_limit: 0.15
+# double (meters)
+basic_limb_safety_radius_adaptation_limit: 0.65
+# double/float (probability, values in [0, 1])
+min_avg_prob: 0.25
+# integer (number of observations)
+human_body_keypoints: 25

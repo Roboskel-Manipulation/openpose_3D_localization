@@ -1,0 +1,16 @@
+# string (topic name)
+human_list_topic: "/openpose_ros/human_list"
+# string (topic name)
+pointcloud_topic: "/camera/depth_registered/points"
+# string (topic name)
+pointcloud_topic_debug: "/camera/depth_registered/points_debug"
+# string (frame name)
+image_sensor_frame: "/camera_rgb_optical_frame"
+# string (topic name)
+robot_frame_coords_str_topic: "/openpose_ros_receiver/robot_frame_coords_str"
+# string (topic name)
+robot_frame_coords_msg_topic: "/openpose_ros_receiver/robot_frame_coords_msg"
+# integer (number of positions)
+queue_size: 1
+# boolean
+logging: false
