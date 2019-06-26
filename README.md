@@ -10,6 +10,9 @@ This repo depends on:
 * https://github.com/gstavrinos/tf_based_on_ar_marker
 
 
+Note: The zed_wrapper package, which is also a dependency, has not been added to the package.xml, in order to allow for easier compilation. You will need to install it if you are planning to use a ZED camera.
+
+
 ## Contents
 
 * **openpose_ros_receiver**: Receive the OpenPose output's skeletons and transform their keypoints coordinates from the camera coordinate frame to the robot coordinate frame.
