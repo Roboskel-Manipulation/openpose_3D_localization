@@ -12,6 +12,14 @@ This repo depends on:
 
 Note: The zed_wrapper package, which is also a dependency, has not been added to the package.xml, in order to allow for easier compilation. You will need to install it if you are planning to use a ZED camera.
 
+## Quick instructions
+
+Generally you should only need to directly run the launch files located inside the openpose_utils_launch package.
+Use the openpose_ros_* launch files, to start the openpose_ros wrapper along with the camera driver of your choice.
+For the whole (experimental) pipeline you should use the whole_pipeline_* launch files, replacing * with the camera of your choice.
+The launch files that end with *_with_marker should be used only under certain circimstances that do not apply to a wide audience, but rather specifically to our lab.
+
+If you want to be able to see the openpose output, edit the openpose_ros_* launch file, and change the `display_output` parameter to `true`.
 
 ## Contents
 
