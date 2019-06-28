@@ -83,7 +83,7 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                     for (uint32_t j = 0; j < 25; j++)
                     {
-                        double x = 0.0, y = 0.0, z = 0.0, prob = 0.0, x_pix = 0.0, y_pix = 0.0, z_pix = 0.0, x0 = 0.0;
+                        double x = 0.0, y = 0.0, z = 0.0, prob = 0.0, x_pix = 0.0, y_pix = 0.0, x0 = 0.0;
 
                         x_pix = list_msg->human_list[i].body_key_points_with_prob[j].x; y_pix = list_msg->human_list[i].body_key_points_with_prob[j].y;
                         prob = list_msg->human_list[i].body_key_points_with_prob[j].prob;
@@ -385,7 +385,6 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
                                     }
                                     tfedFile << "kp " << getPoseBodyPartMappingBody25(j) << ": x=" << baseLinkTransform.getOrigin().x() << " y=" << baseLinkTransform.getOrigin().y()
                                             << " z=" << baseLinkTransform.getOrigin().z() << std::endl;
-                                    // opFile << "kp " << getPoseBodyPartMappingBody25(j) << ": x=" << x_pix << " y=" << y_pix << " z=" << z_pix << std::endl;
                                     strstream << "kp " << getPoseBodyPartMappingBody25(j) << ": x=" << baseLinkTransform.getOrigin().x() << " y=" << baseLinkTransform.getOrigin().y()
                                             << " z=" << baseLinkTransform.getOrigin().z() << std::endl;
                                     
@@ -443,9 +442,9 @@ void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& lis
 
                     for (uint32_t j = 0; j < 25; j++)
                     {
-                        double x = 0.0, y = 0.0, z = 0.0, prob = 0.0, x_pix = 0.0, y_pix = 0.0, z_pix = 0.0, x0 = 0.0;
+                        double x = 0.0, y = 0.0, z = 0.0, prob = 0.0, x_pix = 0.0, y_pix = 0.0, x0 = 0.0;
 
-                        x_pix = list_msg->human_list[i].body_key_points_with_prob[j].x; y_pix = list_msg->human_list[i].body_key_points_with_prob[j].y; z_pix = list_msg->human_list[i].body_key_points_with_prob[j].z;
+                        x_pix = list_msg->human_list[i].body_key_points_with_prob[j].x; y_pix = list_msg->human_list[i].body_key_points_with_prob[j].y;
                         prob = list_msg->human_list[i].body_key_points_with_prob[j].prob;
 
                         if (!std::isnan(x_pix) && !std::isnan(y_pix) && x_pix && y_pix)
