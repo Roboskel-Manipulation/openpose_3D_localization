@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
 <launch>
 
- <arg name="live" default="false" />
+	<arg name="live" default="false" />
 	<param name="use_sim_time" value="false" />
-	
+
 	<include file="$(find openpose_utils_launch)/launch/openpose_ros_xtion.launch">
 		<arg name="live" value="$(arg live)" />
 	</include>
 
-  <include file="$(find openpose_ros_avoid)/launch/openpose_ros_avoid_xtion_orbbec.launch"/>
-  <include file="$(find openpose_ros_receiver)/launch/openpose_ros_receiver_xtion_orbbec.launch"/>
-  <include file="$(find openpose_ros_respond)/launch/openpose_ros_respond.launch"/>
+	<include file="$(find openpose_ros_avoid)/launch/openpose_ros_avoid_xtion_orbbec.launch"/>
+	<include file="$(find openpose_ros_receiver)/launch/openpose_ros_receiver_xtion_orbbec.launch"/>
+	<include file="$(find openpose_ros_respond)/launch/openpose_ros_respond.launch"/>
 
 </launch>
