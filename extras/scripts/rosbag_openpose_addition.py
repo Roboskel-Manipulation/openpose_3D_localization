@@ -71,4 +71,4 @@ if __name__ == "__main__":
     print("\033[92m" + "Done. Good bye!\n" + "\033[0m")
 
 #Example usage:
-#python rosbag_openpose_addition.py /home/gstavrinos/rosbags/ /acoustic_magic_doa/data_raw /audio /camera/depth/image_raw /camera/rgb/image_raw /scan
+#python rosbag_openpose_addition.py /home/gstavrinos/rosbags/ /acoustic_magic_doa/data_raw /audio /camera/depth/image_raw /camera/rgb/image_raw /scan /openpose_ros/human_list
