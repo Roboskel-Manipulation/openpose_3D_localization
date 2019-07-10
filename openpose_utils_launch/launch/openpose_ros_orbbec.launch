@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
-
-  <include file="$(find manos_vision)/launch/orbbec_astra.launch"/>
+  <arg name="live" default="false" />"
+  <include file="$(find manos_vision)/launch/orbbec_astra.launch" if="$(arg live)"/>
 
   <!-- Start openpose_ros -->
   <node pkg="openpose_ros" type="openpose_ros_node" name="openpose_ros_node" output="screen">

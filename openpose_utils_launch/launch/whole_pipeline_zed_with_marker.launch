@@ -2,8 +2,12 @@
 <launch>
 
   <param name="use_sim_time" value="false" />
+  <arg name="live" default="false" />
+  <include file="$(find manos_description)/launch/manos_tf.launch" />
 
-  <include file="$(find openpose_utils_launch)/launch/whole_pipeline_zed.launch"/>
+  <include file="$(find openpose_utils_launch)/launch/whole_pipeline_zed.launch" >
+    <arg name="live" value="$(arg live)" />
+  </include>
 
   <arg name="camera" default="camera" />
 
