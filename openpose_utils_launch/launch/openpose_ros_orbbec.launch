@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-  <arg name="live" default="false" />"
+  <arg name="live" default="false" />
   <include file="$(find manos_vision)/launch/orbbec_astra.launch" if="$(arg live)"/>
 
   <!-- Start openpose_ros -->
@@ -8,7 +8,7 @@
     <param name="image_topic"                value="/camera/rgb/image_raw" />
     <param name="input_image_transport_type" value="raw" />
     <param name="output_topic"               value="/openpose_ros/human_list" />
-    <param name="display_output"             value="false" />
+    <param name="display_output"             value="true" />
     <param name="print_keypoints"            value="false" />
     <param name="save_original_video"        value="false" />
     <param name="save_openpose_video"        value="false" />
