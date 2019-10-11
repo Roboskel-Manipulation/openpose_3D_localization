@@ -1,9 +1,15 @@
 <?xml version="1.0"?>
 <launch>
 
-  <param name="use_sim_time" value="false" />
+  <param name="use_sim_time" value="true" />
   <arg name="live" default="false" />
-  <include file="$(find manos_description)/launch/manos_tf.launch" />
+  <arg name="limited" default="true"/>
+  <include file="$(find manos_description)/launch/ur3_pg70_upload.launch" unless="$(arg live)">
+    <arg name="limited" value="$(arg limited)"/>
+  </include>
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" unless="$(arg live)"/>
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" unless="$(arg live)"/>
 
   <include file="$(find openpose_utils_launch)/launch/whole_pipeline_xtion.launch">
     <arg name="live" value="$(arg live)"/>
@@ -13,7 +19,10 @@
 
   <node pkg="tf" type="static_transform_publisher" name="dummy_tf_publisher"
         args="0 0 0 0 0 0 /dummy_link /camera_link 100" />
-
+  
+  <node unless="$(arg live)" pkg="tf" type="static_transform_publisher" name="dummy_tf_publisher2"
+        args="0 0 0 0 0 0 /camera_link /camera_rgb_optical_frame 100" />
+ 
   <node pkg="tf" type="static_transform_publisher" name="static_marker_link_publisher"
         args="-0.406 0.406 0 0 0 0 /base_link /ar_marker_link 100" />
 
@@ -35,7 +44,7 @@
   </node>
 
   <node pkg="tf_based_on_ar_marker" type="tf_based_on_ar_marker.py" respawn="false" name="tf_based_on_ar_marker" output="screen">
-    <rosparam file="$(find manos_vision)/config/connect_trees2.yaml" command="load" />
+    <rosparam file="$(find manos_vision)/config/connect_trees2.yaml" command="load"/>
   </node>
 
 </launch>
