@@ -1,8 +1,9 @@
 <?xml version="1.0"?>
 <launch>
+
 	<arg name="live" default="false" />
-	<!-- <param name="use_sim_time" value="true" /> -->
-	
+	<param name="use_sim_time" value="true" />
+
 	<include file="$(find openpose_utils_launch)/launch/openpose_ros_xtion.launch">
 		<arg name="live" value="$(arg live)" />
 	</include>
