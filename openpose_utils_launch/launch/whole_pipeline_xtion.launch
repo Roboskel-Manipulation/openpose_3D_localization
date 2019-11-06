@@ -1,13 +1,14 @@
 <?xml version="1.0"?>
 <launch>
 
-	<arg name="live" default="false" />
-	<param name="use_sim_time" value="true" />
+	<arg name="live_camera" default="false" />
+	<param name="use_sim_time" value="$(arg live_camera)" />
 
 	<include file="$(find openpose_utils_launch)/launch/openpose_ros_xtion.launch">
-		<arg name="live" value="$(arg live)" />
+		<arg name="live_camera" value="$(arg live_camera)" />
 	</include>
 
 	<include file="$(find openpose_ros_receiver)/launch/openpose_ros_receiver_xtion_orbbec.launch"/>
+	<!-- <include file="$(find openpose_ros_receiver)/launch/openpose_3D_producer.launch"/> -->
 
 </launch>
