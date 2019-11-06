@@ -4,7 +4,7 @@
   <!-- True if loading limited version of manos -->
   <arg name="limited" default="true"/>
 
-  <!-- True if running gazebo -->
+  <!-- True if listening to clock (when running gazebo or using rosbags. If both ) -->
   <arg name="sim" default="false" /> 
 
   <!-- True if running camera and not a rosbag -->
@@ -32,7 +32,7 @@
   <node pkg="tf" type="static_transform_publisher" name="dummy_tf_publisher"
         args="0 0 0 0 0 0 /dummy_link /camera_link 100" />
   
-  <node unless="$(arg sim)" pkg="tf" type="static_transform_publisher" name="dummy_tf_publisher2"
+  <node pkg="tf" type="static_transform_publisher" name="dummy_tf_publisher2"
         args="0 0 0 -1.571 0 -1.571 /camera_link /camera_rgb_optical_frame 100" />
  
   <node pkg="tf" type="static_transform_publisher" name="static_marker_link_publisher"
@@ -56,7 +56,7 @@
   </node>
 
   <node pkg="tf_based_on_ar_marker" type="tf_based_on_ar_marker.py" respawn="false" name="tf_based_on_ar_marker" output="screen">
-    <rosparam file="$(find manos_vision)/config/connect_trees2.yaml" command="load"/>
+    <rosparam file="$(find manos_vision)/config/connect_trees_xtion_live.yaml" command="load"/>
   </node>
 
 </launch>

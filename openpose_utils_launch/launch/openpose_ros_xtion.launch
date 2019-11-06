@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-  <arg name="live_camera" default="false" />
+  <arg name="live_camera" default="true" />
   <include file="$(find manos_vision)/launch/asus_xtion.launch" if="$(arg live_camera)"/>
 
   <!-- Start openpose_ros -->
