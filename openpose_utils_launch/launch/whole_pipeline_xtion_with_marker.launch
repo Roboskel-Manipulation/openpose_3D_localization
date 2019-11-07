@@ -59,7 +59,7 @@
   </node>
 
   <node pkg="tf_based_on_ar_marker" type="tf_based_on_ar_marker.py" respawn="false" name="tf_based_on_ar_marker" output="screen">
-    <rosparam file="$(find manos_vision)/config/connect_trees_xtion_live.yaml" command="load"/>
+    <rosparam file="$(find manos_vision)/config/connect_trees2.yaml" command="load"/>
   </node>
 
 </launch>
