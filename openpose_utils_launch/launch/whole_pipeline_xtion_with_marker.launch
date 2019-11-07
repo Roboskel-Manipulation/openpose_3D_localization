@@ -1,10 +1,13 @@
 <?xml version="1.0"?>
 <launch>
 
+  <!-- When running a rosbag, use --clock unless gazebo is up -->
+  
   <!-- True if loading limited version of manos -->
   <arg name="limited" default="true"/>
 
-  <!-- True if listening to clock (when running gazebo or using rosbags. If both ) -->
+  <!-- True if listening to clock (when running gazebo or using rosbags. If both are running, then don't use --clock 
+        when playing rosbags) -->
   <arg name="sim" default="false" /> 
 
   <!-- True if running camera and not a rosbag -->
