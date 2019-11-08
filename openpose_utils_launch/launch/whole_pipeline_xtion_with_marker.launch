@@ -1,13 +1,9 @@
 <?xml version="1.0"?>
 <launch>
 
-  <!-- When running a rosbag, use --clock unless gazebo is up -->
-  
-  <!-- True if loading limited version of manos -->
-  <arg name="limited" default="true"/>
+  <!-- When running a rosbag, use -clock unless gazebo is up -->
 
-  <!-- True if listening to clock (when running gazebo or using rosbags. If both are running, then don't use --clock 
-        when playing rosbags) -->
+  <!-- True if listening to clock (when running gazebo or using rosbags. If both are running, then don't use -clock when playing rosbags) -->
   <arg name="sim" default="false" /> 
 
   <!-- True if running camera and not a rosbag -->
@@ -19,7 +15,6 @@
   <param name="use_sim_time" value="$(arg sim)" />
 
   <include file="$(find manos_description)/launch/ur3_pg70_upload.launch" if="$(arg manos_tf)">
-    <arg name="limited" value="$(arg limited)"/>
   </include>
 
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" if="$(arg manos_tf)"/>

@@ -143,9 +143,11 @@ void Human3D::humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::Cons
         
         /* for profiling */
         humanReceiverPub.publish(keypoints_v);
-        // for (short int i=0; i<keypoints_v.keypoints.size(); i++){
-        //     keypoints_v.keypoints[i].points.clear();
-        // }
+        for (short int i=0; i<keypoints_v.keypoints.size(); i++){
+            keypoints_v.keypoints[i].points.x = 0;
+            keypoints_v.keypoints[i].points.y = 0;
+            keypoints_v.keypoints[i].points.z = 0;
+        }
 
         /* publish debugging's pointcloud */
         if (pointcloudEnable)
@@ -171,7 +173,6 @@ int main (int argc, char** argv){
     nh.param("openpose_3D_producer/image_sensor_frame", image_sensor_frame, std::string("/zed_left_camera_frame"));
     nh.param("openpose_3D_producer/robot_frame_coords_msg_topic", robot_frame_coords_msg_topic, std::string("/openpose_ros_receiver/robot_frame_coords_msg"));
     nh.param("openpose_3D_producer/queue_size", queue_size, 2);
-    nh.param("openpose_3D_producer/logging", logging, false);
     nh.param("openpose_3D_producer/neighborhoodFactor", factor, 1);
     nh.param("openpose_3D_producer/pointcloudEnable", pointcloudEnable, false);
     nh.param("openpose_3D_producer/points_of_interest", points_of_interest, std::vector<int>(0));

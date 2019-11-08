@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch>
+
+  <node pkg="openpose_ros_receiver" type="openpose_3D_producer" name="openpose_3D_producer" output="screen">
+    <rosparam command="load" file="$(find openpose_ros_receiver)/config/openpose_3D_producer.yaml"/>
+  </node>
+
+</launch>

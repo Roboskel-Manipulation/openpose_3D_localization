@@ -7,7 +7,8 @@
 		<arg name="live_camera" value="$(arg live_camera)" />
 	</include>
 
-	<include file="$(find openpose_ros_receiver)/launch/openpose_ros_receiver_xtion_orbbec.launch"/>
-	<!-- <include file="$(find openpose_ros_receiver)/launch/openpose_3D_producer.launch"/> -->
+<!-- 	<include file="$(find openpose_ros_receiver)/launch/openpose_ros_receiver_xtion_orbbec.launch"/>
+ -->
+	<include file="$(find openpose_ros_receiver)/launch/openpose_3D_producer.launch"/>
 
 </launch>

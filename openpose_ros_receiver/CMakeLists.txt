@@ -44,3 +44,12 @@ target_link_libraries(openpose_ros_receiver_listener_node
   ${catkin_LIBRARIES}
   ${OpenPose_LIBS} 
 )
+
+add_executable(openpose_3D_producer src/openpose_3D_producer.cpp src/help_functions.cpp)
+
+add_dependencies(openpose_3D_producer ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+target_link_libraries(openpose_3D_producer
+  ${catkin_LIBRARIES}
+  ${OpenPose_LIBS} 
+)

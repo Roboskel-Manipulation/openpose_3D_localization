@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   message_generation
+  geometry_msgs
 )
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
@@ -17,11 +18,14 @@ add_message_files(
   FILES
   OpenPoseReceiverHuman.msg
   OpenPoseReceiverKeypoint.msg
+  Keypoints.msg
+  Keypoints_v.msg
 )
 
 generate_messages(
   DEPENDENCIES
   std_msgs
+  geometry_msgs
 )
 
 catkin_package(
