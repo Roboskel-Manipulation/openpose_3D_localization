@@ -21,12 +21,13 @@ std::vector<std::vector<int> > neighborhood_vector(){
     return int_vv;
 }
 
-openpose_ros_receiver_msgs::Keypoints_v keypointsStructure(std::vector<int> points_of_interest){
+openpose_ros_receiver_msgs::Keypoints_v keypointsStructure(std::vector<int> points_of_interest, std::string frame){
     openpose_ros_receiver_msgs::Keypoints point;
     openpose_ros_receiver_msgs::Keypoints_v points_v;
 
     for (int i=0; i<points_of_interest.size(); i++){
         point.name = getPoseBodyPartMappingBody25(points_of_interest[i]);
+        point.points.header.frame_id = frame;
         points_v.keypoints.push_back(point);
     }
     return points_v;

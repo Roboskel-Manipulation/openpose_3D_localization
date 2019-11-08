@@ -6,20 +6,18 @@
 #include <openpose_ros_msgs/OpenPoseHuman.h>
 #include <openpose_ros_msgs/OpenPoseHumanList.h>
 #include <openpose_ros_msgs/PointWithProb.h>
-#include <openpose_ros_receiver_msgs/OpenPoseReceiverHuman.h>
-#include <openpose_ros_receiver_msgs/OpenPoseReceiverKeypoint.h>
 #include <openpose_ros_receiver_msgs/Keypoints_v.h>
 #include <openpose_ros_receiver_msgs/Keypoints.h>
 
 /* ROS headers */
 #include <ros/ros.h>
-#include <message_filters/subscriber.h>
-#include <message_filters/synchronizer.h>
-#include <message_filters/sync_policies/approximate_time.h>
-#include <std_msgs/String.h>
+// #include <message_filters/subscriber.h>
+// #include <message_filters/synchronizer.h>
+// #include <message_filters/sync_policies/approximate_time.h>
+// #include <std_msgs/String.h>
 
 /* TF headers */
-#include <tf/transform_broadcaster.h>
+// #include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
 
 /* PCL headers */
@@ -29,9 +27,9 @@
 #include <pcl/common/common.h>
 
 /* C++ headers */
-#include <fstream>
-#include <ctime>
-#include <sstream>
+// #include <fstream>
+// #include <ctime>
+// #include <sstream>
 #include <cmath>
 #include <vector>
 #include <string>
@@ -58,8 +56,7 @@
 #define BLUE 255
 
 /* Global Variables */
-static bool tfSubtree, logging, pclMsg, humanListMsg, pointcloudEnable;
-static std::string image_sensor_frame;
+static bool pclMsg, humanListMsg, pointcloudEnable;
 static ros::Publisher robotFrameCoordsPub, humanReceiverPub, pointcloudDebugPub;
 static pcl::PointCloud<pcl::PointXYZRGBA>::Ptr pPCL;
 static std::vector<int> points_of_interest;
@@ -97,9 +94,9 @@ const std::map<int, std::string> POSE_BODY_25_BODY_PARTS
 };
 
 /* Various functions */
-void listenForSkeleton(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg);
+// void listenForSkeleton(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg);
 std::string getPoseBodyPartMappingBody25(int idx);
 std::vector<std::vector<int> > neighborhood_vector(); 
-openpose_ros_receiver_msgs::Keypoints_v keypointsStructure(std::vector<int> points_of_interest);
+openpose_ros_receiver_msgs::Keypoints_v keypointsStructure(std::vector<int> points_of_interest, std::string frame);
 
 #endif

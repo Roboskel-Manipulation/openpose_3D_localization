@@ -1,2 +1,2 @@
 string name
-geometry_msgs/Point points
+geometry_msgs/PointStamped points

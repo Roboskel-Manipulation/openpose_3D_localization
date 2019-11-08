@@ -15,4 +15,4 @@ points_of_interest: [1, 4, 7]
 # neighborhood factor
 factor: 1
 # enable pointcloud debug
-pointcloudEnable: true
+pointcloudEnable: false

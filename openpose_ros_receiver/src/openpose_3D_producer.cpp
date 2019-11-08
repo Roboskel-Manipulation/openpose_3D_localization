@@ -32,25 +32,25 @@ void Human3D::humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::Cons
         humanListMsg = true;
 
         if (list_msg->num_humans == 0){
-            ROS_INFO("No human detected in current frame. Gonna exit...");
+            ROS_INFO("No human detected in current frame.");
             return;
         }
 
         static tf::TransformListener tfListener;
         static tf::StampedTransform baseLinkTransform;
 
-        if (!tfSubtree){
-            try{
-                /* take the TF subtree that we want for the transformations */
-                tfListener.waitForTransform("base_link", image_sensor_frame, ros::Time(0), ros::Duration(TF_WAIT));
-                tfListener.lookupTransform("base_link", image_sensor_frame, ros::Time(0), baseLinkTransform);
+        // if (!tfSubtree){
+        //     try{
+        //         /* take the TF subtree that we want for the transformations */
+        //         tfListener.waitForTransform("base_link", image_sensor_frame, ros::Time(0), ros::Duration(TF_WAIT));
+        //         tfListener.lookupTransform("base_link", image_sensor_frame, ros::Time(0), baseLinkTransform);
 
-                tfSubtree = true;
-            }
-            catch (tf::TransformException &ex){
-                ROS_ERROR("%s", ex.what());
-            }
-        }
+        //         tfSubtree = true;
+        //     }
+        //     catch (tf::TransformException &ex){
+        //         ROS_ERROR("%s", ex.what());
+        //     }
+        // }
 
 
         for (short int i=0; i<points_of_interest.size(); i++){
@@ -106,47 +106,50 @@ void Human3D::humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::Cons
                     if (x > UPPER_VARIATION_THRESH * x0 || x < LOWER_VARIATION_THRESH * x0) 
                         x = x0;
                 }
-                try{
-                    /* locally */
-                    localTransform.setOrigin( tf::Vector3(x, y, z) );
-                    tf::Quaternion localQuat(0, 0, 0, 1);
-                    localTransform.setRotation(localQuat);
-                    tfListener.setTransform(tf::StampedTransform(localTransform, ros::Time::now(), image_sensor_frame, getPoseBodyPartMappingBody25(points_of_interest[i])) );
 
-                    /* LOOKUP LOCAL TRANSFORM */
-                    tfListener.waitForTransform("base_link", getPoseBodyPartMappingBody25(points_of_interest[i]), ros::Time(0), ros::Duration(TF_WAIT));
-                    tfListener.lookupTransform("base_link", getPoseBodyPartMappingBody25(points_of_interest[i]), ros::Time(0), baseLinkTransform);
+                keypoints_v.keypoints[i].points.point.x = x;
+                keypoints_v.keypoints[i].points.point.y = y;
+                keypoints_v.keypoints[i].points.point.z = z;
+                keypoints_v.keypoints[i].points.header.stamp = ros::Time::now();
+                // try{
+                //     // locally 
+                //     localTransform.setOrigin( tf::Vector3(x, y, z) );
+                //     tf::Quaternion localQuat(0, 0, 0, 1);
+                //     localTransform.setRotation(localQuat);
+                //     tfListener.setTransform(tf::StampedTransform(localTransform, ros::Time::now(), image_sensor_frame, getPoseBodyPartMappingBody25(points_of_interest[i])) );
 
-                    /* log */
-                    if (!std::isnan(baseLinkTransform.getOrigin().x()) && !std::isnan(baseLinkTransform.getOrigin().y()) && !std::isnan(baseLinkTransform.getOrigin().z())){
-                        /* process transform's timestamp */
-                        ros::Time now = ros::Time::now(), transformStamp = baseLinkTransform.stamp_;
-                        ros::Duration timeDiff = now - transformStamp;
-                        /* check if we are dealing with a frame old enough (e.g. > 2 sec) to be considered unreliable */
-                        if (timeDiff > ros::Duration(RELIABILITY_THRESHOLD)){
-                            ROS_WARN("Transform older than %f seconds detected", RELIABILITY_THRESHOLD);
-                            ROS_INFO("Debugging print 1");
-                            std::cin.get();
-                            continue;
-                        }
-                        keypoints_v.keypoints[i].points.x = baseLinkTransform.getOrigin().x();
-                        keypoints_v.keypoints[i].points.y = baseLinkTransform.getOrigin().y();
-                        keypoints_v.keypoints[i].points.z = baseLinkTransform.getOrigin().z();
-                    }
-                }
-                catch (tf::TransformException &ex){
-                    ROS_ERROR("%s", ex.what());
-                    continue;
-                }
+                //     // LOOKUP LOCAL TRANSFORM 
+                //     tfListener.waitForTransform("base_link", getPoseBodyPartMappingBody25(points_of_interest[i]), ros::Time(0), ros::Duration(TF_WAIT));
+                //     tfListener.lookupTransform("base_link", getPoseBodyPartMappingBody25(points_of_interest[i]), ros::Time(0), baseLinkTransform);
+
+                //     // log 
+                //     if (!std::isnan(baseLinkTransform.getOrigin().x()) && !std::isnan(baseLinkTransform.getOrigin().y()) && !std::isnan(baseLinkTransform.getOrigin().z())){
+                //         // process transform's timestamp
+                //         ros::Time now = ros::Time::now(), transformStamp = baseLinkTransform.stamp_;
+                //         ros::Duration timeDiff = now - transformStamp;
+                //         // check if we are dealing with a frame old enough (e.g. > 2 sec) to be considered unreliable
+                //         if (timeDiff > ros::Duration(RELIABILITY_THRESHOLD)){
+                //             ROS_WARN("Transform older than %f seconds detected", RELIABILITY_THRESHOLD);
+                //             continue;
+                //         }
+                //         keypoints_v.keypoints[i].points.x = baseLinkTransform.getOrigin().x();
+                //         keypoints_v.keypoints[i].points.y = baseLinkTransform.getOrigin().y();
+                //         keypoints_v.keypoints[i].points.z = baseLinkTransform.getOrigin().z();
+                //     }
+                // }
+                // catch (tf::TransformException &ex){
+                //     ROS_ERROR("%s", ex.what());
+                //     continue;
+                // }
             }
         }
         
         /* for profiling */
         humanReceiverPub.publish(keypoints_v);
         for (short int i=0; i<keypoints_v.keypoints.size(); i++){
-            keypoints_v.keypoints[i].points.x = 0;
-            keypoints_v.keypoints[i].points.y = 0;
-            keypoints_v.keypoints[i].points.z = 0;
+            keypoints_v.keypoints[i].points.point.x = 0;
+            keypoints_v.keypoints[i].points.point.y = 0;
+            keypoints_v.keypoints[i].points.point.z = 0;
         }
 
         /* publish debugging's pointcloud */
@@ -165,7 +168,7 @@ int main (int argc, char** argv){
     ros::NodeHandle nh;
     
     int queue_size, factor;
-    std::string human_list_topic, pointcloud_topic, pointcloud_topic_debug, robot_frame_coords_str_topic, robot_frame_coords_msg_topic;
+    std::string image_sensor_frame, human_list_topic, pointcloud_topic, pointcloud_topic_debug, robot_frame_coords_str_topic, robot_frame_coords_msg_topic;
 
     nh.param("openpose_3D_producer/human_list_topic", human_list_topic, std::string("/openpose_ros/human_list"));
     nh.param("openpose_3D_producer/pointcloud_topic", pointcloud_topic, std::string("/zed/point_cloud/cloud_registered"));
@@ -173,18 +176,18 @@ int main (int argc, char** argv){
     nh.param("openpose_3D_producer/image_sensor_frame", image_sensor_frame, std::string("/zed_left_camera_frame"));
     nh.param("openpose_3D_producer/robot_frame_coords_msg_topic", robot_frame_coords_msg_topic, std::string("/openpose_ros_receiver/robot_frame_coords_msg"));
     nh.param("openpose_3D_producer/queue_size", queue_size, 2);
+    nh.param("openpose_3D_producer/points_of_interest", points_of_interest, std::vector<int>(0));
     nh.param("openpose_3D_producer/neighborhoodFactor", factor, 1);
     nh.param("openpose_3D_producer/pointcloudEnable", pointcloudEnable, false);
-    nh.param("openpose_3D_producer/points_of_interest", points_of_interest, std::vector<int>(0));
 
     /* Initialize Global Variables */
-    tfSubtree = false;
+    // tfSubtree = false;
     pclMsg = false; 
     humanListMsg = true;
 
 
     // Create the structure of the final message based on the points of interest
-    openpose_ros_receiver_msgs::Keypoints_v points_v = keypointsStructure(points_of_interest);
+    openpose_ros_receiver_msgs::Keypoints_v points_v = keypointsStructure(points_of_interest, image_sensor_frame);
 
     // Create a vector containing the neighborhood offsets
     std::vector<std::vector<int> > neighborhood_v = neighborhood_vector();
