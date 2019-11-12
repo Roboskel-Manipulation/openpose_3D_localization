@@ -9,7 +9,7 @@
   <arg name="live_camera" default="true" />
 
   <!-- Always false if running manos -->
-  <arg name="manos_tf" value="true" />
+  <arg name="manos_tf" value="false" />
 
   <param name="use_sim_time" value="$(arg sim)" />
 
