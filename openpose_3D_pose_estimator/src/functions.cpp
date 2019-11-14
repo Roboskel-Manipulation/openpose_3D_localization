@@ -1,4 +1,4 @@
-#include <openpose_3D_producer.hpp>
+#include <openpose_3D_pose_estimator.hpp>
 
 std::string getPoseBodyPartMappingBody25(int idx){
     return POSE_BODY_25_BODY_PARTS.find(idx)->second;
@@ -21,9 +21,9 @@ std::vector<std::vector<int> > neighborhood_vector(){
     return int_vv;
 }
 
-openpose_ros_receiver_msgs::Keypoints_v keypointsStructure(std::vector<int> points_of_interest, std::string frame){
-    openpose_ros_receiver_msgs::Keypoints point;
-    openpose_ros_receiver_msgs::Keypoints_v points_v;
+openpose_3D_pose_estimator_msgs::Openpose_3D_v keypointsStructure(std::vector<int> points_of_interest, std::string frame){
+    openpose_3D_pose_estimator_msgs::Openpose_3D point;
+    openpose_3D_pose_estimator_msgs::Openpose_3D_v points_v;
 
     for (int i=0; i<points_of_interest.size(); i++){
         point.name = getPoseBodyPartMappingBody25(points_of_interest[i]);

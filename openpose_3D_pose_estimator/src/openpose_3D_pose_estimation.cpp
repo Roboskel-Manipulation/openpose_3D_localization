@@ -1,17 +1,17 @@
-#include "openpose_3D_producer.hpp"
+#include "openpose_3D_pose_estimator.hpp"
 
 class Human3D{
 private:
     std::vector<std::vector<int> > neighborhoodOffset;
-    openpose_ros_receiver_msgs::Keypoints_v keypoints_v;
+    openpose_3D_pose_estimator_msgs::Openpose_3D_v keypoints_v;
     int neighborhoodFactor;    
 public:
-    Human3D(std::vector<std::vector<int> > int_vv, openpose_ros_receiver_msgs::Keypoints_v int_vv1n, int f);
+    Human3D(std::vector<std::vector<int> > int_vv, openpose_3D_pose_estimator_msgs::Openpose_3D_v int_vv1n, int f);
     void pointCloudTopicCallback(const pcl::PointCloud<pcl::PointXYZRGBA>::Ptr& pcl_msgs);
     void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& list_msg);
 };
 
-Human3D::Human3D(std::vector<std::vector<int> > int_vv, openpose_ros_receiver_msgs::Keypoints_v int_vv1, int f)
+Human3D::Human3D(std::vector<std::vector<int> > int_vv, openpose_3D_pose_estimator_msgs::Openpose_3D_v int_vv1, int f)
 :neighborhoodOffset(int_vv), keypoints_v(int_vv1), neighborhoodFactor(f){
 }
 
@@ -164,37 +164,36 @@ void Human3D::humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::Cons
 }
 
 int main (int argc, char** argv){
-    ros::init(argc, argv, "openpose_3D_producer");
+    ros::init(argc, argv, "openpose_3D_pose_estimator");
     ros::NodeHandle nh;
     
     int queue_size, factor;
     std::string image_sensor_frame, human_list_topic, pointcloud_topic, pointcloud_topic_debug, robot_frame_coords_str_topic, robot_frame_coords_msg_topic;
 
-    nh.param("openpose_3D_producer/human_list_topic", human_list_topic, std::string("/openpose_ros/human_list"));
-    nh.param("openpose_3D_producer/pointcloud_topic", pointcloud_topic, std::string("/zed/point_cloud/cloud_registered"));
-    nh.param("openpose_3D_producer/pointcloud_topic_debug", pointcloud_topic_debug, std::string("/zed/point_cloud/cloud_registered_debug"));
-    nh.param("openpose_3D_producer/image_sensor_frame", image_sensor_frame, std::string("/zed_left_camera_frame"));
-    nh.param("openpose_3D_producer/robot_frame_coords_msg_topic", robot_frame_coords_msg_topic, std::string("/openpose_ros_receiver/robot_frame_coords_msg"));
-    nh.param("openpose_3D_producer/queue_size", queue_size, 2);
-    nh.param("openpose_3D_producer/points_of_interest", points_of_interest, std::vector<int>(0));
-    nh.param("openpose_3D_producer/neighborhoodFactor", factor, 1);
-    nh.param("openpose_3D_producer/pointcloudEnable", pointcloudEnable, false);
+    nh.param("openpose_3D_pose_estimator/human_list_topic", human_list_topic, std::string("/openpose_ros/human_list"));
+    nh.param("openpose_3D_pose_estimator/pointcloud_topic", pointcloud_topic, std::string("/zed/point_cloud/cloud_registered"));
+    nh.param("openpose_3D_pose_estimator/pointcloud_topic_debug", pointcloud_topic_debug, std::string("/zed/point_cloud/cloud_registered_debug"));
+    nh.param("openpose_3D_pose_estimator/image_sensor_frame", image_sensor_frame, std::string("/zed_left_camera_frame"));
+    nh.param("openpose_3D_pose_estimator/robot_frame_coords_msg_topic", robot_frame_coords_msg_topic, std::string("/openpose_ros_receiver/robot_frame_coords_msg"));
+    nh.param("openpose_3D_pose_estimator/queue_size", queue_size, 2);
+    nh.param("openpose_3D_pose_estimator/points_of_interest", points_of_interest, std::vector<int>(0));
+    nh.param("openpose_3D_pose_estimator/neighborhoodFactor", factor, 1);
+    nh.param("openpose_3D_pose_estimator/pointcloudEnable", pointcloudEnable, false);
 
     /* Initialize Global Variables */
-    // tfSubtree = false;
     pclMsg = false; 
     humanListMsg = true;
 
 
     // Create the structure of the final message based on the points of interest
-    openpose_ros_receiver_msgs::Keypoints_v points_v = keypointsStructure(points_of_interest, image_sensor_frame);
+    openpose_3D_pose_estimator_msgs::Openpose_3D_v points_v = keypointsStructure(points_of_interest, image_sensor_frame);
 
     // Create a vector containing the neighborhood offsets
     std::vector<std::vector<int> > neighborhood_v = neighborhood_vector();
 
     
     /* Publish the 3D coordinates of the points of interest and optionally the debugging pointcloud */
-    humanReceiverPub = nh.advertise<openpose_ros_receiver_msgs::Keypoints_v>(robot_frame_coords_msg_topic, queue_size);
+    humanReceiverPub = nh.advertise<openpose_3D_pose_estimator_msgs::Openpose_3D_v>(robot_frame_coords_msg_topic, queue_size);
     if (pointcloudEnable){
         pointcloudDebugPub =nh.advertise< pcl::PointCloud<pcl::PointXYZRGBA> >(pointcloud_topic_debug, queue_size);
     } 

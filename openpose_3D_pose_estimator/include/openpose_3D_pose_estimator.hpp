@@ -6,18 +6,13 @@
 #include <openpose_ros_msgs/OpenPoseHuman.h>
 #include <openpose_ros_msgs/OpenPoseHumanList.h>
 #include <openpose_ros_msgs/PointWithProb.h>
-#include <openpose_ros_receiver_msgs/Keypoints_v.h>
-#include <openpose_ros_receiver_msgs/Keypoints.h>
+#include <openpose_3D_pose_estimator_msgs/Openpose_3D_v.h>
+#include <openpose_3D_pose_estimator_msgs/Openpose_3D.h>
 
 /* ROS headers */
 #include <ros/ros.h>
-// #include <message_filters/subscriber.h>
-// #include <message_filters/synchronizer.h>
-// #include <message_filters/sync_policies/approximate_time.h>
-// #include <std_msgs/String.h>
 
 /* TF headers */
-// #include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
 
 /* PCL headers */
@@ -27,9 +22,6 @@
 #include <pcl/common/common.h>
 
 /* C++ headers */
-// #include <fstream>
-// #include <ctime>
-// #include <sstream>
 #include <cmath>
 #include <vector>
 #include <string>
@@ -97,6 +89,6 @@ const std::map<int, std::string> POSE_BODY_25_BODY_PARTS
 // void listenForSkeleton(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg);
 std::string getPoseBodyPartMappingBody25(int idx);
 std::vector<std::vector<int> > neighborhood_vector(); 
-openpose_ros_receiver_msgs::Keypoints_v keypointsStructure(std::vector<int> points_of_interest, std::string frame);
+openpose_3D_pose_estimator_msgs::Openpose_3D_v keypointsStructure(std::vector<int> points_of_interest, std::string frame);
 
 #endif

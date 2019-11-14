@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch>
+
+  <node pkg="openpose_3D_pose_estimator" type="openpose_3D_pose_estimator" name="openpose_3D_pose_estimator" output="screen">
+    <rosparam command="load" file="$(find openpose_3D_pose_estimator)/config/openpose_3D_pose_estimator.yaml"/>
+  </node>
+
+</launch>

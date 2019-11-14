@@ -7,7 +7,7 @@ pointcloud_topic_debug: "/camera/depth_registered/points_debug"
 # string (frame name)
 image_sensor_frame: "/camera_rgb_optical_frame"
 # string (topic name)
-robot_frame_coords_msg_topic: "/openpose_ros_receiver/robot_frame_coords_msg"
+robot_frame_coords_msg_topic: "/openpose_3D_pose_estimator/openpose_3D_estimation_msg"
 # integer (number of positions)
 queue_size: 1
 # keypoints of interest
