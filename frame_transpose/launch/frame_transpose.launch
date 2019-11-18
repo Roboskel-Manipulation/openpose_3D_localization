@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch>
+
+  <node pkg="frame_transpose" type="frame_transpose" name="frame_transpose" output="screen">
+    <rosparam command="load" file="$(find frame_transpose)/config/frame_transpose.yaml"/>
+  </node>
+
+</launch>

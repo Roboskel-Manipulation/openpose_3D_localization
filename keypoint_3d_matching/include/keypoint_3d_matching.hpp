@@ -6,8 +6,8 @@
 #include <openpose_ros_msgs/OpenPoseHuman.h>
 #include <openpose_ros_msgs/OpenPoseHumanList.h>
 #include <openpose_ros_msgs/PointWithProb.h>
-#include <openpose_3D_pose_estimator_msgs/Openpose_3D_v.h>
-#include <openpose_3D_pose_estimator_msgs/Openpose_3D.h>
+#include <keypoint_3d_matching_msgs/Keypoint3d_list.h>
+#include <keypoint_3d_matching_msgs/Keypoint3d_list.h>
 
 /* ROS headers */
 #include <ros/ros.h>
@@ -89,6 +89,6 @@ const std::map<int, std::string> POSE_BODY_25_BODY_PARTS
 // void listenForSkeleton(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg);
 std::string getPoseBodyPartMappingBody25(int idx);
 std::vector<std::vector<int> > neighborhood_vector(); 
-openpose_3D_pose_estimator_msgs::Openpose_3D_v keypointsStructure(std::vector<int> points_of_interest, std::string frame);
+keypoint_3d_matching_msgs::Keypoint3d_list keypointsStructure(std::vector<int> points_of_interest, std::string frame);
 
 #endif

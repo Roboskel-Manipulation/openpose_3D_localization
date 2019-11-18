@@ -3,13 +3,13 @@
 
 
   <!-- True if using rosbags -->
-  <arg name="sim" default="false" /> 
+  <arg name="sim" default="true" /> 
 
   <!-- True if running camera and not a rosbag -->
-  <arg name="live_camera" default="true" />
+  <arg name="live_camera" default="false" />
 
   <!-- Always false if running manos -->
-  <arg name="manos_tf" value="false" />
+  <arg name="manos_tf" default="false" />
 
   <param name="use_sim_time" value="$(arg sim)" />
 

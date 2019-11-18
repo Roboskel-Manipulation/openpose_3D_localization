@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch>
+
+  <node pkg="keypoint_3d_matching" type="keypoint_3d_matching" name="keypoint_3d_matching" output="screen">
+    <rosparam command="load" file="$(find keypoint_3d_matching)/config/keypoint_3d_matching.yaml"/>
+  </node>
+
+</launch>
