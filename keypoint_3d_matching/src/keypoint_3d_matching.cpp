@@ -18,6 +18,7 @@ Human3D::Human3D(std::vector<std::vector<int> > int_vv, keypoint_3d_matching_msg
 }
 
 void Human3D::pointCloudTopicCallback(const pcl::PointCloud<pcl::PointXYZRGBA>::Ptr& pcl_msg){
+    ROS_INFO("got into");
     if (humanListMsg){
         pclMsg = true;
         pPCL = pcl_msg;
@@ -39,21 +40,21 @@ void Human3D::humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::Cons
         }
 
         for (short int i=0; i<points_of_interest.size(); i++){
-            double x=0.0, y=0.0, z=0.0;
+            double x=0.0, y=0.0, z=0.0, x_pix, y_pix, z_pix;
             if (points_of_interest[i]<26){
-                double x_pix = list_msg->human_list[0].body_key_points_with_prob[points_of_interest[i]].x;
-                double y_pix = list_msg->human_list[0].body_key_points_with_prob[points_of_interest[i]].y;
-                double prob = list_msg->human_list[0].body_key_points_with_prob[points_of_interest[i]].prob;
+                x_pix = list_msg->human_list[0].body_key_points_with_prob[points_of_interest[i]].x;
+                y_pix = list_msg->human_list[0].body_key_points_with_prob[points_of_interest[i]].y;
+                prob = list_msg->human_list[0].body_key_points_with_prob[points_of_interest[i]].prob;
             }
             else if (points_of_interest[i]<46){
-                double x_pix = list_msg->human_list[0].left_hand_key_points_with_prob[points_of_interest[i]].x;
-                double y_pix = list_msg->human_list[0].left_hand_key_points_with_prob[points_of_interest[i]].y;
-                double prob = list_msg->human_list[0].left_hand_key_points_with_prob[points_of_interest[i]].prob;
+                x_pix = list_msg->human_list[0].left_hand_key_points_with_prob[points_of_interest[i]-26].x;
+                y_pix = list_msg->human_list[0].left_hand_key_points_with_prob[points_of_interest[i]-26].y;
+                prob = list_msg->human_list[0].left_hand_key_points_with_prob[points_of_interest[i]-26].prob;
             }
             else{
-                double x_pix = list_msg->human_list[0].right_hand_key_points_with_prob[points_of_interest[i]].x;
-                double y_pix = list_msg->human_list[0].right_hand_key_points_with_prob[points_of_interest[i]].y;
-                double prob = list_msg->human_list[0].right_hand_key_points_with_prob[points_of_interest[i]].prob;
+                x_pix = list_msg->human_list[0].right_hand_key_points_with_prob[points_of_interest[i]-46].x;
+                y_pix = list_msg->human_list[0].right_hand_key_points_with_prob[points_of_interest[i]-46].y;
+                prob = list_msg->human_list[0].right_hand_key_points_with_prob[points_of_interest[i]-46].prob;
             }
             
             if (!std::isnan(x_pix) && !std::isnan(y_pix) && x_pix && y_pix){
@@ -149,7 +150,7 @@ int main (int argc, char** argv){
     nh.param("keypoint_3d_matching/pointcloudEnable", pointcloudEnable, false);
 
 
-    /* Initialize Global Variables */
+    // Initialize Global Variables
     pclMsg = false; 
     humanListMsg = true;
 
@@ -161,7 +162,7 @@ int main (int argc, char** argv){
     std::vector<std::vector<int> > neighborhood_v = neighborhood_vector();
 
     
-    /* Publish the 3D coordinates of the points of interest and optionally the debugging pointcloud */
+    // Publish the 3D coordinates of the points of interest and optionally the debugging pointcloud
     humanReceiverPub = nh.advertise<keypoint_3d_matching_msgs::Keypoint3d_list>(robot_frame_coords_msg_topic, queue_size);
     if (pointcloudEnable){
         pointcloudDebugPub =nh.advertise< pcl::PointCloud<pcl::PointXYZRGBA> >(pointcloud_topic_debug, queue_size);
@@ -170,8 +171,7 @@ int main (int argc, char** argv){
 
     Human3D obj(neighborhood_v, points_v, factor);
 
-    /* Subscribe to the output topic of the 2D openpose pipeline */
-
+    // Subscribe to the output topic of the 2D openpose pipeline
     ros::Subscriber subPointcloud = nh.subscribe(pointcloud_topic, queue_size, &Human3D::pointCloudTopicCallback, &obj);
     ros::Subscriber subHumanList = nh.subscribe(human_list_topic, queue_size, &Human3D::humanListCallback, &obj);
 
