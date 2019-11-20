@@ -1,7 +1,7 @@
 #include <keypoint_3d_matching.hpp>
 
-std::string getPoseBodyPartMappingBody25(int idx){
-    return POSE_BODY_25_BODY_PARTS.find(idx)->second;
+std::string getPoseBodyPartMappingBody65(int idx){
+    return POSE_BODY_65_BODY_PARTS.find(idx)->second;
 }
 
 std::vector<std::vector<int> > neighborhood_vector(){
@@ -26,7 +26,7 @@ keypoint_3d_matching_msgs::Keypoint3d_list keypointsStructure(std::vector<int> p
     keypoint_3d_matching_msgs::Keypoint3d_list points_v;
 
     for (int i=0; i<points_of_interest.size(); i++){
-        point.name = getPoseBodyPartMappingBody25(points_of_interest[i]);
+        point.name = getPoseBodyPartMappingBody65(points_of_interest[i]);
         point.points.header.frame_id = frame;
         points_v.keypoints.push_back(point);
     }

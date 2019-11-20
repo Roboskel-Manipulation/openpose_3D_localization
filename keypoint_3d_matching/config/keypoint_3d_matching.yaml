@@ -10,7 +10,7 @@ image_sensor_frame: "/camera_rgb_optical_frame"
 keypoint_3d_matching_topic: "/keypoint_3d_matching"
 # integer (number of positions)
 queue_size: 1
-# keypoints of interest
+# body keypoints of interest
 points_of_interest: [1, 4, 7]
 # neighborhood factor
 factor: 1

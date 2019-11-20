@@ -38,29 +38,24 @@ void Human3D::humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::Cons
             return;
         }
 
-        static tf::TransformListener tfListener;
-        static tf::StampedTransform baseLinkTransform;
-
-        // if (!tfSubtree){
-        //     try{
-        //         /* take the TF subtree that we want for the transformations */
-        //         tfListener.waitForTransform("base_link", image_sensor_frame, ros::Time(0), ros::Duration(TF_WAIT));
-        //         tfListener.lookupTransform("base_link", image_sensor_frame, ros::Time(0), baseLinkTransform);
-
-        //         tfSubtree = true;
-        //     }
-        //     catch (tf::TransformException &ex){
-        //         ROS_ERROR("%s", ex.what());
-        //     }
-        // }
-
-
         for (short int i=0; i<points_of_interest.size(); i++){
             double x=0.0, y=0.0, z=0.0;
-            double x_pix = list_msg->human_list[0].body_key_points_with_prob[points_of_interest[i]].x;
-            double y_pix = list_msg->human_list[0].body_key_points_with_prob[points_of_interest[i]].y;
-            double prob = list_msg->human_list[0].body_key_points_with_prob[points_of_interest[i]].prob;
-
+            if (points_of_interest[i]<26){
+                double x_pix = list_msg->human_list[0].body_key_points_with_prob[points_of_interest[i]].x;
+                double y_pix = list_msg->human_list[0].body_key_points_with_prob[points_of_interest[i]].y;
+                double prob = list_msg->human_list[0].body_key_points_with_prob[points_of_interest[i]].prob;
+            }
+            else if (points_of_interest[i]<46){
+                double x_pix = list_msg->human_list[0].left_hand_key_points_with_prob[points_of_interest[i]].x;
+                double y_pix = list_msg->human_list[0].left_hand_key_points_with_prob[points_of_interest[i]].y;
+                double prob = list_msg->human_list[0].left_hand_key_points_with_prob[points_of_interest[i]].prob;
+            }
+            else{
+                double x_pix = list_msg->human_list[0].right_hand_key_points_with_prob[points_of_interest[i]].x;
+                double y_pix = list_msg->human_list[0].right_hand_key_points_with_prob[points_of_interest[i]].y;
+                double prob = list_msg->human_list[0].right_hand_key_points_with_prob[points_of_interest[i]].prob;
+            }
+            
             if (!std::isnan(x_pix) && !std::isnan(y_pix) && x_pix && y_pix){
 
                 pcl::PointXYZRGBA p = pPCL->at(x_pix, y_pix);
@@ -114,36 +109,6 @@ void Human3D::humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::Cons
                 keypoints_v.keypoints[i].points.point.y = y;
                 keypoints_v.keypoints[i].points.point.z = z;
                 keypoints_v.keypoints[i].points.header.stamp = timeStamp;
-                // try{
-                //     // locally 
-                //     localTransform.setOrigin( tf::Vector3(x, y, z) );
-                //     tf::Quaternion localQuat(0, 0, 0, 1);
-                //     localTransform.setRotation(localQuat);
-                //     tfListener.setTransform(tf::StampedTransform(localTransform, ros::Time::now(), image_sensor_frame, getPoseBodyPartMappingBody25(points_of_interest[i])) );
-
-                //     // LOOKUP LOCAL TRANSFORM 
-                //     tfListener.waitForTransform("base_link", getPoseBodyPartMappingBody25(points_of_interest[i]), ros::Time(0), ros::Duration(TF_WAIT));
-                //     tfListener.lookupTransform("base_link", getPoseBodyPartMappingBody25(points_of_interest[i]), ros::Time(0), baseLinkTransform);
-
-                //     // log 
-                //     if (!std::isnan(baseLinkTransform.getOrigin().x()) && !std::isnan(baseLinkTransform.getOrigin().y()) && !std::isnan(baseLinkTransform.getOrigin().z())){
-                //         // process transform's timestamp
-                //         ros::Time now = ros::Time::now(), transformStamp = baseLinkTransform.stamp_;
-                //         ros::Duration timeDiff = now - transformStamp;
-                //         // check if we are dealing with a frame old enough (e.g. > 2 sec) to be considered unreliable
-                //         if (timeDiff > ros::Duration(RELIABILITY_THRESHOLD)){
-                //             ROS_WARN("Transform older than %f seconds detected", RELIABILITY_THRESHOLD);
-                //             continue;
-                //         }
-                //         keypoints_v.keypoints[i].points.x = baseLinkTransform.getOrigin().x();
-                //         keypoints_v.keypoints[i].points.y = baseLinkTransform.getOrigin().y();
-                //         keypoints_v.keypoints[i].points.z = baseLinkTransform.getOrigin().z();
-                //     }
-                // }
-                // catch (tf::TransformException &ex){
-                //     ROS_ERROR("%s", ex.what());
-                //     continue;
-                // }
             }
         }
         
@@ -182,6 +147,7 @@ int main (int argc, char** argv){
     nh.param("keypoint_3d_matching/points_of_interest", points_of_interest, std::vector<int>(0));
     nh.param("keypoint_3d_matching/neighborhoodFactor", factor, 1);
     nh.param("keypoint_3d_matching/pointcloudEnable", pointcloudEnable, false);
+
 
     /* Initialize Global Variables */
     pclMsg = false; 

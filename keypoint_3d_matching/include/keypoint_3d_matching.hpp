@@ -48,14 +48,14 @@
 #define BLUE 255
 
 /* Global Variables */
-static bool pclMsg, humanListMsg, pointcloudEnable;
+static bool pclMsg, humanListMsg, pointcloudEnable, hand_flag, face_flag;
 static ros::Publisher robotFrameCoordsPub, humanReceiverPub, pointcloudDebugPub;
 static pcl::PointCloud<pcl::PointXYZRGBA>::Ptr pPCL;
 static std::vector<int> points_of_interest;
 static geometry_msgs::Point point_msg;
 
-/* OpenPose BODY_25 Body Parts Index-to-Name Mapping */
-const std::map<int, std::string> POSE_BODY_25_BODY_PARTS
+/* OpenPose BODY_65 Body Parts Index-to-Name Mapping */
+const std::map<int, std::string> POSE_BODY_65_BODY_PARTS
 {
     {0,  "Nose"},
     {1,  "Neck"},
@@ -82,12 +82,62 @@ const std::map<int, std::string> POSE_BODY_25_BODY_PARTS
     {22, "RBigToe"},
     {23, "RSmallToe"},
     {24, "RHeel"},
-    {25, "Background"}
+    {25, "Background"},
+    {26,  "LThumb1CMC"},
+    {27,  "LThumb2Knuckles"},
+    {28,  "LThumb3IP"},
+    {29,  "LThumb4FingerTip"},
+    {30,  "LIndex1Knuckles"},
+    {31,  "LIndex2PIP"},
+    {32,  "LIndex3DIP"},
+    {33,  "LIndex4FingerTip"},
+    {34,  "LMiddle1Knuckles"},
+    {35,  "LMiddle2PIP"},
+    {36, "LMiddle3DIP"},
+    {37, "LMiddle4FingerTip"},
+    {38, "LRing1Knuckles"},
+    {39, "LRing2PIP"},
+    {40, "LRing3DIP"},
+    {41, "LRing4FingerTip"},
+    {42, "LPinky1Knuckles"},
+    {43, "LPinky2PIP"},
+    {44, "LPinky3DIP"},
+    {45, "LPinky4FingerTip"},
+    {46, "RThumb1CMC"},
+    {47,  "RThumb2Knuckles"},
+    {48,  "RThumb3IP"},
+    {49,  "RThumb4FingerTip"},
+    {50,  "RIndex1Knuckles"},
+    {51,  "RIndex2PIP"},
+    {52,  "RIndex3DIP"},
+    {53,  "RIndex4FingerTip"},
+    {54,  "RMiddle1Knuckles"},
+    {55,  "RMiddle2PIP"},
+    {56,  "RMiddle3DIP"},
+    {57, "RMiddle4FingerTip"},
+    {58, "RRing1Knuckles"},
+    {59, "RRing2PIP"},
+    {60, "RRing3DIP"},
+    {61, "RRing4FingerTip"},
+    {62, "RPinky1Knuckles"},
+    {63, "RPinky2PIP"},
+    {64, "RPinky3DIP"},
+    {65, "RPinky4FingerTip"}
 };
 
-/* Various functions */
-// void listenForSkeleton(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& msg);
-std::string getPoseBodyPartMappingBody25(int idx);
+// Hand legend:
+//     - Thumb:
+//         - Carpometacarpal Joints (CMC)
+//         - Interphalangeal Joints (IP)
+//     - Other fingers:
+//         - Knuckles or Metacarpophalangeal Joints (MCP)
+//         - PIP (Proximal Interphalangeal Joints)
+//         - DIP (Distal Interphalangeal Joints)
+//     - All fingers:
+//         - Fingertips
+
+// Various functions
+std::string getPoseBodyPartMappingBody65(int idx);
 std::vector<std::vector<int> > neighborhood_vector(); 
 keypoint_3d_matching_msgs::Keypoint3d_list keypointsStructure(std::vector<int> points_of_interest, std::string frame);
 
