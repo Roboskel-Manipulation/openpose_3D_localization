@@ -40,21 +40,18 @@ void Human3D::humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::Cons
         }
 
         for (short int i=0; i<points_of_interest.size(); i++){
-            double x=0.0, y=0.0, z=0.0, x_pix, y_pix, z_pix;
+            double x=0.0, y=0.0, z=0.0, x_pix, y_pix;
             if (points_of_interest[i]<26){
                 x_pix = list_msg->human_list[0].body_key_points_with_prob[points_of_interest[i]].x;
                 y_pix = list_msg->human_list[0].body_key_points_with_prob[points_of_interest[i]].y;
-                prob = list_msg->human_list[0].body_key_points_with_prob[points_of_interest[i]].prob;
             }
             else if (points_of_interest[i]<46){
                 x_pix = list_msg->human_list[0].left_hand_key_points_with_prob[points_of_interest[i]-26].x;
                 y_pix = list_msg->human_list[0].left_hand_key_points_with_prob[points_of_interest[i]-26].y;
-                prob = list_msg->human_list[0].left_hand_key_points_with_prob[points_of_interest[i]-26].prob;
             }
             else{
                 x_pix = list_msg->human_list[0].right_hand_key_points_with_prob[points_of_interest[i]-46].x;
                 y_pix = list_msg->human_list[0].right_hand_key_points_with_prob[points_of_interest[i]-46].y;
-                prob = list_msg->human_list[0].right_hand_key_points_with_prob[points_of_interest[i]-46].prob;
             }
             
             if (!std::isnan(x_pix) && !std::isnan(y_pix) && x_pix && y_pix){
@@ -69,7 +66,6 @@ void Human3D::humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::Cons
                     continue;
                 }
                 
-                // static tf::Transform localTransform;
                 x = p.x;
                 y = p.y;
                 z = p.z;
