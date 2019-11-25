@@ -16,7 +16,7 @@ Note: The zed_wrapper package, which is also a dependency, has not been added to
 
 Run the whole_pipeline_* launch files to launch the pipeline. Replace the * with the camera of your choice. Currently three camera drivers are supported. ASUS XTION, ORBBEC ASTRA and ZED.
 
-## Instructions for Roboskel.
+## Instructions for Roboskel
 
 Run the launch file openpose_sole.launch file if you want to use Openpose solely and openpose_manos.launch file if you want to use Openpose along with Manos.
 
