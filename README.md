@@ -1,4 +1,4 @@
-# Openpose ROS packages for 3D keypoint estimation based on 2D keypoint pixels
+# ROS packages for 3D keypoint estimation based on 2D keypoint pixels
 
 A collection of ROS catkin packages that utilize the OpenPose library from https://github.com/CMU-Perceptual-Computing-Lab/openpose in order to detect human presence near a robotic arm workspace.
 
@@ -11,6 +11,8 @@ This repo depends on:
 
 
 Note: The zed_wrapper package, which is also a dependency, has not been added to the package.xml, in order to allow for easier compilation. You will need to install it if you are planning to use a ZED camera.
+
+Note_2: Make sure to clone the version of Openpose so that the wrapper is compatible. More info in https://github.com/firephinx/openpose_ros.
 
 ## General instructions
 
@@ -38,3 +40,4 @@ If you want to be able to see the openpose output, edit the openpose_ros_* launc
 Tested on:
 * ROS Indigo / Kinetic / Melodic
 * openpose_ros commit #105e950
+* Openpose commit 
