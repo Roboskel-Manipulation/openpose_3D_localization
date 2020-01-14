@@ -18,7 +18,6 @@ Human3D::Human3D(std::vector<std::vector<int> > int_vv, keypoint_3d_matching_msg
 }
 
 void Human3D::pointCloudTopicCallback(const pcl::PointCloud<pcl::PointXYZRGBA>::Ptr& pcl_msg){
-    ROS_INFO("got into");
     if (humanListMsg){
         pclMsg = true;
         pPCL = pcl_msg;
@@ -54,15 +53,26 @@ void Human3D::humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::Cons
                 y_pix = list_msg->human_list[0].right_hand_key_points_with_prob[points_of_interest[i]-46].y;
             }
             
+            timeStamp = ros::Time::now();
+            if (std::isnan(x_pix) || std::isnan(y_pix)){
+                keypoints_v.keypoints[i].points.point.x = 0;
+                keypoints_v.keypoints[i].points.point.y = 0;
+                keypoints_v.keypoints[i].points.point.z = 0;
+                keypoints_v.keypoints[i].points.header.stamp = timeStamp;
+                continue;
+            }
+
             if (!std::isnan(x_pix) && !std::isnan(y_pix) && x_pix && y_pix){
 
                 pcl::PointXYZRGBA p = pPCL->at(x_pix, y_pix);
-                timeStamp = ros::Time::now();
                 double x0 = p.x;
                 int divisors = 0;
 
                 if (std::isnan(p.x) || std::isnan(p.y) || std::isnan(p.z) || !p.x || !p.y || !p.z){
-                    x = 0.0; y = 0.0; z = 0.0;
+                    keypoints_v.keypoints[i].points.point.x = 0;
+                    keypoints_v.keypoints[i].points.point.y = 0;
+                    keypoints_v.keypoints[i].points.point.z = 0;
+                    keypoints_v.keypoints[i].points.header.stamp = timeStamp;
                     continue;
                 }
                 
