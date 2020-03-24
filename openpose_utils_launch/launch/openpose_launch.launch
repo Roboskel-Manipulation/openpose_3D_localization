@@ -19,6 +19,4 @@
     <arg name="manos_tf" value="$(arg manos_tf)"/>
   </include>
 
-<!--     <node pkg="tf" type="static_transform_publisher" name="virtual_force_base_static"
-    args="-0.3 -0.3 0.15 0.0 0.0 0.0 base_link virtual_force_base_frame 1" /> -->
 </launch>
