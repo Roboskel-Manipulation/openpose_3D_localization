@@ -1,23 +1,11 @@
-# openpose_ros_receiver
+# keypoint_3d_matching
 
-Receive the OpenPose output's skeletons and transform their keypoints coordinates from the camera coordinate frame to the robot coordinate frame.
+Receives the OpenPose output (2D pixels) of the keypoints of interest and returns the 3D coordinates of the point expressed
+in the `camera_rgb_optical_frame`. 
 
-## Important Note
+In the config file, the keypoints of interese can be specified as a list of integers, each corresponding to a keypoint.
+The mapping is based on this mapping (https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/src/openpose/pose/poseParameters.cpp)
 
-This software is a product of on-going research and has been developed and tested with only one human in the robot workspace environment. Its adaptation for an environment with multiple humans is left open for future research.
-
-## Dependencies
-
-* **zed-ros-wrapper**: https://github.com/stereolabs/zed-ros-wrapper
-* **manos_description**: https://github.com/Roboskel-Manipulation/manos
-* **manos_vision**: https://github.com/yorgosk/manos_vision
-
-## Run
-
-```bash
-source catkin_workspace/devel/setup.bash
-roslaunch openpose_ros_receiver openpose_ros_receiver.launch
-```
 
 ## Scripts
 
