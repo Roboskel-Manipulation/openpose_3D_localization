@@ -20,7 +20,7 @@ Run the whole_pipeline_* launch files to launch the pipeline. Replace the * with
 
 ## Instructions for Roboskel
 
-Run the launch file openpose_sole.launch file if you want to use Openpose solely and openpose_manos.launch file if you want to use Openpose along with Manos.
+Run the launch file openpose_launch.launch file where specific arguments exist.
 
 ## Arguments:
 * **sim**: True if you want the ROS API to get times from the topic /clock and not the system clock (default true).
