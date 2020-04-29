@@ -7,6 +7,7 @@
 		<arg name="live_camera" value="$(arg live_camera)" />
 	</include>
 
+
 	<include file="$(find keypoint_3d_matching)/launch/keypoint_3d_matching.launch"/>
 
 </launch>

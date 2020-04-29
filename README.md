@@ -27,7 +27,14 @@ Run the launch file openpose_launch.launch file where specific arguments exist.
 * **live_camera**: True if you want to load the camera driver (default false).
 * **manos_tf**: True if you want to load the tf of manos (default false).
 
+Generally you should only need to directly run the launch files located inside the openpose_utils_launch package.
+Use the openpose_ros_* launch files, to start the openpose_ros wrapper along with the camera driver of your choice.
+For the whole (experimental) pipeline you should use the whole_pipeline_* launch files, replacing * with the camera of your choice.
+The launch files that end with *_with_marker should be used only under certain circimstances that do not apply to a wide audience, but rather specifically to our lab (dependency on https://github.com/Roboskel-Manipulation/manos).
+
 If you want to be able to see the openpose output, edit the openpose_ros_* launch file, and change the `display_output` parameter to `true`.
+
+The launch files are configured to play by default using data from rosbags. If you want to run the procedures live, use the `live:=true` and `use_sim_time:=false` params.
 
 ## Contents
 
