@@ -18,20 +18,12 @@ Human3D::Human3D(std::vector<std::vector<int> > int_vv, keypoint_3d_matching_msg
 }
 
 void Human3D::pointCloudTopicCallback(const pcl::PointCloud<pcl::PointXYZRGBA>::Ptr& pcl_msg){
-    if (humanListMsg){
-        pclMsg = true;
-        pPCL = pcl_msg;
-        humanListMsg = false;
-    }
-    else{
-        ros::spinOnce();
-    }
+    pclMsg = true;
+    pPCL = pcl_msg;
 }
-
 
 void Human3D::humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& list_msg){
     if (pclMsg){
-        humanListMsg = true;
 
         if (list_msg->num_humans == 0){
             ROS_INFO("No human detected in current frame.");
@@ -132,9 +124,6 @@ void Human3D::humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::Cons
             pointcloudDebugPub.publish(pPCL);
 
         pclMsg = false;
-    }
-    else{
-        ros::spinOnce();
     }
 }
 
