@@ -37,12 +37,12 @@ void Human3D::humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::Cons
                 y_pix = list_msg->human_list[0].body_key_points_with_prob[points_of_interest[i]].y;
             }
             else if (points_of_interest[i]<46){
-                x_pix = list_msg->human_list[0].left_hand_key_points_with_prob[points_of_interest[i]-26].x;
-                y_pix = list_msg->human_list[0].left_hand_key_points_with_prob[points_of_interest[i]-26].y;
+                x_pix = list_msg->human_list[0].left_hand_key_points_with_prob[points_of_interest[i]-25].x;
+                y_pix = list_msg->human_list[0].left_hand_key_points_with_prob[points_of_interest[i]-25].y;
             }
             else{
-                x_pix = list_msg->human_list[0].right_hand_key_points_with_prob[points_of_interest[i]-46].x;
-                y_pix = list_msg->human_list[0].right_hand_key_points_with_prob[points_of_interest[i]-46].y;
+                x_pix = list_msg->human_list[0].right_hand_key_points_with_prob[points_of_interest[i]-45].x;
+                y_pix = list_msg->human_list[0].right_hand_key_points_with_prob[points_of_interest[i]-45].y;
             }
             
             timeStamp = ros::Time::now();
