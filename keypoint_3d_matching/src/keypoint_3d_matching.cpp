@@ -1,7 +1,5 @@
 #include "keypoint_3d_matching.hpp"
 
-
-ros::Time timeStamp;
 class Human3D{
 private:
     std::vector<std::vector<int> > neighborhoodOffset;
