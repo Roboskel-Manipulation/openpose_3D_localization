@@ -45,12 +45,11 @@ void Human3D::humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::Cons
                 y_pix = list_msg->human_list[0].right_hand_key_points_with_prob[points_of_interest[i]-45].y;
             }
             
-            timeStamp = ros::Time::now();
             if (std::isnan(x_pix) || std::isnan(y_pix)){
                 keypoints_v.keypoints[i].points.point.x = 0;
                 keypoints_v.keypoints[i].points.point.y = 0;
                 keypoints_v.keypoints[i].points.point.z = 0;
-                keypoints_v.keypoints[i].points.header.stamp = timeStamp;
+                keypoints_v.keypoints[i].points.header.stamp = pPCL->header.stamp;
                 continue;
             }
 
@@ -64,7 +63,7 @@ void Human3D::humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::Cons
                     keypoints_v.keypoints[i].points.point.x = 0;
                     keypoints_v.keypoints[i].points.point.y = 0;
                     keypoints_v.keypoints[i].points.point.z = 0;
-                    keypoints_v.keypoints[i].points.header.stamp = timeStamp;
+                    keypoints_v.keypoints[i].points.header.stamp = pPCL->header.stamp;
                     continue;
                 }
                 
@@ -107,7 +106,7 @@ void Human3D::humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::Cons
                 keypoints_v.keypoints[i].points.point.x = x;
                 keypoints_v.keypoints[i].points.point.y = y;
                 keypoints_v.keypoints[i].points.point.z = z;
-                keypoints_v.keypoints[i].points.header.stamp = timeStamp;
+                keypoints_v.keypoints[i].points.header.stamp = pPCL->header.stamp;
             }
         }
         

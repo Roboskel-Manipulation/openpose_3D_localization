@@ -50,7 +50,7 @@
 /* Global Variables */
 static bool pclMsg, humanListMsg, pointcloudEnable, hand_flag, face_flag;
 static ros::Publisher robotFrameCoordsPub, humanReceiverPub, pointcloudDebugPub;
-static pcl::PointCloud<pcl::PointXYZRGBA>::Ptr pPCL;
+static const pcl::PointCloud<pcl::PointXYZRGBA>::Ptr pPCL;
 static std::vector<int> points_of_interest;
 static geometry_msgs::Point point_msg;
 
