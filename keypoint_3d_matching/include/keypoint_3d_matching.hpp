@@ -33,11 +33,8 @@
 #include <openpose/pose/poseParameters.hpp>
 
 /* Important definitions */
-#define RELIABILITY_THRESHOLD 3.0           // seconds -> float
-#define MAX_RETRY 2                         // number of repetitions -> int
-#define TF_WAIT 10                          // seconds -> float
-#define IMG_PIXEL_WIDTH 672                 // pixels
-#define IMG_PIXEL_HEIGHT 376                // pixels
+#define IMG_PIXEL_WIDTH 672                 // image pixels in the x axis
+#define IMG_PIXEL_HEIGHT 376                // image pixels in the y axis
 #define UPPER_VARIATION_THRESH 1.15         // how much different is the avg neighborhood value allowed to be in contrast to the point value --> float
 #define LOWER_VARIATION_THRESH 0.85         // how much different is the avg neighborhood value allowed to be in contrast to the point value --> float
 #define RED_KEYPOINT 255
@@ -50,9 +47,13 @@
 /* Global Variables */
 static bool pclMsg, humanListMsg, pointcloudEnable, hand_flag, face_flag;
 static ros::Publisher robotFrameCoordsPub, humanReceiverPub, pointcloudDebugPub;
-static const pcl::PointCloud<pcl::PointXYZRGBA>::Ptr pPCL;
+static pcl::PointCloud<pcl::PointXYZRGBA>::Ptr pPCL;
 static std::vector<int> points_of_interest;
 static geometry_msgs::Point point_msg;
+
+static int factor;
+static std::string image_sensor_frame, human_list_topic, pointcloud_topic, pointcloud_topic_debug, robot_frame_coords_str_topic, robot_frame_coords_msg_topic;
+static ros::Time pcl_stamp;
 
 /* OpenPose BODY_65 Body Parts Index-to-Name Mapping */
 const std::map<int, std::string> POSE_BODY_65_BODY_PARTS
@@ -136,9 +137,13 @@ const std::map<int, std::string> POSE_BODY_65_BODY_PARTS
 //     - All fingers:
 //         - Fingertips
 
-// Various functions
+// Get keypoint name relative to key
 std::string getPoseBodyPartMappingBody65(int idx);
-std::vector<std::vector<int> > neighborhood_vector(); 
+
+// Construct neighborhood for depth averaging
+std::vector<std::vector<int> > neighborhood_vector();
+
+// Construct data structure for keypoint ROS message 
 keypoint_3d_matching_msgs::Keypoint3d_list keypointsStructure(std::vector<int> points_of_interest, std::string frame);
 
 #endif

@@ -1,3 +1,8 @@
+// Helpful functions for 
+//     - Construct a Keypoint3d_list message based on point_of_interest defined in config/keypoint_3d_matching.yaml
+//     - Find neighboring pixels for averaging the depth values
+
+
 #include <keypoint_3d_matching.hpp>
 
 std::string getPoseBodyPartMappingBody65(int idx){

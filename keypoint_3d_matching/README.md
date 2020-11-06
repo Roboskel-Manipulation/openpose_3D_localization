@@ -1,10 +1,17 @@
 # keypoint_3d_matching
 
-Receives the OpenPose output (2D pixels) of the keypoints of interest and returns the 3D coordinates of the point expressed
-in the `camera_rgb_optical_frame`. 
+# Description
+Receives the OpenPose output (2D pixels) of the keypoints of interest and returns the 3D coordinates of the point expressed in the `camera_rgb_optical_frame`. 
 
-In the config file, the keypoints of interese can be specified as a list of integers, each corresponding to a keypoint.
-The mapping is based on this mapping (https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/src/openpose/pose/poseParameters.cpp)
+- src/keypoint_3d_matching.cpp: Main functionality for the 3D matching
+- src/functions: Helful functions utilized by keypoint_3d_matching.cpp
+- config/keypoint_3d_matching.yaml: Parameters used by the keypoint_3d_matching ROS node
+- include/keypoint_3d_matching.h: Header files and variable declarations
+- launch/keypoint_3d_matching.launch: Launch file for keypoint_3d_matching ROS node
+
+# Run
+- In config/keypoint_3d_matching.yaml specify the points of interest based on include/keypoint_3d_matching.h
+- In a terminal run `roslaunch keypoint_3d_matching keypoint_3d_matching.launch`
 
 
 ## Scripts

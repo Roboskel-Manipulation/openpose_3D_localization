@@ -1,18 +1,18 @@
-# string (topic name)
-human_list_topic: "/openpose_ros/human_list"
-# string (topic name)
-pointcloud_topic: "/camera/depth_registered/points"
-# string (topic name)
-pointcloud_topic_debug: "/camera/depth_registered/points_debug"
-# string (frame name)
-image_sensor_frame: "/camera_rgb_optical_frame"
-# string (topic name)
-keypoint_3d_matching_topic: "/keypoint_3d_matching"
-# integer (number of positions)
-queue_size: 1
 # body keypoints of interest
 points_of_interest: [4, 7]
-# neighborhood factor
-factor: 1
 # enable pointcloud debug
 pointcloudEnable: false
+
+# Openpose topic name
+human_list_topic: "/openpose_ros/human_list"
+# PointCloud topic name
+pointcloud_topic: "/camera/depth_registered/points"
+# PointCloud debug topic name
+pointcloud_topic_debug: "/camera/depth_registered/points_debug"
+# Camera frame 
+image_sensor_frame: "/camera_rgb_optical_frame"
+# 3D points topic name
+keypoint_3d_matching_topic: "/keypoint_3d_matching"
+
+# neighborhood factor
+factor: 1

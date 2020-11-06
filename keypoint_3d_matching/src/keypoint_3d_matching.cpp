@@ -6,23 +6,23 @@ private:
     keypoint_3d_matching_msgs::Keypoint3d_list keypoints_v;
     int neighborhoodFactor;
 public:
-    Human3D(std::vector<std::vector<int> > int_vv, keypoint_3d_matching_msgs::Keypoint3d_list int_vv1n, int f);
-    void pointCloudTopicCallback(const pcl::PointCloud<pcl::PointXYZRGBA>::Ptr& pcl_msgs);
+    Human3D(std::vector<std::vector<int> > neighborhood_v, keypoint_3d_matching_msgs::Keypoint3d_list points_v, int factor);
+    void pointCloudTopicCallback(const pcl::PointCloud<pcl::PointXYZRGBA>::Ptr& pcl_msg);
     void humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& list_msg);
 };
 
-Human3D::Human3D(std::vector<std::vector<int> > int_vv, keypoint_3d_matching_msgs::Keypoint3d_list int_vv1, int f)
-:neighborhoodOffset(int_vv), keypoints_v(int_vv1), neighborhoodFactor(f){
+Human3D::Human3D(std::vector<std::vector<int> > neighborhood_v, keypoint_3d_matching_msgs::Keypoint3d_list points_v, int factor)
+:neighborhoodOffset(neighborhood_v), keypoints_v(points_v), neighborhoodFactor(factor){
 }
 
 void Human3D::pointCloudTopicCallback(const pcl::PointCloud<pcl::PointXYZRGBA>::Ptr& pcl_msg){
     pclMsg = true;
     pPCL = pcl_msg;
+    pcl_conversions::fromPCL(pPCL->header.stamp, pcl_stamp);
 }
 
 void Human3D::humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& list_msg){
     if (pclMsg){
-
         if (list_msg->num_humans == 0){
             ROS_INFO("No human detected in current frame.");
             return;
@@ -47,7 +47,7 @@ void Human3D::humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::Cons
                 keypoints_v.keypoints[i].points.point.x = 0;
                 keypoints_v.keypoints[i].points.point.y = 0;
                 keypoints_v.keypoints[i].points.point.z = 0;
-                keypoints_v.keypoints[i].points.header.stamp = pPCL->header.stamp;
+                keypoints_v.keypoints[i].points.header.stamp = pcl_stamp;
                 continue;
             }
 
@@ -61,7 +61,7 @@ void Human3D::humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::Cons
                     keypoints_v.keypoints[i].points.point.x = 0;
                     keypoints_v.keypoints[i].points.point.y = 0;
                     keypoints_v.keypoints[i].points.point.z = 0;
-                    keypoints_v.keypoints[i].points.header.stamp = pPCL->header.stamp;
+                    keypoints_v.keypoints[i].points.header.stamp = pcl_stamp;
                     continue;
                 }
                 
@@ -104,7 +104,7 @@ void Human3D::humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::Cons
                 keypoints_v.keypoints[i].points.point.x = x;
                 keypoints_v.keypoints[i].points.point.y = y;
                 keypoints_v.keypoints[i].points.point.z = z;
-                keypoints_v.keypoints[i].points.header.stamp = pPCL->header.stamp;
+                keypoints_v.keypoints[i].points.header.stamp = pcl_stamp;
             }
         }
         
@@ -128,15 +128,11 @@ int main (int argc, char** argv){
     ros::init(argc, argv, "keypoint_3d_matching");
     ros::NodeHandle nh;
     
-    int queue_size, factor;
-    std::string image_sensor_frame, human_list_topic, pointcloud_topic, pointcloud_topic_debug, robot_frame_coords_str_topic, robot_frame_coords_msg_topic;
-
     nh.param("keypoint_3d_matching/human_list_topic", human_list_topic, std::string("/openpose_ros/human_list"));
     nh.param("keypoint_3d_matching/pointcloud_topic", pointcloud_topic, std::string("/zed/point_cloud/cloud_registered"));
     nh.param("keypoint_3d_matching/pointcloud_topic_debug", pointcloud_topic_debug, std::string("/zed/point_cloud/cloud_registered_debug"));
     nh.param("keypoint_3d_matching/image_sensor_frame", image_sensor_frame, std::string("/zed_left_camera_frame"));
     nh.param("keypoint_3d_matching/keypoint_3d_matching_topic", robot_frame_coords_msg_topic, std::string("/openpose_ros_receiver/robot_frame_coords_msg"));
-    nh.param("keypoint_3d_matching/queue_size", queue_size, 2);
     nh.param("keypoint_3d_matching/points_of_interest", points_of_interest, std::vector<int>(0));
     nh.param("keypoint_3d_matching/neighborhoodFactor", factor, 1);
     nh.param("keypoint_3d_matching/pointcloudEnable", pointcloudEnable, false);
@@ -155,17 +151,17 @@ int main (int argc, char** argv){
 
     
     // Publish the 3D coordinates of the points of interest and optionally the debugging pointcloud
-    humanReceiverPub = nh.advertise<keypoint_3d_matching_msgs::Keypoint3d_list>(robot_frame_coords_msg_topic, queue_size);
+    humanReceiverPub = nh.advertise<keypoint_3d_matching_msgs::Keypoint3d_list>(robot_frame_coords_msg_topic, 1);
     if (pointcloudEnable){
-        pointcloudDebugPub =nh.advertise< pcl::PointCloud<pcl::PointXYZRGBA> >(pointcloud_topic_debug, queue_size);
+        pointcloudDebugPub =nh.advertise< pcl::PointCloud<pcl::PointXYZRGBA> >(pointcloud_topic_debug, 1);
     } 
 
 
     Human3D obj(neighborhood_v, points_v, factor);
 
     // Subscribe to the output topic of the 2D openpose pipeline
-    ros::Subscriber subPointcloud = nh.subscribe(pointcloud_topic, queue_size, &Human3D::pointCloudTopicCallback, &obj);
-    ros::Subscriber subHumanList = nh.subscribe(human_list_topic, queue_size, &Human3D::humanListCallback, &obj);
+    ros::Subscriber subPointcloud = nh.subscribe(pointcloud_topic, 1, &Human3D::pointCloudTopicCallback, &obj);
+    ros::Subscriber subHumanList = nh.subscribe(human_list_topic, 1, &Human3D::humanListCallback, &obj);
 
     ros::spin();
 

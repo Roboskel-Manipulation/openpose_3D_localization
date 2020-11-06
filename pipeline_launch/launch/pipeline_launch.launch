@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="sim" default="true" />   <!-- True if using rosbags and false if using camera-->
+  <arg name="live_camera" default="false" />   <!-- True if running camera and false if using rosbag-->
+  <arg name="marker" default="true" /> <!-- True if using marker -->
+  <param name="use_sim_time" value="$(arg sim)" />
+
+  <!-- launch xtion driver -->
+  <include file="$(find manos_vision)/launch/asus_xtion.launch" if="$(arg live_camera)">
+  </include>
+
+  <!-- launch orbbec drive -->
+  <!--   <include file="$(find manos_vision)/launch/orbbec_asus.launch" if="$(arg live_camera)">
+  </include> -->
+
+  <!-- launch zed driver -->
+  <!--   <include file="$(find zed_wrapper)/launch/zed.launch" if="$(arg live_camera)">
+  </include> -->
+
+  <!-- launch openpose -->
+  <node pkg="openpose_ros" type="openpose_ros_node" name="openpose_ros_node" output="screen">
+    <param name="image_topic"                value="/camera/rgb/image_raw" />
+    <param name="input_image_transport_type" value="raw" />
+    <param name="output_topic"               value="/openpose_ros/human_list" />
+    <param name="display_output"             value="true" />
+    <param name="print_keypoints"            value="false" />
+    <param name="save_original_video"        value="false" />
+    <param name="save_openpose_video"        value="false" />
+    <param name="original_video_file_name"   value="original_video_output.avi" />
+    <param name="openpose_video_file_name"   value="openpose_video_output.avi" />
+    <param name="video_fps"                  value="30" />
+  </node>
+
+  <!-- launch keypoint 3d matching -->
+  <include file="$(find keypoint_3d_matching)/launch/keypoint_3d_matching.launch">
+  </include>
+
+  <!-- launch marker and frame transpose -->
+  <group if="$(arg marker)">
+    <!-- launch marker -->
+    <include file="$(find openpose_utils_launch)/launch/marker_setup.launch">
+    </include>
+
+    <!-- launch frame transpose -->
+    <include file="$(find frame_transpose)/launch/frame_transpose.launch">
+    </include>
+  </group>
+
+
+</launch>
