@@ -1,5 +1,6 @@
 #include "keypoint_3d_matching.hpp"
 
+// Class definition
 class Human3D{
 private:
     std::vector<std::vector<int> > neighborhoodOffset;
@@ -15,12 +16,14 @@ Human3D::Human3D(std::vector<std::vector<int> > neighborhood_v, keypoint_3d_matc
 :neighborhoodOffset(neighborhood_v), keypoints_v(points_v), neighborhoodFactor(factor){
 }
 
+// PointCloud callback
 void Human3D::pointCloudTopicCallback(const pcl::PointCloud<pcl::PointXYZRGBA>::Ptr& pcl_msg){
     pclMsg = true;
     pPCL = pcl_msg;
     pcl_conversions::fromPCL(pPCL->header.stamp, pcl_stamp);
 }
 
+// Openpose callback
 void Human3D::humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::ConstPtr& list_msg){
     if (pclMsg){
         if (list_msg->num_humans == 0){
@@ -30,6 +33,8 @@ void Human3D::humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::Cons
 
         for (short int i=0; i<points_of_interest.size(); i++){
             double x=0.0, y=0.0, z=0.0, x_pix, y_pix;
+            
+            // Get pixels of point of interest
             if (points_of_interest[i]<26){
                 x_pix = list_msg->human_list[0].body_key_points_with_prob[points_of_interest[i]].x;
                 y_pix = list_msg->human_list[0].body_key_points_with_prob[points_of_interest[i]].y;
@@ -43,6 +48,7 @@ void Human3D::humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::Cons
                 y_pix = list_msg->human_list[0].right_hand_key_points_with_prob[points_of_interest[i]-45].y;
             }
             
+            // If pixels are NaN, set zero coordinates
             if (std::isnan(x_pix) || std::isnan(y_pix)){
                 keypoints_v.keypoints[i].points.point.x = 0;
                 keypoints_v.keypoints[i].points.point.y = 0;
@@ -50,13 +56,15 @@ void Human3D::humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::Cons
                 keypoints_v.keypoints[i].points.header.stamp = pcl_stamp;
                 continue;
             }
-
+            
+            // If pixels are not NaN
             if (!std::isnan(x_pix) && !std::isnan(y_pix) && x_pix && y_pix){
 
                 pcl::PointXYZRGBA p = pPCL->at(x_pix, y_pix);
                 double x0 = p.x;
                 int divisors = 0;
-
+                
+                // If PointCloud values are NaN, set zero coordinates
                 if (std::isnan(p.x) || std::isnan(p.y) || std::isnan(p.z) || !p.x || !p.y || !p.z){
                     keypoints_v.keypoints[i].points.point.x = 0;
                     keypoints_v.keypoints[i].points.point.y = 0;
@@ -68,7 +76,8 @@ void Human3D::humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::Cons
                 x = p.x;
                 y = p.y;
                 z = p.z;
-
+                
+                // If valid PointCloud coordinates, average depth values of neighboors
                 for (short int j=0; j<neighborhoodOffset.size(); j++){
                     if ((x_pix+neighborhoodFactor*neighborhoodOffset[j][1] >= 0 && x_pix+neighborhoodFactor*neighborhoodOffset[j][1] < IMG_PIXEL_WIDTH) && (y_pix+neighborhoodFactor*neighborhoodOffset[j][0] >= 0 && y_pix+neighborhoodFactor*neighborhoodOffset[j][0] < IMG_PIXEL_HEIGHT)){
                         p = pPCL->at(x_pix+neighborhoodFactor*neighborhoodOffset[j][1], y_pix+neighborhoodFactor*neighborhoodOffset[j][0]);
@@ -100,7 +109,8 @@ void Human3D::humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::Cons
                     if (x > UPPER_VARIATION_THRESH * x0 || x < LOWER_VARIATION_THRESH * x0) 
                         x = x0;
                 }
-
+                
+                // Construct the custom ROS message
                 keypoints_v.keypoints[i].points.point.x = x;
                 keypoints_v.keypoints[i].points.point.y = y;
                 keypoints_v.keypoints[i].points.point.z = z;
@@ -108,7 +118,7 @@ void Human3D::humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::Cons
             }
         }
         
-        /* for profiling */
+        // Publish the coordinates
         humanReceiverPub.publish(keypoints_v);
         for (short int i=0; i<keypoints_v.keypoints.size(); i++){
             keypoints_v.keypoints[i].points.point.x = 0;
@@ -116,7 +126,7 @@ void Human3D::humanListCallback(const openpose_ros_msgs::OpenPoseHumanList::Cons
             keypoints_v.keypoints[i].points.point.z = 0;
         }
 
-        /* publish debugging's pointcloud */
+        // publish debugging's pointcloud
         if (pointcloudEnable)
             pointcloudDebugPub.publish(pPCL);
 
