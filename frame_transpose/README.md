@@ -12,4 +12,4 @@ In config/frame_transpose.yaml specify the following:
 
 In a terminal run:
 
-    roslaunch frame_transpose frame_transpose
+    roslaunch frame_transpose frame_transpose.launch
