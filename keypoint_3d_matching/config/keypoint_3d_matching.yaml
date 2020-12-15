@@ -1,5 +1,5 @@
 # body keypoints of interest
-points_of_interest: [4, 7]
+points_of_interest: [4, 5, 7]
 # enable pointcloud debug
 pointcloudEnable: false
 
