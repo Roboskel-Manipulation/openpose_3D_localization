@@ -1,7 +1,7 @@
 # body keypoints of interest
 points_of_interest: [4, 5, 7]
 # enable pointcloud debug
-pointcloudEnable: false
+pointcloudEnable: true
 
 # Openpose topic name
 human_list_topic: "/openpose_ros/human_list"

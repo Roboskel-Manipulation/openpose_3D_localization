@@ -2,9 +2,14 @@
 #include <std_msgs/Bool.h>
 #include <keypoint_3d_matching_msgs/Keypoint3d_list.h>
 
+#include <vector>
+
+#define TRANSLATION_SIZE 10
+
 float lWrist, lShoulder, threshold=0.02;
 std_msgs::Bool msg;
 ros::Publisher pub;
+std::vector<float> translations;
 
 void check_keypoints_placement_callback (const keypoint_3d_matching_msgs::Keypoint3d_list::ConstPtr keypoint_msg){
 	for (auto it = keypoint_msg->keypoints.begin(); it != keypoint_msg->keypoints.end(); ++it){
@@ -15,9 +20,18 @@ void check_keypoints_placement_callback (const keypoint_3d_matching_msgs::Keypoi
 			lShoulder = it->points.point.z;
 		}
 	}
-	ROS_INFO("%.3f, %.3f", lWrist, lShoulder);
-	if (lWrist != 0 and lShoulder != 0){
-		msg.data = lWrist - lShoulder > threshold ? true : false;
+	if (lWrist != 0 and lShoulder !=0){
+		translations.push_back(lWrist-lShoulder);
+		if (translations.size() > TRANSLATION_SIZE){
+			int neg=0;
+			for (auto c : translations){
+				if (c < 0)
+					neg += 1;
+			}
+			ROS_INFO("%d", neg);
+			msg.data = neg > 3 ? false : true;
+			translations.clear();
+		}
 	}
 	else{
 		msg.data = true;

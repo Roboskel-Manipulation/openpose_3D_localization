@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<launch>
+	<node name="check_keypoints_placement_node" type="check_keypoints_placement" pkg="check_keypoints_placement" respawn="false" output="log">
+	</node>
+</launch>
