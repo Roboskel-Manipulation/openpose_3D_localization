@@ -1,15 +1,15 @@
 # keypoint_3d_matching
 
-# Description
+## Description
 A ROS package which receives the OpenPose output (2D pixels) and the PointCloud  and produces the 3D coordinates of the Openpose points expressed in the camera frame. 
 
 - src/keypoint_3d_matching.cpp: Main functionality for the 3D matching
-- src/functions.cpp: Helful functions used by keypoint_3d_matching.cpp
+- src/functions.cpp: Helpful functions used by keypoint_3d_matching.cpp
 - config/keypoint_3d_matching.yaml: Parameters used by the keypoint_3d_matching ROS node
 - include/keypoint_3d_matching.h: Header files and variable declarations
 - launch/keypoint_3d_matching.launch: Launch file for keypoint_3d_matching ROS node
 
-# Configuration
+## Configuration
 - In <b>config/keypoint_3d_matching.yaml</b> specify:
 * `points_of_interest`: A list of integers that declares the keypoints for which the 3D coordinates will be produced. The mapping between keypoints and integers is declared in `include/keypoint_3d_matching.yaml` and is compatible with the respective Openpose mapping as stated [here](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/src/openpose/pose/poseParameters.cpp). 
 * `pointcloud_topic`: Topic of the pointcloud provided by your camera. 
@@ -17,7 +17,7 @@ A ROS package which receives the OpenPose output (2D pixels) and the PointCloud 
 * `pointcloudEnable: Flag for debugging (publishing to the `pointcloud_topic_debug`)
 * `image_sensor_frame`: Topic of the RGB images provided by your camera.
 
-# Run
+## Run
 - In a terminal run `roslaunch keypoint_3d_matching keypoint_3d_matching.launch`
 
 
