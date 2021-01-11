@@ -6,14 +6,14 @@ A collection of ROS catkin packages that utilize the OpenPose library from [here
 ## Dependencies
 This repo depends on:
 
-* https://github.com/firephinx/openpose_ros
-* https://github.com/ros-perception/ar_track_alvar
-* https://github.com/Roboskel-Manipulation/manos_vision
-* https://github.com/gstavrinos/tf_based_on_ar_marker
+* [Openpose wrapper](https://github.com/firephinx/openpose_ros)
+* [Ar marker tracker](https://github.com/ros-perception/ar_track_alvar)
+* [Camera utilities](https://github.com/Roboskel-Manipulation/manos_vision)
+* [Tf constructor](https://github.com/gstavrinos/tf_based_on_ar_marker)
 
 Note: The zed_wrapper package, which is also a dependency, has not been added to the package.xml, in order to allow for easier compilation. You will need to install it if you are planning to use a ZED camera.
 
-Note_2: Make sure to clone the version of Openpose so that the wrapper is compatible. More info in https://github.com/firephinx/openpose_ros.
+Note_2: Make sure to clone the version of Openpose so that the wrapper is compatible. More info in [here](https://github.com/firephinx/openpose_ros).
 
 ## Packages:
 * <b>keypoint_3d_matching</b>: Accepts Openpose pixels and a PointCloud and produces the 3D coordinates expressed in the camera frame.
