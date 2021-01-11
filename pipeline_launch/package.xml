@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>openpose_utils_launch</name>
+  <name>pipeline_launch</name>
   <version>0.0.1</version>
   <description>Collection of launch files, for the openpose_utils repository</description>
 

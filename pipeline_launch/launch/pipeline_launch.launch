@@ -38,7 +38,7 @@
   <!-- launch marker and frame transpose -->
   <group if="$(arg marker)">
     <!-- launch marker -->
-    <include file="$(find openpose_utils_launch)/launch/marker_setup.launch">
+    <include file="$(find pipeline_launch)/launch/marker_setup.launch">
     </include>
 
     <!-- launch frame transpose -->
