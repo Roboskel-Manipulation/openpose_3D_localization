@@ -14,5 +14,5 @@ image_sensor_frame: "/camera_rgb_optical_frame"
 # 3D points topic name
 keypoint_3d_matching_topic: "/keypoint_3d_matching"
 
-# neighborhood factor
+# pixel step for constructing the neighbourhood when averaging the depth values
 factor: 1
