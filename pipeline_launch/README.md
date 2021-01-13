@@ -1,4 +1,4 @@
 # pipeline_launch
 
-- pipeline_launch.launch: Launch file for camera driver, openpose_ros node, keypoint_3d_matching, marker_setup and frame_transpose
-- marker_setup.launch: Launch file to setup the marker and construct the tf tree
+* marker_setup.launch: Launches the ar_marker and construct the tf tree (customize for Roboskel setup).
+* pipeline_launch.launch: Launches the camera driver, openpose_ros node, keypoint_3d_matching, marker_setup and frame_transpose.
