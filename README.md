@@ -1,32 +1,28 @@
-# ROS packages for 3D keypoint estimation based on 2D Openpose pixels
+# openpose_3D_localization
 
 ## Description
-A collection of ROS catkin packages that utilize the OpenPose library from [here](https://github.com/CMU-Perceptual-Computing-Lab/openpose) in order to estimate the 3D position of the human in the space.
+A collection of ROS packages that estimates the 3D position of human body joints in a requested reference frame. It is based on  [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose) 2D joint information  
 
 ## Dependencies
 This repo depends on:
 
-* [Openpose wrapper](https://github.com/firephinx/openpose_ros)
-* [Ar marker tracker](https://github.com/ros-perception/ar_track_alvar)
+* [OpenPose wrapper](https://github.com/firephinx/openpose_ros)
+* [AR marker tracker](https://github.com/ros-perception/ar_track_alvar)
 * [Camera utilities](https://github.com/Roboskel-Manipulation/manos_vision)
-* [Tf constructor](https://github.com/gstavrinos/tf_based_on_ar_marker)
-
-Note: The zed_wrapper package, which is also a dependency, has not been added to the package.xml, in order to allow for easier compilation. You will need to install it if you are planning to use a ZED camera.
-
-Note_2: Make sure to clone the version of Openpose so that the wrapper is compatible. More info in [here](https://github.com/firephinx/openpose_ros).
+* [TF constructor](https://github.com/gstavrinos/tf_based_on_ar_marker)
 
 ## Packages:
-* <b>keypoint_3d_matching</b>: Accepts Openpose pixels and a PointCloud and produces the 3D coordinates expressed in the camera frame.
-* <b>keypoint_3d_matching_msgs</b>: Custom ROS mesages used by <b>keypoint_3d_matching</b>.
+* <b>keypoint_3d_matching</b>: A ROS package which matches the OpenPose output (2D pixels) to 3D PointCloud information. The output 3D coordinates are expressed in the camera frame.
+* <b>keypoint_3d_matching_msgs</b>: Custom ROS messages used by <b>keypoint_3d_matching</b>.
 * <b>frame_transpose</b>: Transforms points to a different reference frame.
 * <b>pipeline_launch</b>: Collection of launch files.
 
 ## Run
 * In a terminal run `roslaunch pipeline_launch pipeline_launch.launch`
 * Arguments:
-	* sim: True if using rosbags and false if using camera
-	* live_camera: True if running camera and false if using rosbag
-	* marker: True if using marker
+    * sim: Set [use_sim_time](http://wiki.ros.org/Clock) (True if playing running a rosbag. Make sure you play the rosbag including the --clock flag.)
+    * live_camera: True if running a camera
+    * marker: True if using marker
 
 ## System
 
