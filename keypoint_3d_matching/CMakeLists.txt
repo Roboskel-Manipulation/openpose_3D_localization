@@ -14,7 +14,12 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   keypoint_3d_matching_msgs
 )
-find_package(/usr/local/lib/OpenPose/OpenPose REQUIRED)
+
+find_package(CUDA REQUIRED) # Uncomment this line if you have trouble compiling
+find_package(OpenCV REQUIRED)
+find_package(GFlags)
+find_package(Glog)
+find_package(OpenPose REQUIRED)
 
 catkin_package(
    INCLUDE_DIRS include
