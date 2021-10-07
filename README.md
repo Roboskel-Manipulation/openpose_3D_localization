@@ -6,7 +6,7 @@ A collection of ROS packages that estimates the 3D position of human body joints
 ## Dependencies
 This repo depends on:
 
-* [OpenPose wrapper](https://github.com/firephinx/openpose_ros)
+* [OpenPose wrapper](https://github.com/firephinx/openpose_ros) (compatible with commit 7635674)
 * [AR marker tracker](https://github.com/ros-perception/ar_track_alvar)
 * [Camera utilities](https://github.com/Roboskel-Manipulation/manos_vision)
 * [TF constructor](https://github.com/gstavrinos/tf_based_on_ar_marker)
